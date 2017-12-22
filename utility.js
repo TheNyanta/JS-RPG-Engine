@@ -11,3 +11,9 @@ function i2xy(index,mapWidth) {
     return [x,y];
 }
 
+function DisableScrollbar() {
+    document.documentElement.style.overflow = 'hidden';
+    document.body.scoll = "no";
+}
+
+

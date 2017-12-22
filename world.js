@@ -1,16 +1,17 @@
-var World = function(w, h) {
-    this.mx = 0;
-    this.my = 0;
-    this.width = w;
-    this.height = h;
-    this.map = 0;
-    this.draw = function() {
-        for (var y = 0; y < this.height; y++) {
-            for (var x = 0; x < this.width; x++) {
-                var id = this.map[x + (y * this.width)];
-                if (id === 0) continue;
-                sprites[id].draw(this.mx + (x * BLOCK_W), this.my + (y * BLOCK_H));
-            }
+function DrawMap()
+{
+    mapIndex = 0;
+
+    for (var y = 0; y < 10; y++)
+    {
+        for (var x = 0; x < 10; x++, mapIndex++)
+        {
+            var tile_x = x * BLOCK_W;
+            var tile_y = y * BLOCK_H;
+            var tileType = map[mapIndex];
+            if (tileType == 0) water.draw(tile_x, tile_y);
+            else
+                wall.draw(tile_x, tile_y);
         }
     }
 }

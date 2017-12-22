@@ -4,9 +4,12 @@
         <script src="utility.js" type="text/javascript"></script>
         <script src="jquery-3.2.1.js" type="text/javascript"></script>
         <script src="canvas.js" type="text/javascript"></script>
+        <script src="animate.js" type="text/javascript"></script>
+        <script src="spritesheet.js" type="text/javascript"></script>
         <script src="sprite.js" type="text/javascript"></script>
         <script src="world.js" type="text/javascript"></script>
-        <script src="keyboard.js" type="text/javascript"></script>        
+        <script src="keyboard.js" type="text/javascript"></script>
+        <script src="mouse.js" type="text/javascript"></script>
         
         <script language = "javascript">
             
@@ -19,6 +22,11 @@
             var char_y = 32;
             var speed = 5;
             
+            var dog_x = 32;
+            var dog_y = 32;
+            
+            var rotwise = 1;
+            
             var tilemapWidth = 10;
             var tileMapHeight = 10;
             
@@ -26,7 +34,15 @@
             var water = new Sprite("water.png");
             
             var character = new Sprite("char.png");
-            //var char2 = new Sprite("char.png");
+            
+            var dog = new Sprite("dog-sprite-sheet.png");
+            var dog_is_moving = false;
+            var dog_direction = 0;
+            
+            var audio = new Audio('banana-phone.m4a');
+            //audio.play();
+            
+            
             
             var map = [0,0,0,0,0,0,0,0,0,0,
                        0,0,1,1,1,1,0,0,0,0,
@@ -46,91 +62,106 @@
                 Context = new HTML("game", 640, 480);
                 
                 InitializeKeyboard();
+                
+                //InitializeMouse();
+                
+                DisableScrollbar();
+                
+                InitalizeAnimationCounters();
             });
             
             $(window).on('load', function () {
                 
             });
             
-            /*
-            //Prints out the code for any currently pressed key
-            $("body").keyup(function(event){
-                console.log("event.keyCode=" + event.keyCode);
-            });
-            */
-            
             setInterval(function() {
                 
-                // Draw Tile Map
-                mapIndex = 0;
+                ResetAnimationCounter();
                 
-                for (var y = 0; y < tileMapHeight; y++) {
-                    for(var x = 0; x < tilemapWidth; x++, mapIndex++) {
-                        var tile_x = x * BLOCK_W;
-                        var tile_y = y * BLOCK_H;
-                        
-                        var tileType = map[mapIndex];
-                        
-                        if (tileType == 0) {
-                            water.draw(tile_x, tile_y);
-                        }
-                        else {
-                            wall.draw(tile_x, tile_y);
-                        }
-                    }
-                }
-                //console.log(kstate[1]);
-                if (kstate[0]) {
-                    
+                DrawMap();
+                
+                dog_is_moving = false;
+                
+                dog_direction = 0;
+                
+                if (key.enter) {
+                    if (rotwise == 1)
+                        rotwise = -1;
+                    else rotwise = 1;
                 }                    
-                if (kstate[1]) {
-                    //KEY 'UP'
-                    char_y -= speed;
-                    if (char_y < -12) {
-                        char_y = -12;
+                if (key.up || key.w) {
+                    dog_y -= speed;
+                    if (dog_y < -12) {
+                        dog_y = -12;
                     }
+                    dog_direction |= DIR_N;
+                    dog_is_moving = true;
                 }
-                if (kstate[2]) {
-                    //KEY 'DOWN'
-                    char_y += speed;
-                    if (char_y > 416) {
-                        char_y = 416;
+                if (key.down || key.s) {
+                    dog_y += speed;
+                    if (dog_y > 416) {
+                        dog_y = 416;
                     }
+                    dog_direction |= DIR_S;
+                    dog_is_moving = true;
                 }
-                if (kstate[3]) {
-                    //KEY 'LEFT'
-                    char_x -= speed;
-                    if (char_x < -16) {
-                        char_x = -16;
+                if (key.left || key.a) {
+                    dog_x -= speed;
+                    if (dog_x < -16) {
+                        dog_x = -16;
                     }
+                    dog_direction |= DIR_W;
+                    dog_is_moving = true;
                 }
-                if (kstate[4]) {
-                    //KEY 'RIGHT'
-                    char_x += speed;
-                    if (char_x > 576) {
-                        char_x = 576;
+                if (key.right || key.d) {
+                    dog_x += speed;
+                    if (dog_x > 576) {
+                        dog_x = 576;
                     }
+                    dog_direction |= DIR_E;
+                    dog_is_moving = true;
                 }
-                if (kstate[11]) {
-                    //KEY '+'
+                if (key.plus) {
                     speed++;
                     if (speed > 10) {
                         speed = 10;
                     }
                 }
-                if (kstate[12]) {
-                    //KEY '-'
+                if (key.minus) {
                     speed--;
                     if (speed < 1) {
                         speed = 1;
                     }
                 }
+                if (key.esc) {
+                    audio.play();
+                }
                 
                 // Animated characters
-                character.drawAnimated(char_x,char_y, [0,13,26,39]);
-                //character.drawAnimated(char_x,char_y, [0,1,2,3,4,5,6]);
-                //char2.drawAnimated(126, 126, [26,27,28,29,30,31,32]);
-                
+            var dog_seq = 0;
+
+            if (dog_is_moving)
+            {
+                if (dog_direction & DIR_W) dog_seq = [33,34,35,36];
+                if (dog_direction & DIR_E) dog_seq = [1,2,3,4];
+                if (dog_direction & DIR_N) dog_seq = [49,50,51,52];
+                if (dog_direction & DIR_S) dog_seq = [17,18,19,20];
+                if (dog_direction & DIR_N && dog_direction & DIR_E) dog_seq = [57,58,59,60];
+                if (dog_direction & DIR_N && dog_direction & DIR_W) dog_seq = [41,42,43,44];
+                if (dog_direction & DIR_S && dog_direction & DIR_E) dog_seq = [9,10,11,12];
+                if (dog_direction & DIR_S && dog_direction & DIR_W) dog_seq = [25,26,27,28];
+
+                // Finally, animate the dog.
+                dog.draw(dog_x, dog_y, dog_seq);
+            }
+            else
+            {
+                dog.draw(dog_x, dog_y, 0);
+            }
+                // Animated characters
+                //character.draw(char_x,char_y, [1,2,3,4]);
+                //character.drawAnimated(mouseX,mouseY, [0,13,26,39]);
+                //char2.drawAnimated(126, 126, [26,27,28,29,30,31,32]);                
                 
             }, framerate);
         
