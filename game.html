@@ -1,0 +1,146 @@
+<html>
+    <head>
+        <title>RPG GAME</title>
+        <script src="utility.js" type="text/javascript"></script>
+        <script src="jquery-3.2.1.js" type="text/javascript"></script>
+        <script src="canvas.js" type="text/javascript"></script>
+        <script src="sprite.js" type="text/javascript"></script>
+        <script src="world.js" type="text/javascript"></script>
+        <script src="keyboard.js" type="text/javascript"></script>        
+        
+        <script language = "javascript">
+            
+            var Context = null;
+            var framerate = 24;
+            var BLOCK_W = 32;
+            var BLOCK_H = 32;
+            
+            var char_x = 64;
+            var char_y = 32;
+            var speed = 5;
+            
+            var tilemapWidth = 10;
+            var tileMapHeight = 10;
+            
+            var wall = new Sprite("wall.png");
+            var water = new Sprite("water.png");
+            
+            var character = new Sprite("char.png");
+            //var char2 = new Sprite("char.png");
+            
+            var map = [0,0,0,0,0,0,0,0,0,0,
+                       0,0,1,1,1,1,0,0,0,0,
+                       0,0,1,1,1,1,0,0,0,0,
+                       0,0,1,1,0,0,0,0,0,0,
+                       0,0,1,1,1,0,0,0,0,0,
+                       0,0,0,1,1,1,0,0,0,0,
+                       0,0,0,0,1,1,1,0,0,0,
+                       0,0,0,0,0,1,1,0,0,0,
+                       0,0,0,0,0,0,0,0,0,0,
+                       0,0,0,0,0,0,0,0,0,0 ];
+            
+            var mapIndex = 0;
+            
+            $(document).ready(function() {
+                
+                Context = new HTML("game", 640, 480);
+                
+                InitializeKeyboard();
+            });
+            
+            $(window).on('load', function () {
+                
+            });
+            
+            /*
+            //Prints out the code for any currently pressed key
+            $("body").keyup(function(event){
+                console.log("event.keyCode=" + event.keyCode);
+            });
+            */
+            
+            setInterval(function() {
+                
+                // Draw Tile Map
+                mapIndex = 0;
+                
+                for (var y = 0; y < tileMapHeight; y++) {
+                    for(var x = 0; x < tilemapWidth; x++, mapIndex++) {
+                        var tile_x = x * BLOCK_W;
+                        var tile_y = y * BLOCK_H;
+                        
+                        var tileType = map[mapIndex];
+                        
+                        if (tileType == 0) {
+                            water.draw(tile_x, tile_y);
+                        }
+                        else {
+                            wall.draw(tile_x, tile_y);
+                        }
+                    }
+                }
+                //console.log(kstate[1]);
+                if (kstate[0]) {
+                    
+                }                    
+                if (kstate[1]) {
+                    //KEY 'UP'
+                    char_y -= speed;
+                    if (char_y < -12) {
+                        char_y = -12;
+                    }
+                }
+                if (kstate[2]) {
+                    //KEY 'DOWN'
+                    char_y += speed;
+                    if (char_y > 416) {
+                        char_y = 416;
+                    }
+                }
+                if (kstate[3]) {
+                    //KEY 'LEFT'
+                    char_x -= speed;
+                    if (char_x < -16) {
+                        char_x = -16;
+                    }
+                }
+                if (kstate[4]) {
+                    //KEY 'RIGHT'
+                    char_x += speed;
+                    if (char_x > 576) {
+                        char_x = 576;
+                    }
+                }
+                if (kstate[11]) {
+                    //KEY '+'
+                    speed++;
+                    if (speed > 10) {
+                        speed = 10;
+                    }
+                }
+                if (kstate[12]) {
+                    //KEY '-'
+                    speed--;
+                    if (speed < 1) {
+                        speed = 1;
+                    }
+                }
+                
+                // Animated characters
+                character.drawAnimated(char_x,char_y, [0,13,26,39]);
+                //character.drawAnimated(char_x,char_y, [0,1,2,3,4,5,6]);
+                //char2.drawAnimated(126, 126, [26,27,28,29,30,31,32]);
+                
+                
+            }, framerate);
+        
+        </script>
+    </head>
+
+
+    <body>
+        
+        <canvas id="game"></canvas>
+        
+    </body>    
+</html>
