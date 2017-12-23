@@ -1,4 +1,4 @@
-var Sprite = function(fn, spriteWidth, spriteHeight) {
+var Sprite = function(fn, spriteWidth, spriteHeight, spritesX,spritesY) {
 
     this.TO_RADIANS = Math.PI/180;
     this.image = null;
@@ -8,6 +8,8 @@ var Sprite = function(fn, spriteWidth, spriteHeight) {
     
     this.spriteWidth = spriteWidth;
     this.spriteHeight = spriteHeight;
+    this.spritesX = spritesX;
+    this.spritesY = spritesY;
 
     this.load = function(filename) { this.image = new Image(); this.image.src = filename; return this; };
     this.to_pattern = function(x_times) { this.pattern_x_times = x_times; this.pattern = Context.context.createPattern(this.image, 'repeat'); this.is_pattern = true; };
@@ -59,7 +61,7 @@ var Sprite = function(fn, spriteWidth, spriteHeight) {
 
         // If various is a single numeric frame id
         if ($.isNumeric(various) && various >= 0) {
-            var res = i2xy(various, 8);
+            var res = i2xy(various, spritesX);
             Context.context.drawImage(this.image, res[0]*spriteWidth, res[1]*spriteHeight, spriteWidth, spriteHeight, x, y, spriteWidth, spriteHeight);
         } else
 

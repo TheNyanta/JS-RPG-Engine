@@ -21,8 +21,8 @@
             var Context = null;
             var framerate = 24;
             
-            var canvasWidth = 3200;
-            var canvasHeight = 2880;
+            var canvasWidth = 320;
+            var canvasHeight = 288;
             
             var char_x = 16;
             var char_y = 16;
@@ -32,11 +32,11 @@
             var sprite_width = 24;
             var sprite_height = 32;
             
-            var stone = new Sprite("ChipSet/stone.png", 16, 16);
-            var grass = new Sprite("ChipSet/grass.png", 16, 16);
-            var bergwald = new Sprite("ChipSet/bergwald.png", 16, 16);
+            var stone = new Sprite("ChipSet/stone.png", 16, 16, 1, 1);
+            var grass = new Sprite("ChipSet/grass.png", 16, 16, 1, 1);
+            var bergwald = new Sprite("ChipSet/bergwald.png", 16, 16, 30, 16);
             
-            var character = new Sprite("CharSet/character.png", 24, 32);
+            var character = new Sprite("CharSet/character.png", 24, 32, 8, 12);
             var character_is_moving = false;
             var character_direction = 0;
             var character_look = 0;
@@ -64,7 +64,7 @@
             setInterval(function() {
                 // Backgorund: White Canvas, TODO: Implement (moving) background image
                 var whiteCanvas = new Rectangle(0, 0, canvasWidth, canvasHeight);
-                //whiteCanvas.draw('white');
+                whiteCanvas.draw('white');
                 
                 var char_collision_box = new Rectangle(char_x, char_y, sprite_width, sprite_height);
                 
@@ -91,15 +91,14 @@
                 ResetAnimationCounter();
 
                 //DrawMap();
-                bergwald.draw(0, 0, 1)
                 
-                mapIndex = 0;        
-                for (var y = 0; y < bergwaldHeight; y++) {
-                    for (var x = 0; x < bergwaldWidth; x++, mapIndex++) {
+                
+                var bMapIndex = 0;        
+                for (var y = 0; y < 20; y++) {
+                    for (var x = 0; x < 20; x++, bMapIndex++) {
                         var tile_x = x * 16;
-                        var tile_y = y * 16;
-                        var res = i2xy(bergwaldMap[mapIndex], 30);
-                        bergwald.draw(tile_x, tile_y, res);
+                        var tile_y = y * 16
+                        bergwald.draw(tile_x, tile_y, bergwaldMap[bMapIndex]);
                     }
                 }
                 
@@ -122,8 +121,8 @@
                 }
                 else if (key.down || key.s) {
                     char_y += speed;
-                    if (char_y > 288-32) {
-                        char_y = 288-32;
+                    if (char_y > canvasHeight-32) {
+                        char_y = canvasHeight-32;
                     }
                     character_direction |= DIR_S;
                     character_look = DIR_S;
@@ -140,8 +139,8 @@
                 }
                 else if (key.right || key.d) {
                     char_x += speed;
-                    if (char_x > 320-20) {
-                        char_x = 320-20;
+                    if (char_x > canvasWidth-20) {
+                        char_x = canvasWidth-20;
                     }
                     character_direction |= DIR_E;
                     character_look = DIR_E;
@@ -185,6 +184,7 @@
                     if (character_look == DIR_E) char_look = 9;     
                     if (character_look == DIR_N) char_look = 1;
                     if (character_look == DIR_S) char_look = 17;
+                    
                     character.draw(char_x, char_y, char_look);
                 } 
                 
