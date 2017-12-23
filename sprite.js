@@ -53,7 +53,7 @@ var Sprite = function(fn) {
         // If various is a single numeric frame id
         if ($.isNumeric(various) && various >= 0) {
             var res = i2xy(various, 8);
-            Context.context.drawImage(this.image, res[0]*32, res[1]*32, 32, 32, x, y, 32, 32);
+            Context.context.drawImage(this.image, res[0]*sprite_width, res[1]*sprite_height, sprite_width, sprite_height, x, y, sprite_width, sprite_height);
         } else
 
         // if various is Animation Sequence - an array like [1,2,3,4] or [17,18,19,20];
@@ -67,7 +67,7 @@ var Sprite = function(fn) {
                 AnimationCounter[AnimationCounterIndex].animationCurrentFrame = various[AnimationCounter[AnimationCounterIndex].animationIndexCounter];
             }
             var res = i2xy(AnimationCounter[AnimationCounterIndex].animationCurrentFrame, 8);
-            Context.context.drawImage(this.image, res[0]*32, res[1]*32, 32, 32, x, y, 32, 32);
+            Context.context.drawImage(this.image, res[0]*sprite_width, res[1]*sprite_height, sprite_width, sprite_height, x, y, sprite_width, sprite_height);
 
             AnimationCounterIndex++;
         }
@@ -88,9 +88,9 @@ var Sprite = function(fn) {
         Context.context.save();
         Context.context.translate(x+16, y+16);    // Translate sprite to its center
         Context.context.rotate(angle * this.TO_RADIANS);    // Rotate sprite around its center
-        Context.context.drawImage(this.image, res[0]*32, res[1]*32, 32, 32,
+        Context.context.drawImage(this.image, res[0]*sprite_width, res[1]*sprite_height, sprite_width, sprite_height,
             -16, -16,                         // Translate sprite back to its original position
-            32, 32);
+            sprite_width, sprite_height);
         Context.context.restore();
 
         AnimationCounterIndex++;
