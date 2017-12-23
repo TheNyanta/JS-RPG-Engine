@@ -9,9 +9,9 @@ function DrawMap()
             var tile_x = x * BLOCK_W;
             var tile_y = y * BLOCK_H;
             var tileType = map[mapIndex];
-            if (tileType == 0) water.draw(tile_x, tile_y);
+            if (tileType == 0) grass.draw(tile_x, tile_y);
             else
-                wall.draw(tile_x, tile_y);
+                stone.draw(tile_x, tile_y);
         }
     }
 }
