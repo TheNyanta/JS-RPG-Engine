@@ -13,16 +13,16 @@
         <script src="mouse.js" type="text/javascript"></script>
         <script src="point.js" type="text/javascript"></script>
         <script src="vector.js" type="text/javascript"></script>
-        <script src="segment.js" type="text/javascript"></script>
-        <script src="rectangle.js" type="text/javascript"></script>
+        <script src="segment.js" type="application/javascript"></script>
+        <script src="rectangle.js" type="application/javascript"></script>
         
         <script language = "javascript">
             
             var Context = null;
             var framerate = 24;
             
-            var canvasWidth = 3200;
-            var canvasHeight = 2880;
+            var canvasWidth = 320;
+            var canvasHeight = 288;
             
             var char_x = 16;
             var char_y = 16;
@@ -34,15 +34,14 @@
             
             var stone = new Sprite("ChipSet/stone.png", 16, 16);
             var grass = new Sprite("ChipSet/grass.png", 16, 16);
-            var bergwald = new Sprite("ChipSet/bergwald.png", 16, 16);
             
             var character = new Sprite("CharSet/character.png", 24, 32);
             var character_is_moving = false;
             var character_direction = 0;
             var character_look = 0;
             
-            var audio1 = new Audio('Music/banana-phone.m4a');
-            var audio2 = new Audio('Music/Forest.m4a');
+            var audio = new Audio('Music/banana-phone.m4a');
+            //var audio = new Audio('Music/Forest.m4a');
             
             
             $(document).ready(function() {
@@ -62,46 +61,23 @@
             $(window).on('load', function () { });
             
             setInterval(function() {
-                // Backgorund: White Canvas, TODO: Implement (moving) background image
-                var whiteCanvas = new Rectangle(0, 0, canvasWidth, canvasHeight);
-                //whiteCanvas.draw('white');
-                
                 var char_collision_box = new Rectangle(char_x, char_y, sprite_width, sprite_height);
+                 
+                var whiteCanvas = new Rectangle(0, 0, canvasWidth, canvasHeight);
+                whiteCanvas.draw('white');
                 
-                var rect1 = new Rectangle(100, 100, 50, 50);
-                rect1.draw('blue', true, 'blue',false);
+                var rect = new Rectangle(100, 100, 50, 50);
+                rect.draw('blue', true, 'blue',false);
                 
-                if (char_collision_box.rectInside(rect1)) {
-                    rect1.draw('red',true,'red',false);
-                    audio1.play();
+                if (char_collision_box.rectInside(rect)) {
+                    rect.draw('red',true,'red',false);
+                    audio.play();
                 }
-                else
-                    audio1.pause();
-                
-                var rect2 = new Rectangle(200, 100, 50, 50);
-                rect2.draw('green', true, 'green',false);
-                
-                if (char_collision_box.rectInside(rect2)) {
-                    rect2.draw('red',true,'red',false);
-                    audio2.play();
-                }
-                else
-                    audio2.pause();
+                else audio.pause();
                 
                 ResetAnimationCounter();
 
                 //DrawMap();
-                bergwald.draw(0, 0, 1)
-                
-                mapIndex = 0;        
-                for (var y = 0; y < bergwaldHeight; y++) {
-                    for (var x = 0; x < bergwaldWidth; x++, mapIndex++) {
-                        var tile_x = x * 16;
-                        var tile_y = y * 16;
-                        var res = i2xy(bergwaldMap[mapIndex], 30);
-                        bergwald.draw(tile_x, tile_y, res);
-                    }
-                }
                 
                 character_is_moving = false;
                 
@@ -187,7 +163,8 @@
                     if (character_look == DIR_S) char_look = 17;
                     character.draw(char_x, char_y, char_look);
                 } 
-                
+                // Show a the collision box around the character 
+                char_collision_box.draw('black',false,'black',true)
                 
             }, framerate);
         

@@ -1,10 +1,13 @@
-var Sprite = function(fn) {
+var Sprite = function(fn, spriteWidth, spriteHeight) {
 
     this.TO_RADIANS = Math.PI/180;
     this.image = null;
     this.is_pattern = false;
     this.pattern = null;
     this.pattern_x_times = 0;
+    
+    this.spriteWidth = spriteWidth;
+    this.spriteHeight = spriteHeight;
 
     this.load = function(filename) { this.image = new Image(); this.image.src = filename; return this; };
     this.to_pattern = function(x_times) { this.pattern_x_times = x_times; this.pattern = Context.context.createPattern(this.image, 'repeat'); this.is_pattern = true; };
@@ -39,7 +42,11 @@ var Sprite = function(fn) {
 
     // Normal draw
     this.drawOldVersion = function(x, y) {
-        Context.context.drawImage(this.image, x, y, BLOCK_W, BLOCK_H);
+        Context.context.drawImage(this.image, x, y, spriteWidth, spriteHeight);
+    };
+    
+    this.drawMap = function(x, y, index) {
+                Context.context.drawImage(this.image, res[0]*16, res[1]*16, 16, 16, tile_x, tile_y, 16, 16);         
     };
 
     this.draw = function(x, y, various)
@@ -47,13 +54,13 @@ var Sprite = function(fn) {
         // Draw regular sprite
         if (various == undefined)
         {
-            Context.context.drawImage(this.image, x, y, BLOCK_W, BLOCK_H);
+            Context.context.drawImage(this.image, x, y, spriteWidth, spriteHeight);
         } else
 
         // If various is a single numeric frame id
         if ($.isNumeric(various) && various >= 0) {
             var res = i2xy(various, 8);
-            Context.context.drawImage(this.image, res[0]*sprite_width, res[1]*sprite_height, sprite_width, sprite_height, x, y, sprite_width, sprite_height);
+            Context.context.drawImage(this.image, res[0]*spriteWidth, res[1]*spriteHeight, spriteWidth, spriteHeight, x, y, spriteWidth, spriteHeight);
         } else
 
         // if various is Animation Sequence - an array like [1,2,3,4] or [17,18,19,20];
@@ -67,7 +74,7 @@ var Sprite = function(fn) {
                 AnimationCounter[AnimationCounterIndex].animationCurrentFrame = various[AnimationCounter[AnimationCounterIndex].animationIndexCounter];
             }
             var res = i2xy(AnimationCounter[AnimationCounterIndex].animationCurrentFrame, 8);
-            Context.context.drawImage(this.image, res[0]*sprite_width, res[1]*sprite_height, sprite_width, sprite_height, x, y, sprite_width, sprite_height);
+            Context.context.drawImage(this.image, res[0]*spriteWidth, res[1]*spriteHeight, spriteWidth, spriteHeight, x, y, spriteWidth, spriteHeight);
 
             AnimationCounterIndex++;
         }
@@ -88,9 +95,9 @@ var Sprite = function(fn) {
         Context.context.save();
         Context.context.translate(x+16, y+16);    // Translate sprite to its center
         Context.context.rotate(angle * this.TO_RADIANS);    // Rotate sprite around its center
-        Context.context.drawImage(this.image, res[0]*sprite_width, res[1]*sprite_height, sprite_width, sprite_height,
+        Context.context.drawImage(this.image, res[0]*spriteWidth, res[1]*spriteHeight, spriteWidth, spriteHeight,
             -16, -16,                         // Translate sprite back to its original position
-            sprite_width, sprite_height);
+            spriteWidth, spriteHeight);
         Context.context.restore();
 
         AnimationCounterIndex++;
