@@ -1,0 +1,160 @@
+<html>
+    <head>
+        <title>Sprite Test</title>
+        <script src="utility.js" type="text/javascript"></script>
+        <script src="jquery-3.2.1.js" type="text/javascript"></script>
+        <script src="canvas.js" type="text/javascript"></script>
+        <script src="maps.js" type="text/javascript"></script>
+        <script src="animate.js" type="text/javascript"></script>
+        <script src="spritesheet.js" type="text/javascript"></script>
+        <script src="sprite.js" type="text/javascript"></script>
+        <script src="world.js" type="text/javascript"></script>
+        <script src="keyboard.js" type="text/javascript"></script>
+        <script src="mouse.js" type="text/javascript"></script>
+        <script src="point.js" type="text/javascript"></script>
+        <script src="vector.js" type="text/javascript"></script>
+        <script src="segment.js" type="text/javascript"></script>
+        <script src="rectangle.js" type="text/javascript"></script>
+        
+        <script language = "javascript">
+            
+            var Context = null;
+            var framerate = 24;
+            
+            var canvasWidth = 480;
+            var canvasHeight = 360;
+            
+            var rel_x = 4;
+            var rel_y = 0;
+            
+            var char_x = 16;
+            var char_y = 16;
+            
+            var speed = 2;
+                     
+            var sprite_width = 24;
+            var sprite_height = 32;
+            
+            var stone = new Sprite("ChipSet/stone.png", 16, 16, 1, 1);
+            var grass = new Sprite("ChipSet/grass.png", 16, 16, 1, 1);            
+            var bergwald = new Sprite("ChipSet/bergwald.png", 16, 16, 30, 16);
+            
+            var panorama = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
+            
+            var character = new Sprite("CharSet/Mannschgerl.png", 320, 360, 3, 1);
+            var move_character_enabled = true;
+            
+            var audio1 = new Audio('Music/banana-phone.m4a');
+            var audio2 = new Audio('Music/Forest.m4a');
+            
+            var mouse_x = 0;
+            var mouse_y = 0;
+            
+            $(document).ready(function() {
+                
+                Context = new HTML("game", canvasWidth, canvasHeight);
+                
+                // Easy access to grafics (gfx)
+                window.gfx = Context.context;
+                
+                InitializeKeyboard();
+                
+                DisableScrollbar();
+                
+                InitalizeAnimationCounters();
+            });
+            
+            $(window).on('load', function () { });
+            
+            setInterval(function() {
+                // Background: TODO: Implement moving background
+                // Stretch panorama to canavas size for a background
+                panorama.draw2(0, 0, canvasWidth, canvasHeight);
+                
+                ResetAnimationCounter();
+                
+                // <if else> for four direction movement
+                if (move_character_enabled) {
+                    if (key.up || key.w) {
+                        char_y -= speed;
+                        if (char_y < -16) {
+                            char_y = -16;
+                        }
+                        character_direction |= DIR_N;
+                        character_look = DIR_N;
+                        character_is_moving = true;
+                    }
+                    if (key.down || key.s) {
+                        char_y += speed;
+                        if (char_y > canvasHeight-32) {
+                            char_y = canvasHeight-32;
+                        }
+                        character_direction |= DIR_S;
+                        character_look = DIR_S;
+                        character_is_moving = true;
+                    }
+                    if (key.left || key.a) {
+                        char_x -= speed;
+                        if (char_x < -4) {
+                            char_x = -4;
+                        }
+                        character_direction |= DIR_W;
+                        character_look = DIR_W;
+                        character_is_moving = true;
+                    }
+                    if (key.right || key.d) {
+                        char_x += speed;
+                        if (char_x > canvasWidth-20) {
+                            char_x = canvasWidth-20;
+                        }
+                        character_direction |= DIR_E;
+                        character_look = DIR_E;
+                        character_is_moving = true;
+                    }
+                }
+                if (key.plus) {
+                    speed++;
+                    if (speed > 10) {
+                        speed = 10;
+                    }
+                }
+                if (key.minus) {
+                    speed--;
+                    if (speed < 1) {
+                        speed = 1;
+                    }
+                }
+                if (key.o) {
+                    // Mouse position
+                    console.log("mouse_x: " +mouse_x+", mouse_y" +mouse_y);
+                }
+                
+                if (key.p) {
+                    // Position debug
+                    console.log("char_x: " +char_x+", char_y" +char_y);
+                }                
+                
+                // Animated characters
+                var char_seq = 0;
+                
+                if (character_is_moving) {
+                    char_seq = [1,2];
+                    
+                    character.draw(char_x, char_y, char_seq);
+                }
+                else
+                    character.draw(char_x, char_y, 0);
+                
+                
+            }, framerate);
+        
+        </script>
+    </head>
+
+
+    <body>
+        
+        <canvas id="game"></canvas>
+        
+    </body>    
+</html>
