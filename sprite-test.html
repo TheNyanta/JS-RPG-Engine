@@ -37,7 +37,7 @@
             
             var panorama = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
             
-            var character = new Sprite("CharSet/Mannschgerl.png", 320, 360, 3, 1);
+            var character = new Sprite("CharSet/Mannschgerl.png", 320, 360, 3, 3);
             var move_character_enabled = true;
             var character_is_moving = false;
             
@@ -74,8 +74,6 @@
                         if (char_y < -16) {
                             char_y = -16;
                         }
-                        character_direction |= DIR_N;
-                        character_look = DIR_N;
                         character_is_moving = true;
                     }
                     if (key.down || key.s) {
@@ -83,8 +81,6 @@
                         if (char_y > canvasHeight-32) {
                             char_y = canvasHeight-32;
                         }
-                        character_direction |= DIR_S;
-                        character_look = DIR_S;
                         character_is_moving = true;
                     }
                     if (key.left || key.a) {
@@ -92,8 +88,6 @@
                         if (char_x < -4) {
                             char_x = -4;
                         }
-                        character_direction |= DIR_W;
-                        character_look = DIR_W;
                         character_is_moving = true;
                     }
                     if (key.right || key.d) {
@@ -101,8 +95,6 @@
                         if (char_x > canvasWidth-20) {
                             char_x = canvasWidth-20;
                         }
-                        character_direction |= DIR_E;
-                        character_look = DIR_E;
                         character_is_moving = true;
                     }
                 }
@@ -132,7 +124,7 @@
                 var char_seq = 0;
                 
                 if (character_is_moving) {
-                    char_seq = [1,2];
+                    char_seq = [0,1,2];
                     
                     character.draw(char_x, char_y, char_seq);
                 }
