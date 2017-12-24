@@ -21,8 +21,11 @@
             var Context = null;
             var framerate = 24;
             
-            var canvasWidth = 480;//320;
-            var canvasHeight = 256;//288;
+            var canvasWidth = 480;
+            var canvasHeight = 360;
+            
+            var rel_x = 4;
+            var rel_y = 0;
             
             var char_x = 16;
             var char_y = 16;
@@ -33,17 +36,22 @@
             var sprite_height = 32;
             
             var stone = new Sprite("ChipSet/stone.png", 16, 16, 1, 1);
-            var grass = new Sprite("ChipSet/grass.png", 16, 16, 1, 1);
+            var grass = new Sprite("ChipSet/grass.png", 16, 16, 1, 1);            
             var bergwald = new Sprite("ChipSet/bergwald.png", 16, 16, 30, 16);
+            
+            var panorama = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
             
             var character = new Sprite("CharSet/character.png", 24, 32, 8, 12);
             var character_is_moving = false;
             var character_direction = 0;
             var character_look = 0;
+            var move_character_enabled = true;
             
             var audio1 = new Audio('Music/banana-phone.m4a');
             var audio2 = new Audio('Music/Forest.m4a');
             
+            var mouse_x = 0;
+            var mouse_y = 0;
             
             $(document).ready(function() {
                 
@@ -62,9 +70,9 @@
             $(window).on('load', function () { });
             
             setInterval(function() {
-                // Backgorund: White Canvas, TODO: Implement (moving) background image
-                var whiteCanvas = new Rectangle(0, 0, canvasWidth, canvasHeight);
-                whiteCanvas.draw('white');
+                // Background: TODO: Implement moving background
+                // Stretch panorama to canavas size for a background
+                panorama.draw2(0, 0, canvasWidth, canvasHeight);
                 
                 var char_collision_box = new Rectangle(char_x, char_y, sprite_width, sprite_height);
                 
@@ -72,11 +80,11 @@
                 
                 // Draw Map from a single spritesheet + indexMap 
                 var bMapIndex = 0;        
-                for (var y = 0; y < 22; y++) {
-                    for (var x = 0; x < 22; x++, bMapIndex++) {
-                        var tile_x = x * 16;
-                        var tile_y = y * 16;
-                        bergwald.draw(tile_x, tile_y, map[bMapIndex]-1);
+                for (var h = 0; h < 22; h++) {
+                    for (var w = 0; w < 22; w++, bMapIndex++) {
+                        var tile_w = (w + rel_x) * 16;
+                        var tile_h = (h + rel_y) * 16;
+                        bergwald.draw(tile_w, tile_h, map[bMapIndex]-1);
                     }
                 }
                 
@@ -91,58 +99,88 @@
                     audio1.pause();
                 
                 var rect2 = new Rectangle(200, 100, 10, 10);
-                rect2.draw('green', true, 'green',false);
+                rect2.draw('green',true,'green',false);
                 
                 if (char_collision_box.rectInside(rect2)) {
-                    rect2.draw('red',true,'yellow',false);
+                    rect2.draw('yellow',true,'yellow',false);
                     audio2.play();
                 }
                 else
                     audio2.pause();
                 
+                
+                var mouseRect = new Rectangle(mouse_x, mouse_y, 25, 25);
+                mouseRect.draw('white', true, 'blue',false);
+                
                 character_is_moving = false;
                 
                 character_direction = 0;
                 
+                // Pseudo gravity
+                if (char_x < 44) {
+                    move_character_enabled = false;
+                    if (char_y < 320)
+                        char_y = char_y + 4;
+                    else 
+                        move_character_enabled = true;
+                }                    
+                else if (char_x > 410) {
+                    move_character_enabled = false;
+                    if (char_y < 320)
+                        char_y = char_y + 4;
+                    else
+                        move_character_enabled = true;
+                }
+                else if (char_y < 40) {
+                    move_character_enabled = false;
+                    char_y = char_y + 4;                   
+                }
+                else move_character_enabled = true;
+                
+                // Teleport to mouse                
                 if (key.enter) {
-                    
+                    char_x = mouse_x;
+                    char_y = mouse_y;
                 }
+                
                 // <if else> for four direction movement
-                if (key.up || key.w) {
-                    char_y -= speed;
-                    if (char_y < -16) {
-                        char_y = -16;
+                if (move_character_enabled) {
+                    if (key.up || key.w) {
+                        char_y -= speed;
+                        if (char_y < -16) {
+                            char_y = -16;
+                        }
+                        character_direction |= DIR_N;
+                        character_look = DIR_N;
+                        character_is_moving = true;
                     }
-                    character_direction |= DIR_N;
-                    character_look = DIR_N;
-                    character_is_moving = true;
-                }
-                else if (key.down || key.s) {
-                    char_y += speed;
-                    if (char_y > canvasHeight-32) {
-                        char_y = canvasHeight-32;
+                    if (key.down || key.s) {
+                        char_y += speed;
+                        if (char_y > canvasHeight-32) {
+                            char_y = canvasHeight-32;
+                        }
+                        character_direction |= DIR_S;
+                        character_look = DIR_S;
+                        character_is_moving = true;
                     }
-                    character_direction |= DIR_S;
-                    character_look = DIR_S;
-                    character_is_moving = true;
-                }
-                else if (key.left || key.a) {
-                    char_x -= speed;
-                    if (char_x < -4) {
-                        char_x = -4;
+                    if (key.left || key.a) {
+                        char_x -= speed;
+                        if (char_x < -4) {
+                            char_x = -4;
+                        }
+                        character_direction |= DIR_W;
+                        character_look = DIR_W;
+                        character_is_moving = true;
                     }
-                    character_direction |= DIR_W;
-                    character_look = DIR_W;
-                    character_is_moving = true;
-                }
-                else if (key.right || key.d) {
-                    char_x += speed;
-                    if (char_x > canvasWidth-20) {
-                        char_x = canvasWidth-20;
+                    if (key.right || key.d) {
+                        char_x += speed;
+                        if (char_x > canvasWidth-20) {
+                            char_x = canvasWidth-20;
+                        }
+                        character_direction |= DIR_E;
+                        character_look = DIR_E;
+                        character_is_moving = true;
                     }
-                    character_direction |= DIR_E;
-                    character_look = DIR_E;
-                    character_is_moving = true;
                 }
                 if (key.plus) {
                     speed++;
@@ -157,10 +195,13 @@
                     }
                 }
                 if (key.o) {
-                    
+                    // Mouse position
+                    console.log("mouse_x: " +mouse_x+", mouse_y" +mouse_y);
                 }
+                
                 if (key.p) {
-                    
+                    // Position debug
+                    console.log("char_x: " +char_x+", char_y" +char_y);
                 }
                 
                 // Animated characters
@@ -182,6 +223,8 @@
                     if (character_look == DIR_E) char_look = 13;     
                     if (character_look == DIR_N) char_look = 1;
                     if (character_look == DIR_S) char_look = 25;
+                    
+                    if (!move_character_enabled) char_look = 31;
                     
                     character.draw(char_x, char_y, char_look);
                 } 

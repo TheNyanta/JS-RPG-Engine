@@ -116,6 +116,8 @@ function InitializeKeyboard() {
         //console.log("event.keyCode=" + e.keyCode); //Lookup unknown keyCode
               
         if (e.keyCode == KEY_ENTER) { key.enter = true; }
+        if (e.keyCode == KEY_ESC) { key.esc = true; }
+        if (e.keyCode == KEY_SPACE) { key.space = true; }
         if (e.keyCode == KEY_LEFT) { key.left = true; }
         if (e.keyCode == KEY_UP) { key.up = true; }
         if (e.keyCode == KEY_RIGHT) { key.right = true; }
@@ -124,8 +126,6 @@ function InitializeKeyboard() {
         if (e.keyCode == KEY_A) { key.a = true; }       
         if (e.keyCode == KEY_S) { key.s = true; }
         if (e.keyCode == KEY_D) { key.d = true; }
-        if (e.keyCode == KEY_ESC) { key.esc = true; }
-        if (e.keyCode == KEY_SPACE) { key.space = true; }
         if (e.keyCode == KEY_PLUS) { key.plus = true; }
         if (e.keyCode == KEY_MINUS) { key.minus = true; }
         if (e.keyCode == KEY_O) { key.o = true; }

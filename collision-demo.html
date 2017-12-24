@@ -71,9 +71,8 @@
             
             setInterval(function() {
                 var char_collision_box = new Rectangle(char_x, char_y, character.spriteWidth, character.spriteHeight);
-                 
-                //var whiteCanvas = new Rectangle(0, 0, canvasWidth, canvasHeight);
-                //whiteCanvas.draw('black');
+                
+                // Stretch panorama to canavas size for a background
                 panorama.draw2(0, 0, canvasWidth, canvasHeight);
                 
                 // Music box
@@ -174,7 +173,7 @@
                     character_look = DIR_N;
                     character_is_moving = true;
                 }
-                else if (key.down || key.s) {
+                if (key.down || key.s) {
                     char_y += speed;
                     if (char_y > 288-32) {
                         char_y = 288-32;
@@ -183,7 +182,7 @@
                     character_look = DIR_S;
                     character_is_moving = true;
                 }
-                else if (key.left || key.a) {
+                if (key.left || key.a) {
                     char_x -= speed;
                     if (char_x < -4) {
                         char_x = -4;
@@ -192,7 +191,7 @@
                     character_look = DIR_W;
                     character_is_moving = true;
                 }
-                else if (key.right || key.d) {
+                if (key.right || key.d) {
                     char_x += speed;
                     if (char_x > 320-20) {
                         char_x = 320-20;
