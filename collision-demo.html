@@ -34,11 +34,20 @@
             
             var stone = new Sprite("ChipSet/stone.png", 16, 16, 1, 1);
             var grass = new Sprite("ChipSet/grass.png", 16, 16, 1, 1);
+            var panorama = new Sprite("sternenregen-explosion.png", 320, 240, 1, 1);
             
             var character = new Sprite("CharSet/character.png", 24, 32, 8, 12);
             var character_is_moving = false;
             var character_direction = 0;
             var character_look = 0;
+            
+            var movRect_x = 80;
+            var movRect_y = 170;
+            var pol_x = 1;
+            var pol_y = 1;
+            
+            var bumpRect_x = 145;
+            var bumpRect_y = 119;
             
             var audio = new Audio('Music/banana-phone.m4a');
             //var audio = new Audio('Music/Forest.m4a');
@@ -61,12 +70,14 @@
             $(window).on('load', function () { });
             
             setInterval(function() {
-                var char_collision_box = new Rectangle(char_x, char_y, sprite_width, sprite_height);
+                var char_collision_box = new Rectangle(char_x, char_y, character.spriteWidth, character.spriteHeight);
                  
-                var whiteCanvas = new Rectangle(0, 0, canvasWidth, canvasHeight);
-                whiteCanvas.draw('white');
+                //var whiteCanvas = new Rectangle(0, 0, canvasWidth, canvasHeight);
+                //whiteCanvas.draw('black');
+                panorama.draw2(0, 0, canvasWidth, canvasHeight);
                 
-                var rect = new Rectangle(100, 100, 50, 50);
+                // Music box
+                var rect = new Rectangle(270, 238, 50, 50);
                 rect.draw('blue', true, 'blue',false);
                 
                 if (char_collision_box.rectInside(rect)) {
@@ -74,6 +85,73 @@
                     audio.play();
                 }
                 else audio.pause();
+                
+                // Moveable Box
+                var movRect = new Rectangle(movRect_x, movRect_y, 50, 50);
+                movRect.draw('green', true, 'blue',false);
+                
+                if (char_collision_box.rectInside(movRect)) {
+                    pol_x *= -1;
+                    pol_y *= -1;
+                    if (movRect_x < char_x) movRect_x -= speed;
+                    if (movRect_x > char_x) movRect_x += speed;
+                    if (movRect_y < char_y) movRect_y -= speed;
+                    if (movRect_y > char_y) movRect_y += speed;
+                }
+                
+                // Bumper Box
+                var fixRect = new Rectangle(bumpRect_x, bumpRect_y, 50, 50);
+                fixRect.draw('yellow', true, 'blue',false);
+                var test = true;
+                
+                // Bump player
+                if (char_collision_box.rectInside(fixRect)) {
+                    if (bumpRect_x - character.spriteWidth < char_x) {
+                        if (char_x < bumpRect_x + 50 - character.spriteWidth)
+                            char_x -= speed;
+                        else char_x += speed;
+                    }
+                    if (bumpRect_y - character.spriteHeight < char_y) {
+                        if (char_y < bumpRect_y + 50 - character.spriteHeight)
+                            char_y -= speed;
+                        else char_y += speed;
+                    }
+                }
+                
+                // Bump MovBox
+                if (movRect.rectInside(fixRect)) {
+                    if (bumpRect_x - 50 < movRect_x) {
+                        if (movRect_x < bumpRect_x)
+                            movRect_x -= 2;
+                        else movRect_x += 2;
+                    }
+                    if (bumpRect_y - 50 < movRect_y) {
+                        if (movRect_y < bumpRect_y)
+                            movRect_y -= 2;
+                        else movRect_y += 2;
+                    }
+                }
+                
+                // movRect Border Collision check
+                if (movRect_x < 0){
+                    movRect_x += 1;
+                    pol_x = 1;                    
+                }
+                if (movRect_x > 320-50) {
+                    movRect_x -= 1;
+                    pol_x = -1;
+                }
+                if (movRect_y < 0) {
+                    movRect_y += 1;
+                    pol_y = 1;
+                }
+                if (movRect_y > 288-50) {
+                    movRect_y -= 1;
+                    pol_y = -1;
+                }
+                
+                movRect_x += pol_x;
+                movRect_y += pol_y;
                 
                 ResetAnimationCounter();
 
