@@ -34,7 +34,7 @@
             
             var stone = new Sprite("ChipSet/stone.png", 16, 16, 1, 1);
             var grass = new Sprite("ChipSet/grass.png", 16, 16, 1, 1);
-            var panorama = new Sprite("sternenregen-explosion.png", 320, 240, 1, 1);
+            var panorama = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
             
             var character = new Sprite("CharSet/character.png", 24, 32, 8, 12);
             var character_is_moving = false;
@@ -222,25 +222,26 @@
                 
                 // Animated characters
                 var char_seq = 0;
-                var char_look = 17;
+                var char_look = 25;
                 
                 if (character_is_moving)
                 {
-                    if (character_direction & DIR_W) char_seq = [24,25,26];
-                    if (character_direction & DIR_E) char_seq = [9,10,11];     
+                    if (character_direction & DIR_W) char_seq = [36,37,38];
+                    if (character_direction & DIR_E) char_seq = [12,13,14];     
                     if (character_direction & DIR_N) char_seq = [0,1,2];
-                    if (character_direction & DIR_S) char_seq = [16,17,18];
+                    if (character_direction & DIR_S) char_seq = [24,25,26];
                     
                     character.draw(char_x, char_y, char_seq);
                 }
                 else
                 {
-                    if (character_look == DIR_W) char_look = 25;
-                    if (character_look == DIR_E) char_look = 9;     
+                    if (character_look == DIR_W) char_look = 37;
+                    if (character_look == DIR_E) char_look = 13;     
                     if (character_look == DIR_N) char_look = 1;
-                    if (character_look == DIR_S) char_look = 17;
+                    if (character_look == DIR_S) char_look = 25;
+                    
                     character.draw(char_x, char_y, char_look);
-                } 
+                }
                 // Show a the collision box around the character 
                 char_collision_box.draw('black',false,'black',true)
                 

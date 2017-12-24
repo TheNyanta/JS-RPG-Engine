@@ -6,8 +6,8 @@ function DrawMap()
     {
         for (var x = 0; x < mapWidth; x++, mapIndex++)
         {
-            var tile_x = x * BLOCK_W;
-            var tile_y = y * BLOCK_H;
+            var tile_x = x * tileWidth;
+            var tile_y = y * tileHeight;
             var tileType = map[mapIndex];
             if (tileType == 0) grass.draw(tile_x, tile_y);
             else

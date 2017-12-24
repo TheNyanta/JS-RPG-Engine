@@ -61,7 +61,7 @@ var Sprite = function(fn, spriteWidth, spriteHeight, spritesX,spritesY) {
 
         // If various is a single numeric frame id
         if ($.isNumeric(various) && various >= 0) {
-            var res = i2xy(various, spritesX);
+            var res = i2xy(various, Math.max(spritesX, spritesY));
             Context.context.drawImage(this.image, res[0]*spriteWidth, res[1]*spriteHeight, spriteWidth, spriteHeight, x, y, spriteWidth, spriteHeight);
         } else
 
@@ -75,7 +75,7 @@ var Sprite = function(fn, spriteWidth, spriteHeight, spritesX,spritesY) {
                     AnimationCounter[AnimationCounterIndex].animationIndexCounter = 0;
                 AnimationCounter[AnimationCounterIndex].animationCurrentFrame = various[AnimationCounter[AnimationCounterIndex].animationIndexCounter];
             }
-            var res = i2xy(AnimationCounter[AnimationCounterIndex].animationCurrentFrame, 8);
+            var res = i2xy(AnimationCounter[AnimationCounterIndex].animationCurrentFrame, Math.max(spritesX, spritesY));
             Context.context.drawImage(this.image, res[0]*spriteWidth, res[1]*spriteHeight, spriteWidth, spriteHeight, x, y, spriteWidth, spriteHeight);
 
             AnimationCounterIndex++;

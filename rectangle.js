@@ -28,6 +28,11 @@ var Rectangle = function(x, y, width, height)
 		}
 	}
     
+    this.center = function(centerX, centerY) {
+		this.x = centerX - this.width/2;
+		this.y = centerY - this.height/2;
+	}
+    
     this.rectInside = function (rect) {
         if (this.x < rect.x + rect.width && this.x + this.width > rect.x &&
             this.y < rect.y + rect.height && this.y + this.height > rect.y) {
