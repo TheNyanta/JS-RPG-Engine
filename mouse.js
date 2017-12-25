@@ -138,5 +138,7 @@ function InitalizeMouse() {
         
         char_x = mouse_x;
         char_y = mouse_y;
+        
+        console.log("click: " + mouse_x + ", " + mouse_y);
     });
 };
