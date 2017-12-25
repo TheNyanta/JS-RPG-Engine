@@ -22,3 +22,20 @@ function EnableScrollbar() {
 }
 
 
+function enterFullscreen(element) {
+    if(element.requestFullscreen) {
+        element.requestFullscreen();
+    } else if(element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+    } else if(element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen();
+    } else if(element.msRequestFullscreen) {
+        element.msRequestFullscreen();
+    }
+    //TODO resize canvas if fullscreen
+    //canvasHeight = $(window).height();
+    //canvasWidth = $(window).width();
+    //Context.context.width = canvasWidth;
+    //Context.context.height = canvasHeight; 
+}
+

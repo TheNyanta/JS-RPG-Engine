@@ -119,12 +119,21 @@ var Mouse = new MouseControls();
 })();*/
 
 var Mouse = function() {
-    this.left = false;
-    this.right = false;    
+    //TODO: implement below
+    this.leftclick = false;
+    this.rightclick = false;
+    
+    //Click start
+    this.x1 = null;
+    this.y2 = null;
+    
+    //Click end
+    this.x2 = null;
+    this.y2 = null;
 };
 
 function InitalizeMouse() {
-    //TODO: correct mouse pos not in all browsers: OK: Opera, Edge, Firefox; NOT_OK: Chrome
+    // get mouse position on move
     document.getElementById("game").onmousemove = handleMouseMove;
      
     function handleMouseMove(event) {
@@ -133,6 +142,7 @@ function InitalizeMouse() {
         mouse_y = event.clientY - dim.top;
     }                            
     
+    // single click/touch event
     $(document.getElementById("game")).click(function(e) {
         DisableScrollbar();
         
@@ -141,4 +151,11 @@ function InitalizeMouse() {
         
         console.log("click: " + mouse_x + ", " + mouse_y);
     });
+    
+    // double click event
+    document.getElementById("game").ondblclick = doubleClick;
+    
+    function doubleClick(event) {
+        
+    };
 };

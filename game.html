@@ -12,6 +12,7 @@
         <script src="world.js" type="text/javascript"></script>
         <script src="keyboard.js" type="text/javascript"></script>
         <script src="mouse.js" type="text/javascript"></script>
+        <script src="motion.js" type="text/javascript"></script>
         <script src="point.js" type="text/javascript"></script>
         <script src="vector.js" type="text/javascript"></script>
         <script src="segment.js" type="text/javascript"></script>
@@ -27,27 +28,11 @@
             
             var rel_x = 4;
             var rel_y = 0;
-            
-            var char_x = 16;
-            var char_y = 16;
-            
-            var speed = 2;
-                     
-            var sprite_width = 24;
-            var sprite_height = 32;
-            
-            var stone = new Sprite("ChipSet/stone.png", 16, 16, 1, 1);
-            var grass = new Sprite("ChipSet/grass.png", 16, 16, 1, 1);            
+                                
             var bergwald = new Sprite("ChipSet/bergwald.png", 16, 16, 30, 16);
             
             var panorama = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
-            
-            var character = new Sprite("CharSet/character.png", 24, 32, 8, 12);
-            var character_is_moving = false;
-            var character_direction = 0;
-            var character_look = 0;
-            var move_character_enabled = true;
-            
+               
             var audio1 = new Audio('Music/banana-phone.ogg');
             var audio2 = new Audio('Music/forest.ogg');
             
@@ -75,7 +60,7 @@
                 // Stretch panorama to canavas size for a background
                 panorama.draw2(0, 0, canvasWidth, canvasHeight);
                 
-                var char_collision_box = new Rectangle(char_x, char_y, sprite_width, sprite_height);
+                var char_collision_box = new Rectangle(char_x, char_y, character.spriteWidth, character.spriteWidth);
                 
                 ResetAnimationCounter();
                 
@@ -110,153 +95,13 @@
                     audio2.pause();
                 
                 
-                var mouseRect = new Rectangle(mouse_x, mouse_y, sprite_width, sprite_height);
+                var mouseRect = new Rectangle(mouse_x, mouse_y, character.spriteWidth, character.spriteHeight);
                 mouseRect.draw('white', false, 'black',true);
                 
-                character_is_moving = false;
-                
-                character_direction = 0;
-                
-                // Pseudo gravity
-                if (char_x < 44) {
-                    move_character_enabled = false;
-                    if (char_y < 320)
-                        char_y = char_y + 4;
-                    else 
-                        move_character_enabled = true;
-                }                    
-                else if (char_x > 410) {
-                    move_character_enabled = false;
-                    if (char_y < 320)
-                        char_y = char_y + 4;
-                    else
-                        move_character_enabled = true;
-                }
-                else if (char_y < 40) {
-                    move_character_enabled = false;
-                    char_y = char_y + 4;                   
-                }
-                else move_character_enabled = true;
-                
-                // INPUT
-                             
-                if (key.enter) {
-                    
-                }
-                
-                if (key.esc) {
-                    EnableScrollbar();
-                }
-                
-                // <if else> for four direction movement
-                if (move_character_enabled) {
-                    if (key.up || key.w) {
-                        char_y -= speed;
-                        if (char_y < -16) {
-                            char_y = -16;
-                        }
-                        character_direction |= DIR_N;
-                        character_look = DIR_N;
-                        character_is_moving = true;
-                    }
-                    if (key.down || key.s) {
-                        char_y += speed;
-                        if (char_y > canvasHeight-32) {
-                            char_y = canvasHeight-32;
-                        }
-                        character_direction |= DIR_S;
-                        character_look = DIR_S;
-                        character_is_moving = true;
-                    }
-                    if (key.left || key.a) {
-                        char_x -= speed;
-                        if (char_x < -4) {
-                            char_x = -4;
-                        }
-                        character_direction |= DIR_W;
-                        character_look = DIR_W;
-                        character_is_moving = true;
-                    }
-                    if (key.right || key.d) {
-                        char_x += speed;
-                        if (char_x > canvasWidth-20) {
-                            char_x = canvasWidth-20;
-                        }
-                        character_direction |= DIR_E;
-                        character_look = DIR_E;
-                        character_is_moving = true;
-                    }
-                }
-                
-                if (key.key0) {
-                    DisableScrollbar();
-                }
-                if (key.plus) {
-                    speed++;
-                    if (speed > 10) {
-                        speed = 10;
-                    }
-                }
-                if (key.minus) {
-                    speed--;
-                    if (speed < 1) {
-                        speed = 1;
-                    }
-                }
-                if (key.o) {
-                    // Mouse position
-                    console.log("mouse_x: " +mouse_x+", mouse_y" +mouse_y);
-                }
-                
-                if (key.p) {
-                    // Position debug
-                    console.log("char_x: " +char_x+", char_y" +char_y);
-                }                
-                
-                // Animated characters
-                var char_seq = 0;
-                var char_look = 25;
-                
-                if (character_is_moving)
-                {
-                    if (character_direction & DIR_W) char_seq = [36,37,38];
-                    if (character_direction & DIR_E) char_seq = [12,13,14];     
-                    if (character_direction & DIR_N) char_seq = [0,1,2];
-                    if (character_direction & DIR_S) char_seq = [24,25,26];
-                    
-                    character.draw(char_x, char_y, char_seq);
-                }
-                else
-                {
-                    if (character_look == DIR_W) char_look = 37;
-                    if (character_look == DIR_E) char_look = 13;     
-                    if (character_look == DIR_N) char_look = 1;
-                    if (character_look == DIR_S) char_look = 25;
-                    
-                    if (!move_character_enabled) char_look = 31;
-                    
-                    character.draw(char_x, char_y, char_look);
-                } 
+                drawMotion(); 
                 
                 
             }, framerate);
-            
-            function enterFullscreen(element) {
-                if(element.requestFullscreen) {
-                    element.requestFullscreen();
-                } else if(element.mozRequestFullScreen) {
-                    element.mozRequestFullScreen();
-                } else if(element.webkitRequestFullscreen) {
-                    element.webkitRequestFullscreen();
-                } else if(element.msRequestFullscreen) {
-                    element.msRequestFullscreen();
-                }
-                //TODO resize canvas if fullscreen
-                //canvasHeight = $(window).height();
-                //canvasWidth = $(window).width();
-                //Context.context.width = canvasWidth;
-                //Context.context.height = canvasHeight;               
-            }
         
         </script>
         
