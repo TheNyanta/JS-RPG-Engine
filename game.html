@@ -63,12 +63,12 @@
                 
                 InitializeKeyboard();
                 
-                DisableScrollbar();
-                
                 InitalizeAnimationCounters();
+                
+                InitalizeMouse();
             });
             
-            $(window).on('load', function () { });
+            $(window).on('load', function () {});
             
             setInterval(function() {
                 // Background: TODO: Implement moving background
@@ -110,8 +110,8 @@
                     audio2.pause();
                 
                 
-                var mouseRect = new Rectangle(mouse_x, mouse_y, 25, 25);
-                mouseRect.draw('white', true, 'blue',false);
+                var mouseRect = new Rectangle(mouse_x, mouse_y, sprite_width, sprite_height);
+                mouseRect.draw('white', false, 'black',true);
                 
                 character_is_moving = false;
                 
@@ -138,10 +138,16 @@
                 }
                 else move_character_enabled = true;
                 
+                // INPUT
+                
                 // Teleport to mouse                
                 if (key.enter) {
                     char_x = mouse_x;
                     char_y = mouse_y;
+                }
+                
+                if (key.esc) {
+                    EnableScrollbar();
                 }
                 
                 // <if else> for four direction movement
@@ -182,6 +188,10 @@
                         character_look = DIR_E;
                         character_is_moving = true;
                     }
+                }
+                
+                if (key.key0) {
+                    DisableScrollbar();
                 }
                 if (key.plus) {
                     speed++;
@@ -232,12 +242,42 @@
                 
                 
             }, framerate);
+            
+            function enterFullscreen(element) {
+                if(element.requestFullscreen) {
+                    element.requestFullscreen();
+                } else if(element.mozRequestFullScreen) {
+                    element.mozRequestFullScreen();
+                } else if(element.webkitRequestFullscreen) {
+                    element.webkitRequestFullscreen();
+                } else if(element.msRequestFullscreen) {
+                    element.msRequestFullscreen();
+                }
+                //canvasHeight = $(window).height();
+                //canvasWidth = $(window).width();
+                //Context.context.width = canvasWidth;
+                //Context.context.height = canvasHeight;               
+            }
         
         </script>
+        
     </head>
 
 
     <body>
+        <h1 id="title" >game.html</h1>
+        
+        <p>
+            Clicking on the game disables scrolling for this website. Press "Esc" to enable it again.
+            
+            <button onclick="enterFullscreen(document.getElementById('game'))" id="exit">Fullscreen</button>
+        </p>
+        
+        <p>
+            WASD + Arrow-Key: Character Control; Enter: Move Character to Mouse; +/-: Speed Up/Down
+        </p>
+        
+        
         
         <canvas id="game"></canvas>
         

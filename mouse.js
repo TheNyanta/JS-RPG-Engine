@@ -72,12 +72,13 @@ var MouseControls = function()
 var Mouse = new MouseControls();
 */ 
 
+/*
 (function() {
     var mousePos;
 
-    document.onmousemove = handleMouseMove;
+    document.getElementById("game").onmousemove = handleMouseMove;
     setInterval(getMousePosition, 100); // setInterval repeats every X ms
-
+    
     function handleMouseMove(event) {
         var dot, eventDoc, doc, body, pageX, pageY;
 
@@ -111,8 +112,27 @@ var Mouse = new MouseControls();
         }
         else {
             // Use pos.x and pos.y
-            mouse_x = pos.x - 8;
-            mouse_y = pos.y - 8;
+            mouse_x = pos.x-8;
+            mouse_y = pos.y;
         }
     }
-})();
+})();*/
+
+var Mouse = function() {
+    this.left = false;
+    this.right = false;    
+};
+
+function InitalizeMouse() {
+    document.getElementById("game").onmousemove = handleMouseMove;
+     
+    function handleMouseMove(event) {
+        var dim = document.getElementById("game").getBoundingClientRect();
+        mouse_x = event.clientX - dim.left;
+        mouse_y = event.clientY - dim.top;
+    }
+    
+    $(document.getElementById("game")).click(function(e) {
+        DisableScrollbar();
+    });
+};

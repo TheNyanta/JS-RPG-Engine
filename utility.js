@@ -16,4 +16,9 @@ function DisableScrollbar() {
     document.body.scoll = "no";
 }
 
+function EnableScrollbar() {
+    document.documentElement.style.overflow = 'visible';
+    document.body.scroll = "yes";
+}
+
 
