@@ -28,6 +28,8 @@
             var canvasHeight = 360;
             
             var panorama = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
+            var bananaphone = new Sprite("FaceSet/bananaphone.png");
+            var forest = new Sprite("FaceSet/forest.png");
                
             var audio1 = new Audio('Music/banana-phone.ogg');
             var audio2 = new Audio('Music/forest.ogg');
@@ -47,6 +49,7 @@
                 InitalizeAnimationCounters();
                 
                 InitalizeMouse();
+                
             });
             
             $(window).on('load', function () {});
@@ -77,7 +80,7 @@
                 // Rectangle-Char-Collision
                 if (char_collision_box.rectInside(rect1)) {
                     rect1.draw('red',true,'red',false);
-                    DrawDialog("bananaphone");
+                    DrawDialog("bananaphone", bananaphone);
                     audio1.play();
                 }
                 else
@@ -88,7 +91,7 @@
                 // Rectangle-Char-Collision
                 if (char_collision_box.rectInside(rect2)) {
                     rect2.draw('yellow',true,'yellow',false);
-                    DrawDialog("forest");
+                    DrawDialog("forest", forest);
                     audio2.play();
                 }
                 else
