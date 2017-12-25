@@ -124,15 +124,19 @@ var Mouse = function() {
 };
 
 function InitalizeMouse() {
+    //TODO: correct mouse pos not in all browsers: OK: Opera, Edge, Firefox; NOT_OK: Chrome
     document.getElementById("game").onmousemove = handleMouseMove;
      
     function handleMouseMove(event) {
         var dim = document.getElementById("game").getBoundingClientRect();
         mouse_x = event.clientX - dim.left;
         mouse_y = event.clientY - dim.top;
-    }
+    }                            
     
     $(document.getElementById("game")).click(function(e) {
         DisableScrollbar();
+        
+        char_x = mouse_x;
+        char_y = mouse_y;
     });
 };

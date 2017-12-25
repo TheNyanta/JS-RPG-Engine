@@ -253,6 +253,7 @@
                 } else if(element.msRequestFullscreen) {
                     element.msRequestFullscreen();
                 }
+                //TODO resize canvas if fullscreen
                 //canvasHeight = $(window).height();
                 //canvasWidth = $(window).width();
                 //Context.context.width = canvasWidth;
@@ -274,11 +275,9 @@
         </p>
         
         <p>
-            WASD + Arrow-Key: Character Control; Enter: Move Character to Mouse; +/-: Speed Up/Down
+            WASD or Arrow-Key: Character Control; Click: Moves Character to Mouse; +/-: Speed Up/Down
         </p>
-        
-        
-        
+    
         <canvas id="game"></canvas>
         
     </body>    
