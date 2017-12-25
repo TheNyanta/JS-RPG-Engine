@@ -139,7 +139,7 @@ function gravity() {
 }
 
 // Draw all motions
-function drawMotion() {
+function DrawMotion() {
     gravity();
     characterMotion();
 }
