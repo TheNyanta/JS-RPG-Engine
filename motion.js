@@ -18,7 +18,9 @@ function characterMotion() {
     character_direction = 0;
     
     // INPUT
-    if (key.enter) {}
+    if (key.enter) {
+        DrawDialog("Hello World!");
+    }
     if (key.esc) {
         EnableScrollbar();
     }

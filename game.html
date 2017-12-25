@@ -10,6 +10,7 @@
         <script src="spritesheet.js" type="text/javascript"></script>
         <script src="sprite.js" type="text/javascript"></script>
         <script src="world.js" type="text/javascript"></script>
+        <script src="dialog.js" type="text/javascript"></script>
         <script src="keyboard.js" type="text/javascript"></script>
         <script src="mouse.js" type="text/javascript"></script>
         <script src="motion.js" type="text/javascript"></script>
@@ -76,6 +77,7 @@
                 // Rectangle-Char-Collision
                 if (char_collision_box.rectInside(rect1)) {
                     rect1.draw('red',true,'red',false);
+                    DrawDialog("bananaphone");
                     audio1.play();
                 }
                 else
@@ -86,6 +88,7 @@
                 // Rectangle-Char-Collision
                 if (char_collision_box.rectInside(rect2)) {
                     rect2.draw('yellow',true,'yellow',false);
+                    DrawDialog("forest");
                     audio2.play();
                 }
                 else
@@ -96,7 +99,9 @@
                 mouseRect.draw('white', false, 'black',true);
                 
                 // Draws motion of moveable objects
-                DrawMotion(); 
+                DrawMotion();
+                
+                //DrawDialog();
                 
                 // Layer 4: Objects over Layer 3 - i.e. stand behind a tree
                 // TODO: add in world.js
