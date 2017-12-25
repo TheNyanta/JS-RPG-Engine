@@ -121,21 +121,26 @@ function characterMotion() {
 function gravity() {
     if (char_x < 44) {
         move_character_enabled = false;
-        if (char_y < 320)
+        if (char_y < 320) {
             char_y = char_y + 4;
+            character_look = DIR_S;
+        }
         else 
             move_character_enabled = true;
     }
     else if (char_x > 410) {
         move_character_enabled = false;
-        if (char_y < 320)
+        if (char_y < 320) {
             char_y = char_y + 4;
-                    else
-                        move_character_enabled = true;
+            character_look = DIR_S;
+        }
+        else
+            move_character_enabled = true;
     }
     else if (char_y < 40) {
         move_character_enabled = false;
         char_y = char_y + 4;
+        character_look = DIR_S;
     }
     else move_character_enabled = true;
 }
