@@ -51,16 +51,24 @@
             $(window).on('load', function () {});
             
             setInterval(function() {
+                
+                ResetAnimationCounter();
+                
+                // Layer 0: Panorama
                 // Background: TODO: Implement moving background
                 // Stretch panorama to canavas size for a background
                 panorama.draw2(0, 0, canvasWidth, canvasHeight);
                 
+                // Layer 1: Walkable ground 
+                DrawBackgroundMap();
+                
+                // Layer 2: Objects on the ground below Layer 3
+                //TODO: add in world.js
+                
+                // Layer 3: character & objects
+                
                 // Collison Box of the character
                 var char_collision_box = new Rectangle(char_x, char_y, character.spriteWidth, character.spriteWidth);
-                
-                ResetAnimationCounter();
-                
-                DrawMap();
                 
                 // Rectangle 1 blue
                 var rect1 = new Rectangle(100, 100, 10, 10);
@@ -88,7 +96,10 @@
                 mouseRect.draw('white', false, 'black',true);
                 
                 // Draws motion of moveable objects
-                DrawMotion();                 
+                DrawMotion(); 
+                
+                // Layer 4: Objects over Layer 3 - i.e. stand behind a tree
+                // TODO: add in world.js
                 
             }, framerate);
         
