@@ -125,45 +125,55 @@ function characterMotion() {
         if (character_look == DIR_N) char_look = 1;
         if (character_look == DIR_S) char_look = 25;
         
-        //if (motionEnabled)
+        if(!isGravity)
             character.draw(char_x, char_y, char_look);
     
     }
 }
 
 // Draw pseudo gravity
+var isGravity = false;
 function gravity() {
     if (!chatSequence) {
     if (char_x < 44) {
         motionEnabled = false;
+        isGravity = true;
         if (char_y < 320) {
             char_y = char_y + 4;
             character_look = DIR_S;
         }
-        else 
+        else {
             motionEnabled = true;
+            isGravity = false;            
+        }
     }
     else if (char_x > 410) {
         motionEnabled = false;
+        isGravity = true;
         if (char_y < 320) {
             char_y = char_y + 4;
             character_look = DIR_S;
         }
-        else
+        else {
             motionEnabled = true;
+            isGravity = false;
+        }
     }
     else if (char_y < 40) {
         motionEnabled = false;
+        isGravity = true;
         char_y = char_y + 4;
         character_look = DIR_S;
     }
-    else motionEnabled = true;
-    
+    else {
+        motionEnabled = true;
+        isGravity = false;
+    }
     }
     
     // Character falling animation
-    //if (!motionEnabled)
-        //character.draw(char_x, char_y, 31);
+    if (!motionEnabled && isGravity)
+        character.draw(char_x, char_y, 31);
 }
 
 // Draw all motions
