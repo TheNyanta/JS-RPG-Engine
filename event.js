@@ -1,8 +1,17 @@
 function gameEvents() {
     // Events on input
     if (key.enter) {
-        //setTimeout(function() {delayVar = true;}, 2000);
-        DrawDialog("Hello World!");
+        chatSequence = true;
+        dialogText = "This is a chat sequence!";
+        setTimeout(function() {
+            dialogText = "You can't move while it runs!";
+            setTimeout(function() {chatSequence = false;}, 2000);       
+        }, 2000);
+               
+    }
+    
+    if(chatSequence){
+        DrawDialog(dialogText, undefined, true);
     }
     
     if (key.esc) {
@@ -46,7 +55,7 @@ var character = new Sprite("CharSet/character.png", 24, 32, 8, 12);
 var character_is_moving = false;
 var character_direction = 0;
 var character_look = 0;
-var move_character_enabled = true;
+var motionEnabled = true;
             
 var speed = 2;
 
@@ -57,7 +66,7 @@ function characterMotion() {
     character_direction = 0;
     
     // <if else> for four direction movement
-    if (move_character_enabled) {
+    if (motionEnabled) {
         if (key.up || key.w) {
             char_y -= speed;
             if (char_y < -16) {
@@ -116,42 +125,56 @@ function characterMotion() {
         if (character_look == DIR_N) char_look = 1;
         if (character_look == DIR_S) char_look = 25;
         
-        if (!move_character_enabled) char_look = 31;                  
-        
-        character.draw(char_x, char_y, char_look);
+        //if (motionEnabled)
+            character.draw(char_x, char_y, char_look);
+    
     }
 }
 
 // Draw pseudo gravity
 function gravity() {
+    if (!chatSequence) {
     if (char_x < 44) {
-        move_character_enabled = false;
+        motionEnabled = false;
         if (char_y < 320) {
             char_y = char_y + 4;
             character_look = DIR_S;
         }
         else 
-            move_character_enabled = true;
+            motionEnabled = true;
     }
     else if (char_x > 410) {
-        move_character_enabled = false;
+        motionEnabled = false;
         if (char_y < 320) {
             char_y = char_y + 4;
             character_look = DIR_S;
         }
         else
-            move_character_enabled = true;
+            motionEnabled = true;
     }
     else if (char_y < 40) {
-        move_character_enabled = false;
+        motionEnabled = false;
         char_y = char_y + 4;
         character_look = DIR_S;
     }
-    else move_character_enabled = true;
+    else motionEnabled = true;
+    
+    }
+    
+    // Character falling animation
+    //if (!motionEnabled)
+        //character.draw(char_x, char_y, 31);
 }
 
 // Draw all motions
 function DrawEvents() {
+    if (chatSequence) {
+        motionEnabled = false;
+    }
+    else {
+        motionEnabled = true;
+    }
+    
     gravity();
     characterMotion();
     gameEvents();
