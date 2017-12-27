@@ -13,7 +13,7 @@
         <script src="dialog.js" type="text/javascript"></script>
         <script src="keyboard.js" type="text/javascript"></script>
         <script src="mouse.js" type="text/javascript"></script>
-        <script src="motion.js" type="text/javascript"></script>
+        <script src="event.js" type="text/javascript"></script>
         <script src="point.js" type="text/javascript"></script>
         <script src="vector.js" type="text/javascript"></script>
         <script src="segment.js" type="text/javascript"></script>
@@ -102,12 +102,13 @@
                 mouseRect.draw('white', false, 'black',true);
                 
                 // Draws motion of moveable objects
-                DrawMotion();
+                DrawEvents();
                 
                 //DrawDialog();
                 
                 // Layer 4: Objects over Layer 3 - i.e. stand behind a tree
                 // TODO: add in world.js
+
                 
             }, framerate);
         
@@ -127,6 +128,10 @@
         
         <p>
             WASD or Arrow-Key: Character Control; Click: Moves Character to Mouse; +/-: Speed Up/Down
+        </p>
+        
+        <p>
+            Press Enter to see a dialog.        
         </p>
     
         <canvas id="game"></canvas>
