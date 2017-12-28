@@ -13,6 +13,6 @@ Start: https://thenyanta.github.io/game.html
 
 Template: https://pastebin.com/Z3zhb7cY
 
-Added new features: Respawn apple if not collected
+Adding new features: Respawn apple if not collected
 
 Start: https://thenyanta.github.io/snake.html
