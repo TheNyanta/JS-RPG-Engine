@@ -16,6 +16,7 @@
             xv=yv=0;
             trail=[];
             tail = 5;
+            spawn = false;
             function game() {
                 px+=xv;
                 py+=yv;
@@ -52,6 +53,10 @@
                     ax=Math.floor(Math.random()*tc);
                     ay=Math.floor(Math.random()*tc);
                 }
+                setTimeout(function() {
+                    ax=Math.floor(Math.random()*tc);
+                    ay=Math.floor(Math.random()*tc);
+                }, 10000);
                 
                 ctx.fillStyle="red";
                 ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
