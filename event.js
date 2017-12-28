@@ -18,7 +18,17 @@ function gameEvents() {
         EnableScrollbar();
     }
     
-    if (key.key0) {}
+    if (key.key0) {
+        
+    }
+    
+    if (key.key1) {
+        mapID = 0;
+    }
+    
+    if (key.key2) {
+        mapID = 1;
+    }
     
     if (key.plus) {
         speed++;
@@ -45,6 +55,10 @@ function gameEvents() {
     }
             
 }
+
+// Camera
+var cam_x = 0;
+var cam_y = 0;
 
 // Character Properties
 var char_x = 16;
@@ -135,40 +149,42 @@ function characterMotion() {
 var isGravity = false;
 function gravity() {
     if (!chatSequence) {
-    if (char_x < 44) {
-        motionEnabled = false;
-        isGravity = true;
-        if (char_y < 320) {
+        if (mapID == 0) {
+            if (char_x < 44) {
+                motionEnabled = false;
+                isGravity = true;
+                if (char_y < 320) {
+                    char_y = char_y + 4;
+                    character_look = DIR_S;
+                }
+                else {
+                    motionEnabled = true;
+                    isGravity = false; 
+                }
+            }
+            else if (char_x > 410) {
+                motionEnabled = false;
+                isGravity = true;
+                if (char_y < 320) {
             char_y = char_y + 4;
-            character_look = DIR_S;
+                    character_look = DIR_S;
+                }
+                else {
+                    motionEnabled = true;
+                    isGravity = false;
+                }
+            }
+            else if (char_y < 40) {
+                motionEnabled = false;
+                isGravity = true;
+                char_y = char_y + 4;
+                character_look = DIR_S;
+            }
+            else {
+                motionEnabled = true;
+                isGravity = false;
+            }
         }
-        else {
-            motionEnabled = true;
-            isGravity = false;            
-        }
-    }
-    else if (char_x > 410) {
-        motionEnabled = false;
-        isGravity = true;
-        if (char_y < 320) {
-            char_y = char_y + 4;
-            character_look = DIR_S;
-        }
-        else {
-            motionEnabled = true;
-            isGravity = false;
-        }
-    }
-    else if (char_y < 40) {
-        motionEnabled = false;
-        isGravity = true;
-        char_y = char_y + 4;
-        character_look = DIR_S;
-    }
-    else {
-        motionEnabled = true;
-        isGravity = false;
-    }
     }
     
     // Character falling animation

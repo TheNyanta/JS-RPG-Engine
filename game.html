@@ -5,19 +5,19 @@
         <script src="utility.js" type="text/javascript"></script>
         <script src="jquery-3.2.1.js" type="text/javascript"></script>
         <script src="canvas.js" type="text/javascript"></script>
-        <script src="maps.js" type="text/javascript"></script>
-        <script src="animate.js" type="text/javascript"></script>
+        <script src="point.js" type="text/javascript"></script>
+        <script src="vector.js" type="text/javascript"></script>
+        <script src="segment.js" type="text/javascript"></script>
+        <script src="rectangle.js" type="text/javascript"></script>
         <script src="spritesheet.js" type="text/javascript"></script>
         <script src="sprite.js" type="text/javascript"></script>
+        <script src="maps.js" type="text/javascript"></script>
+        <script src="animate.js" type="text/javascript"></script>
         <script src="world.js" type="text/javascript"></script>
         <script src="dialog.js" type="text/javascript"></script>
         <script src="keyboard.js" type="text/javascript"></script>
         <script src="mouse.js" type="text/javascript"></script>
         <script src="event.js" type="text/javascript"></script>
-        <script src="point.js" type="text/javascript"></script>
-        <script src="vector.js" type="text/javascript"></script>
-        <script src="segment.js" type="text/javascript"></script>
-        <script src="rectangle.js" type="text/javascript"></script>
         
         <script language = "javascript">
             
@@ -28,11 +28,14 @@
             var canvasHeight = 360;
             
             var panorama = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
+            
             var bananaphone = new Sprite("FaceSet/bananaphone.png");
             var forest = new Sprite("FaceSet/forest.png");
+            var snowflake = new Sprite("FaceSet/snowflake.png");
                
             var audio1 = new Audio('Music/banana-phone.ogg');
             var audio2 = new Audio('Music/forest.ogg');
+            var audio3 = new Audio('Music/snow.ogg');
             
             var mouse_x = 0;
             var mouse_y = 0;
@@ -70,44 +73,15 @@
                 //TODO: add in world.js
                 
                 // Layer 3: character & objects
+                DrawObjects();
                 
-                // Collison Box of the character
-                var char_collision_box = new Rectangle(char_x, char_y, character.spriteWidth, character.spriteWidth);
-                
-                // Rectangle 1 blue
-                var rect1 = new Rectangle(100, 100, 10, 10);
-                rect1.draw('blue', true, 'blue',false);
-                // Rectangle-Char-Collision
-                if (char_collision_box.rectInside(rect1)) {
-                    rect1.draw('red',true,'red',false);
-                    DrawDialog("bananaphone", bananaphone);
-                    audio1.play();
-                }
-                else
-                    audio1.pause();
-                // Rectangle 2 green
-                var rect2 = new Rectangle(200, 100, 10, 10);
-                rect2.draw('green',true,'green',false);
-                // Rectangle-Char-Collision
-                if (char_collision_box.rectInside(rect2)) {
-                    rect2.draw('yellow',true,'yellow',false);
-                    DrawDialog("forest", forest);
-                    audio2.play();
-                }
-                else
-                    audio2.pause();
-                
-                
-                var mouseRect = new Rectangle(mouse_x, mouse_y, character.spriteWidth, character.spriteHeight);
-                mouseRect.draw('white', false, 'black',true);
-                
+
                 // Draws motion of moveable objects
                 DrawEvents();
                 
-                //DrawDialog();
-                
                 // Layer 4: Objects over Layer 3 - i.e. stand behind a tree
                 // TODO: add in world.js
+                DrawForegroundMap();
 
                 
             }, framerate);
