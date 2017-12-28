@@ -56,7 +56,7 @@
             $(window).on('load', function () { });
             
             setInterval(function() {
-                var char_collision_box = new Rectangle(char_x, char_y, character.spriteWidth, character.spriteHeight);
+                var char_collision_box = new Rectangle(charX[mapID], charY[mapID], character.spriteWidth, character.spriteHeight);
                 
                 // Stretch panorama to canavas size for a background
                 panorama.draw2(0, 0, canvasWidth, canvasHeight);
@@ -78,10 +78,10 @@
                 if (char_collision_box.rectInside(movRect)) {
                     pol_x *= -1;
                     pol_y *= -1;
-                    if (movRect_x < char_x) movRect_x -= speed;
-                    if (movRect_x > char_x) movRect_x += speed;
-                    if (movRect_y < char_y) movRect_y -= speed;
-                    if (movRect_y > char_y) movRect_y += speed;
+                    if (movRect_x < charX[mapID]) movRect_x -= speed;
+                    if (movRect_x > charX[mapID]) movRect_x += speed;
+                    if (movRect_y < charY[mapID]) movRect_y -= speed;
+                    if (movRect_y > charY[mapID]) movRect_y += speed;
                 }
                 
                 // Bumper Box
@@ -91,15 +91,15 @@
                 
                 // Bump player
                 if (char_collision_box.rectInside(fixRect)) {
-                    if (bumpRect_x - character.spriteWidth < char_x) {
-                        if (char_x < bumpRect_x + 50 - character.spriteWidth)
-                            char_x -= speed;
-                        else char_x += speed;
+                    if (bumpRect_x - character.spriteWidth < charX[mapID]) {
+                        if (charX[mapID] < bumpRect_x + 50 - character.spriteWidth)
+                            charX[mapID] -= speed;
+                        else charX[mapID] += speed;
                     }
-                    if (bumpRect_y - character.spriteHeight < char_y) {
-                        if (char_y < bumpRect_y + 50 - character.spriteHeight)
-                            char_y -= speed;
-                        else char_y += speed;
+                    if (bumpRect_y - character.spriteHeight < charY[mapID]) {
+                        if (charY[mapID] < bumpRect_y + 50 - character.spriteHeight)
+                            charY[mapID] -= speed;
+                        else charY[mapID] += speed;
                     }
                 }
                 

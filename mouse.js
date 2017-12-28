@@ -146,8 +146,8 @@ function InitalizeMouse() {
     $(document.getElementById("game")).click(function(e) {
         DisableScrollbar();
         
-        char_x = mouse_x;
-        char_y = mouse_y;
+        charX[mapID] = mouse_x;
+        charY[mapID] = mouse_y;
         
         console.log("click: " + mouse_x + ", " + mouse_y);
     });

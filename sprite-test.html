@@ -25,21 +25,18 @@
             var canvasWidth = 1200;
             var canvasHeight = 800;
             
-            var rel_x = 4;
-            var rel_y = 0;
+            var relativeX[mapID] = 4;
+            var relativeY[mapID] = 0;
             
-            var char_x = 16;
-            var char_y = 16;
+            var charX[mapID] = 16;
+            var charY[mapID] = 16;
             
             var speed = 2;
-                     
-            var sprite_width = 24;
-            var sprite_height = 32;
             
             var panorama = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
             
             var character = new Sprite("CharSet/Mannschgerl.png", 320, 360, 3, 3);
-            var move_character_enabled = true;
+            var motionEnabled = true;
             var character_is_moving = false;
             
             var mouse_x = 0;
@@ -70,32 +67,32 @@
                 character_is_moving = false;
                 
                 // <if else> for four direction movement
-                if (move_character_enabled) {
+                if (motionEnabled) {
                     if (key.up || key.w) {
-                        char_y -= speed;
-                        if (char_y < -16) {
-                            char_y = -16;
+                        charY[mapID] -= speed;
+                        if (charY[mapID] < -16) {
+                            charY[mapID] = -16;
                         }
                         character_is_moving = true;
                     }
                     if (key.down || key.s) {
-                        char_y += speed;
-                        if (char_y > canvasHeight-32) {
-                            char_y = canvasHeight-32;
+                        charY[mapID] += speed;
+                        if (charY[mapID] > canvasHeight-32) {
+                            charY[mapID] = canvasHeight-32;
                         }
                         character_is_moving = true;
                     }
                     if (key.left || key.a) {
-                        char_x -= speed;
-                        if (char_x < -4) {
-                            char_x = -4;
+                        charX[mapID] -= speed;
+                        if (charX[mapID] < -4) {
+                            charX[mapID] = -4;
                         }
                         character_is_moving = true;
                     }
                     if (key.right || key.d) {
-                        char_x += speed;
-                        if (char_x > canvasWidth-20) {
-                            char_x = canvasWidth-20;
+                        charX[mapID] += speed;
+                        if (charX[mapID] > canvasWidth-20) {
+                            charX[mapID] = canvasWidth-20;
                         }
                         character_is_moving = true;
                     }
@@ -119,7 +116,7 @@
                 
                 if (key.p) {
                     // Position debug
-                    console.log("char_x: " +char_x+", char_y" +char_y);
+                    console.log("charX[mapID]: " +charX[mapID]+", charY[mapID]" +charY[mapID]);
                 }                
                 
                 // Animated characters
@@ -128,10 +125,10 @@
                 if (character_is_moving) {
                     char_seq = [0,1,2];
                     
-                    character.draw(char_x, char_y, char_seq);
+                    character.draw(charX[mapID], charY[mapID], char_seq);
                 }
                 else
-                    character.draw(char_x, char_y, 0);
+                    character.draw(charX[mapID], charY[mapID], 0);
                 
                 
             }, framerate);

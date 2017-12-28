@@ -1,5 +1,6 @@
 var Keyboard = function() {
     this.enter = false;
+    this.shift = false;
     this.esc = false;
     this.space = false;
     this.left = false;
@@ -49,6 +50,7 @@ var Keyboard = function() {
 
 // ASCII codes
 var KEY_ENTER = 13;
+var KEY_SHIFT = 16;
 var KEY_ESC = 27;
 var KEY_SPACE = 32;
 var KEY_LEFT = 37;
@@ -116,6 +118,7 @@ function InitializeKeyboard() {
         //console.log("event.keyCode=" + e.keyCode); //Lookup unknown keyCode
               
         if (e.keyCode == KEY_ENTER) { key.enter = true; }
+        if (e.keyCode == KEY_SHIFT) { key.shift = true; }
         if (e.keyCode == KEY_ESC) { key.esc = true; }
         if (e.keyCode == KEY_SPACE) { key.space = true; }
         if (e.keyCode == KEY_LEFT) { key.left = true; }
@@ -147,6 +150,7 @@ function InitializeKeyboard() {
     $(document).keyup(function(e) {
               
         if (e.keyCode == KEY_ENTER) { key.enter = false; } 
+        if (e.keyCode == KEY_SHIFT) { key.shift = false; }
         if (e.keyCode == KEY_ESC) { key.esc = false; }
         if (e.keyCode == KEY_SPACE) { key.space = false; }
         if (e.keyCode == KEY_LEFT) { key.left = false; }
