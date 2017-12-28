@@ -1,36 +1,38 @@
 // to move the map on the canvas
-var rel_x = 4*16;
-var rel_y = 0;
+var relativeX = [4*16, 0];
+var relativeY = [0, 0];
 
 var charTileX = 0;
 var charTileY = 0;
 
 /*var World function() {
-    this.rel_x = 4;
+    this.relativeX[mapID] = 4;
     this.y = 0;
 }*/
 
 function moveMap() {
-    charTileX = Math.floor((char_x + character.spriteWidth/2)/16);
-    charTileY = Math.floor((char_y + character.spriteHeight/2)/16);
+    /*
+    charTileX = Math.floor((charX[mapID] + character.spriteWidth/2)/16);
+    charTileY = Math.floor((charY[mapID] + character.spriteHeight/2)/16);
     if ((charTileX > (canvasWidth/16) )) {
-        rel_x = charTileX - canvasWidth/16;
+        relativeX[mapID] = charTileX - canvasWidth/16;
     }
     if ((charTileY > (canvasHeight/16) )) {
-        rel_y = charTileY - canvasHeight/16;
+        relativeY[mapID] = charTileY - canvasHeight/16;
     }
+    */
 }
                                 
 
 
 // Layer 1
 function DrawBackgroundMap() {
-    //moveMap();
+    moveMap();
     var mapIndex = 0;        
     for (var h = 0; h < mapHeight[mapID]; h++) {
         for (var w = 0; w < mapWidth[mapID]; w++, mapIndex++) {
-            var tile_w = w * tileWidth[mapID] + rel_x;
-            var tile_h = h * tileHeight[mapID] + rel_y;
+            var tile_w = w * tileWidth[mapID] + relativeX[mapID];
+            var tile_h = h * tileHeight[mapID] + relativeY[mapID];
             if (map[mapID][mapIndex]-1 >= 0)
                 chipset[mapID].draw(tile_w, tile_h, map[mapID][mapIndex]-1);
         }
@@ -42,7 +44,7 @@ function DrawBackgroundMap() {
 // Layer 3
 function DrawObjects() {
     // Collison Box of the character
-    var char_collision_box = new Rectangle(char_x, char_y, character.spriteWidth, character.spriteWidth);
+    var char_collision_box = new Rectangle(charX[mapID], charY[mapID], character.spriteWidth, character.spriteWidth);
     
     if (mapID == 0) {
     // Rectangle 1 blue
