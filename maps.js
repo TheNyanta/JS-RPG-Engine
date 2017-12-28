@@ -11,9 +11,6 @@ var snowforest = new Sprite("ChipSet/snowforest.png", 8, 8, 60, 32);
 var tileWidth = [16, 8];
 var tileHeight = [16, 8];
 
-var charX = [0, 0];
-var charY = [0, 0];
-
 var mapWidth = [22, 80];
 var mapHeight = [22, 20];
 
