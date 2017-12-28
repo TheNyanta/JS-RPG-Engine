@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Snake https://pastebin.com/Z3zhb7cY</title>
+        <title>Snake</title>
         <canvas id="gc" width="400" height="400"></canvas>
         <script>
             window.onload=function() {
@@ -16,7 +16,12 @@
             xv=yv=0;
             trail=[];
             tail = 5;
-            spawn = false;
+            
+            prevTailLength = 5;
+            timer = 0;
+            Ltimer = 0;
+            tailAdd = false;
+            
             function game() {
                 px+=xv;
                 py+=yv;
@@ -48,15 +53,36 @@
                     trail.shift();
                 }
                 
+                if (Ltimer%50==49) {
+                    tailAdd = true;
+                    Ltimer=0;
+                }
+                
+                if (!tailAdd)
+                    Ltimer++;
+                    
+                
                 if(ax==px && ay==py) {
                     tail++;
                     ax=Math.floor(Math.random()*tc);
                     ay=Math.floor(Math.random()*tc);
+                    setTimeout(function() {
+                        if (tailAdd)
+                            prevTailLength++;
+                    });
                 }
-                setTimeout(function() {
+                
+                if (prevTailLength == tail) {
+                    timer++;
+                }
+                else
+                    timer=0;
+                
+                if (timer%60==59) {
                     ax=Math.floor(Math.random()*tc);
                     ay=Math.floor(Math.random()*tc);
-                }, 10000);
+                    timer=0;
+                }
                 
                 ctx.fillStyle="red";
                 ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
@@ -80,5 +106,8 @@
             }
         </script>
     </head>    
-    <body background="Panorama/Background.jpg"></body>    
+    <body background="Panorama/Background.jpg">
+        <p> Template: https://pastebin.com/Z3zhb7cY</p>
+        <p> New: Respawn Apple if not collected</p>
+    </body>   
 </html>     
