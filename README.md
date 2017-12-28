@@ -15,4 +15,4 @@ To start the collision demo open https://thenyanta.github.io/collision-demo.html
 
 Template: ttps://pastebin.com/Z3zhb7cY
 
-Adding new features
+Added new features: Respawn apple if not collected
