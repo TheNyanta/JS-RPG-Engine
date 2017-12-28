@@ -48,7 +48,7 @@ function DrawObjects() {
     
     if (mapID == 0) {
     // Rectangle 1 blue
-    var rect1 = new Rectangle(100, 100, 10, 10);
+    var rect1 = new Rectangle(100+relativeX[mapID], 100+relativeY[mapID], 10, 10);
     rect1.draw('blue', true, 'blue',false);
     // Rectangle-Char-Collision
     if (char_collision_box.rectInside(rect1)) {
@@ -59,7 +59,7 @@ function DrawObjects() {
     else
         audio1.pause();
     // Rectangle 2 green
-    var rect2 = new Rectangle(200, 100, 10, 10);
+    var rect2 = new Rectangle(200+relativeX[mapID], 100+relativeY[mapID], 10, 10);
     rect2.draw('green',true,'green',false);
     // Rectangle-Char-Collision
     if (char_collision_box.rectInside(rect2)) {
@@ -76,7 +76,7 @@ function DrawObjects() {
     }
     
     if (mapID == 1) {
-        var rect1 = new Rectangle(100, 100, 10, 10);
+        var rect1 = new Rectangle(100+relativeX[mapID], 100+relativeY[mapID], 10, 10);
     rect1.draw('yellow', true, 'yellow',false);
     // Rectangle-Char-Collision
     if (char_collision_box.rectInside(rect1)) {
