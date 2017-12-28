@@ -27,7 +27,8 @@
             var canvasWidth = 480;
             var canvasHeight = 360;
             
-            var panorama = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
+            var sheeps = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
+            var snowycar = new Sprite("Panorama/snowycar.jpg", 320, 240, 1, 1);
             
             var bananaphone = new Sprite("FaceSet/bananaphone.png");
             var forest = new Sprite("FaceSet/forest.png");
@@ -64,7 +65,12 @@
                 // Layer 0: Panorama
                 // Background: TODO: Implement moving background
                 // Stretch panorama to canavas size for a background
-                panorama.draw2(0, 0, canvasWidth, canvasHeight);
+                if (mapID == 0) {
+                    sheeps.draw2(0, 0, canvasWidth, canvasHeight);
+                }
+                if (mapID == 1) {
+                    snowycar.draw2(0, 0, canvasWidth, canvasHeight);
+                }
                 
                 // Layer 1: Walkable ground 
                 DrawBackgroundMap();
@@ -105,7 +111,7 @@
         </p>
         
         <p>
-            Press Enter to see a dialog.        
+            Press "Enter" to see a dialog. Press "0" for Grassmap. Press "1" for Snowmap.       
         </p>
     
         <canvas id="game"></canvas>

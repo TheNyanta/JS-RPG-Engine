@@ -185,6 +185,10 @@ function gravity() {
                 isGravity = false;
             }
         }
+        else {
+            motionEnabled = true;
+            isGravity = false;
+        }
     }
     
     // Character falling animation
