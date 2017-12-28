@@ -31,7 +31,7 @@ function gameEvents() {
     }
         
     if (key.key0) {
-        
+        console.log("mapWidth: " + mapWidth[mapID] + ", relativeX: " + relativeX[mapID] + ", canvasWidth: " + canvasWidth + ", mapHeight: " + mapHeight[mapID] + ", relativeY: " + relativeY[mapID] + ", canvasHeight: " + canvasHeight);
     }    
     
     if (key.plus) {
@@ -69,8 +69,8 @@ function gameEvents() {
 }
 
 // Camera
-var cam_x = 0;
-var cam_y = 0;
+var cameraX = [0, 0];
+var cameraY = [0, 0];
 
 // Character Properties
 var character = new Sprite("CharSet/character.png", 24, 32, 8, 12);
@@ -92,41 +92,64 @@ function characterMotion() {
     if (motionEnabled && !key.shift) {
         if (key.up || key.w) {
             charY[mapID] -= speed;
-            if (charY[mapID] < -16) {
-                charY[mapID] = -16;
-            }
             character_direction |= DIR_N;
             character_look[mapID] = DIR_N;
             character_is_moving = true;
         }
-        if (key.down || key.s) {
+        else if (key.down || key.s) {
             charY[mapID] += speed;
-            if (charY[mapID] > canvasHeight-32) {
-                charY[mapID] = canvasHeight-32;
-            }
             character_direction |= DIR_S;
             character_look[mapID] = DIR_S;
             character_is_moving = true;
         }
-        if (key.left || key.a) {
+        else if (key.left || key.a) {
             charX[mapID] -= speed;
-            if (charX[mapID] < -4) {
-                charX[mapID] = -4;
-            }
             character_direction |= DIR_W;
             character_look[mapID] = DIR_W;
             character_is_moving = true;
         }
-        if (key.right || key.d) {
+        else if (key.right || key.d) {
             charX[mapID] += speed;
-            if (charX[mapID] > canvasWidth-20) {
-                charX[mapID] = canvasWidth-20;
-            }
             character_direction |= DIR_E;
             character_look[mapID] = DIR_E;
             character_is_moving = true;
         }
     }
+    
+    // Character boundry check
+    if (charY[mapID] < -16) {
+        charY[mapID] = -16;
+        character_is_moving = false;
+    }
+    if (charY[mapID] > canvasHeight-32) {
+        charY[mapID] = canvasHeight-32;
+        character_is_moving = false;
+    }
+    if (charX[mapID] < -4) {
+        charX[mapID] = -4;
+        character_is_moving = false;
+    }
+    if (charX[mapID] > canvasWidth-20) {
+        charX[mapID] = canvasWidth-20;
+        character_is_moving = false;
+    }
+    
+    // Map boundry check
+    /*
+    if (cameraX[mapID] < Math.floor(canvasWidth/2)) {
+        if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] > canvasWidth) {
+            relativeX[mapID] = 0;
+        }
+    }
+    else {
+        if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] < canvasWidth) {
+            relativeX[mapID] = 0;            
+        }
+    }
+    */
+    
+    cameraX[mapID] = charX[mapID];
+    cameraY[mapID] = charY[mapID];
     
     // Animated characters
     var char_seq = 0;
@@ -139,7 +162,7 @@ function characterMotion() {
         if (character_direction & DIR_N) char_seq = [0,1,2];
         if (character_direction & DIR_S) char_seq = [24,25,26];                 
         
-        character.draw(charX[mapID], charY[mapID], char_seq);
+        character.draw(cameraX[mapID], cameraY[mapID], char_seq);
     }
     else
     {
@@ -149,7 +172,7 @@ function characterMotion() {
         if (character_look[mapID] == DIR_S) char_look = 25;
         
         if(!isGravity)
-            character.draw(charX[mapID], charY[mapID], char_look);
+            character.draw(cameraX[mapID], cameraY[mapID], char_look);
     
     }
 }
