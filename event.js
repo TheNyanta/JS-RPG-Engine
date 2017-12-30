@@ -80,8 +80,8 @@ function gameEvents() {
             
 }
 
-var cameraX = [0, 0];
-var cameraY = [0, 0];
+var cameraX = [200, 100];
+var cameraY = [100, 100];
 
 // Character Properties
 

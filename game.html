@@ -48,8 +48,8 @@
             var mouse_x = 0;
             var mouse_y = 0;
             
-            var charX = [0, 0];
-            var charY = [0, 0];
+            var charX = [200, 100];
+            var charY = [100, 100];
             
             $(document).ready(function() {
                 
@@ -84,22 +84,23 @@
                     sheeps.draw2(0, 0, canvasWidth, canvasHeight);
                 }
                 
-                // Layer 1: Walkable ground 
+                // Layer 1.1: Walkable ground 
                 DrawBackgroundMap();
                 
-                // Layer 2: Objects on the ground below Layer 3
+                // Layer 1.2: Objects on the ground below Layer 3
                 //TODO: add in world.js
                 
                 // Layer 3: character & objects
-                DrawObjects();
-                
+                DrawObjects();                
 
                 // Draws motion of moveable objects
                 DrawEvents();
                 
+                DrawForegroundMap();
+                
                 // Layer 4: Objects over Layer 3 - i.e. stand behind a tree
                 // TODO: add in world.js
-                DrawForegroundMap();
+                
 
                 
             }, framerate);
@@ -125,7 +126,6 @@
         <h5>            
             TODO:            
             <div>- Implement Collision Detection for a given map</div>
-            <div>- Add upper map layer</div>
             <div>- Add NPCs/Objects properly</div>
             <div>- Refine Dialogs</div>
             <div>- Implement Enter/Touch-Interaction with NPCs/Objects</div>
