@@ -29,7 +29,7 @@
             var canvasHeight = 352;
             
             var sheeps = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
-            var snowycar = new Sprite("Panorama/snowycar.jpg", 320, 240, 1, 1);
+            var sunset = new Sprite("Panorama/sunset1.png", 320, 240, 1, 1);
             
             var bananaphone = new Sprite("FaceSet/bananaphone.png");
             var forest = new Sprite("FaceSet/forest.png");
@@ -78,10 +78,10 @@
                 // Background: TODO: Implement moving background
                 // Stretch panorama to canavas size for a background
                 if (mapID == 0) {
-                    sheeps.draw2(0, 0, canvasWidth, canvasHeight);
+                    sunset.draw2(0, 0, canvasWidth, canvasHeight);
                 }
                 if (mapID == 1) {
-                    snowycar.draw2(0, 0, canvasWidth, canvasHeight);
+                    sheeps.draw2(0, 0, canvasWidth, canvasHeight);
                 }
                 
                 // Layer 1: Walkable ground 
