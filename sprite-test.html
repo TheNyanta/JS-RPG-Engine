@@ -11,8 +11,8 @@
         <script src="rectangle.js" type="text/javascript"></script>
         <script src="spritesheet.js" type="text/javascript"></script>
         <script src="sprite.js" type="text/javascript"></script>
-        <script src="maps.js" type="text/javascript"></script>
         <script src="animate.js" type="text/javascript"></script>
+        <script src="maps.js" type="text/javascript"></script>
         <script src="world.js" type="text/javascript"></script>
         <script src="dialog.js" type="text/javascript"></script>
         <script src="keyboard.js" type="text/javascript"></script>
@@ -38,6 +38,9 @@
             var mouse_x = 0;
             var mouse_y = 0;
             
+            var charX = [0, 0];
+            var charY = [0, 0];
+            
             $(document).ready(function() {
                 
                 Context = new HTML("game", canvasWidth, canvasHeight);
@@ -59,8 +62,13 @@
                 // Stretch panorama to canavas size for a background
                 panorama.draw2(0, 0, canvasWidth, canvasHeight);
                 
+                DrawEvents();
+                
+                
                 ResetAnimationCounter();
                 character_is_moving = false;
+                
+                
                 
                 // <if else> for four direction movement
                 if (motionEnabled) {
@@ -93,6 +101,9 @@
                         character_is_moving = true;
                     }
                 }
+                
+                
+                
                 if (key.plus) {
                     speed++;
                     if (speed > 10) {
@@ -112,7 +123,7 @@
                 
                 if (key.p) {
                     // Position debug
-                    console.log("charX[mapID]: " +charX[mapID]+", charY[mapID]" +charY[mapID]);
+                    console.log("charX[mapID]: " +cameraX[mapID]+", charY[mapID]" +cameraY[mapID]);
                 }                
                 
                 // Animated characters
@@ -121,10 +132,10 @@
                 if (character_is_moving) {
                     char_seq = [0,1,2];
                     
-                    character.draw(charX[mapID], charY[mapID], char_seq);
+                    character.draw(cameraX[mapID], cameraY[mapID], char_seq);
                 }
                 else
-                    character.draw(charX[mapID], charY[mapID], 0);
+                    character.draw(cameraX[mapID], cameraY[mapID], 0);
                 
                 
             }, framerate);

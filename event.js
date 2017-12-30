@@ -1,18 +1,17 @@
 function gameEvents() {
     // Events on input
     if (key.enter) {
+        /*
         chatSequence = true;
         dialogText = "This is a chat sequence!";
-        setTimeout(function() {
-            dialogText = "You can't move while it runs!";
-            setTimeout(function() {chatSequence = false;}, 2000);       
-        }, 2000);
-               
+        setTimeout(function() { dialogText = "You can't move while it runs!"; }, 2000);
+        setTimeout(function() { chatSequence = false;}, 4000);
+        */
     }
-    
+    /*
     if(chatSequence){
         DrawDialog(dialogText, undefined, true);
-    }
+    }*/
     
     if (key.esc) {
         EnableScrollbar();
@@ -84,7 +83,6 @@ var cameraX = [0, 0];
 var cameraY = [0, 0];
 
 // Character Properties
-var character = new Sprite("CharSet/character.png", 24, 32, 8, 12);
 
 var character_is_moving = false;
 var character_direction = 0;
