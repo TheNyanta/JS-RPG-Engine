@@ -23,8 +23,8 @@ function DrawBackgroundMap() {
             var tile_w = w * tileWidth[mapID] - relativeX[mapID];
             var tile_h = h * tileHeight[mapID] - relativeY[mapID];
             // Don't draw no-tile
-            if (map[mapID][mapIndex]-1 >= 0)
-                chipset[mapID].draw(tile_w, tile_h, map[mapID][mapIndex]-1);
+            if (map[mapID][0][mapIndex]-1 >= 0)
+                chipset[mapID].draw(tile_w, tile_h, map[mapID][0][mapIndex]-1);
         }
     }
 }
@@ -78,6 +78,16 @@ function DrawObjects() {
     else {
         audio3.pause();
     }
+    
+    var mapIndex = 0;        
+    for (var h = 0; h < mapHeight[mapID]; h++) {
+        for (var w = 0; w < mapWidth[mapID]; w++, mapIndex++) {
+            var tile_w = w * tileWidth[mapID] - prevRelX;
+            var tile_h = h * tileHeight[mapID] - prevRelY;
+            if (map[mapID][1][mapIndex]-1 >= 0)
+                chipset[mapID].draw(tile_w, tile_h, map[mapID][1][mapIndex]-1);
+        }
+    }
 }
 
 // Layer 4
@@ -90,8 +100,8 @@ function DrawForegroundMap() {
         for (var w = 0; w < mapWidth[mapID]; w++, mapIndex++) {
             var tile_w = w * tileWidth[mapID] - prevRelX;
             var tile_h = h * tileHeight[mapID] - prevRelY;
-            if (map[mapID+2][mapIndex]-1 >= 0)
-                chipset[mapID].draw(tile_w, tile_h, map[mapID+2][mapIndex]-1);
+            if (map[mapID][2][mapIndex]-1 >= 0)
+                chipset[mapID].draw(tile_w, tile_h, map[mapID][2][mapIndex]-1);
         }
     }
 }
