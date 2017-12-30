@@ -25,7 +25,7 @@
             var framerate = 24;
             
             var canvasWidth = 480;
-            var canvasHeight = 360;
+            var canvasHeight = 352;
             
             var sheeps = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
             var snowycar = new Sprite("Panorama/snowycar.jpg", 320, 240, 1, 1);
@@ -59,6 +59,8 @@
                 InitalizeAnimationCounters();
                 
                 InitalizeMouse();
+                
+                LoadGamestate();
                 
             });
             
@@ -113,14 +115,22 @@
         </p>
         
         <p>
-            WASD or Arrow-Key: Character Control; Click: Moves Character to Mouse; +/-: Speed Up/Down; Shift + WASD: Move Tilemap
+            WASD or Arrow-Key: Character Control; Click: Moves Character to Mouse; +/-: Speed Up/Down
         </p>
         
         <p>
             Press "Enter" to see a dialog. Press "1" for Grassmap. Press "2" for Snowmap.       
         </p>
-    
+        
         <canvas id="game"></canvas>
+        
+        <h5>            
+            TODO:            
+            <div>Implement Collision Detection for a given map</div>
+            <div>Add NPCs/Objects properly</div>
+            <div>Refine Dialogs</div>
+            <div>Implement Enter-Interaction with NPCs/Objects</div>
+        </h5>    
         
     </body>    
 </html>

@@ -27,7 +27,15 @@ function gameEvents() {
     }
     
     if (key.key3) {
-        
+        console.log("Cookies: "+ document.cookie);
+    }
+    
+    if (key.key4) {
+        SaveGamestate();        
+    }
+    
+    if (key.key5) {
+        console.log("camera: [" + cameraX[mapID] + ", " + cameraY[mapID] + "]");
     }
         
     if (key.key0) {
@@ -57,18 +65,17 @@ function gameEvents() {
         // Position debug
         console.log("charX[mapID]: " +charX[mapID]+", charY[mapID]" +charY[mapID]);
     }
-    
+    /*
     // Move Map
     if (key.shift) {
         if (key.w) relativeY[mapID] -= speed;
         if (key.s) relativeY[mapID] += speed;
         if (key.a) relativeX[mapID] -= speed;
         if (key.d) relativeX[mapID] += speed;
-    }
+    }*/
             
 }
 
-// Camera
 var cameraX = [0, 0];
 var cameraY = [0, 0];
 
@@ -88,75 +95,157 @@ function characterMotion() {
     character_is_moving = false;
     character_direction = 0;
     
-    // <if else> for four direction movement
+    // <if else> for single direction movement at the same time only
     if (motionEnabled && !key.shift) {
         if (key.up || key.w) {
-            charY[mapID] -= speed;
             character_direction |= DIR_N;
             character_look[mapID] = DIR_N;
-            character_is_moving = true;
+            
+            // Map is not at the upper end
+            if (relativeY[mapID] < 0) {
+                // Camera is below the middle of the canvas: move camera up
+                if (cameraY[mapID] > Math.floor(canvasHeight/2)) {
+                    cameraY[mapID] -= speed;
+                }
+                // Camera is "above"/at the middle of the canvas: move map downwards + character move on spot
+                else {
+                    relativeY[mapID] += speed;
+                }
+            }
+            // Map is at the upper end: move camera up
+            else {
+                cameraY[mapID] -= speed;
+            }
+            
+            // Top Boundry Check 
+            if (charY[mapID] < -16) {
+                charY[mapID] = -16;
+            }
+            else {
+                charY[mapID] -= speed;
+            }
+            if (cameraY[mapID] < -16) {
+                cameraY[mapID] = -16;
+                character_is_moving = false;
+            }
+            else {
+                character_is_moving = true;
+            }
         }
+        
         else if (key.down || key.s) {
-            charY[mapID] += speed;
             character_direction |= DIR_S;
             character_look[mapID] = DIR_S;
-            character_is_moving = true;
+            
+            // Map is not at the lower end
+            if (tileHeight[mapID] * mapHeight[mapID] + relativeY[mapID] > canvasHeight) {
+                // Camera is below the middle of the canvas: move map upwards
+                if (cameraY[mapID] > Math.floor(canvasHeight/2)) {
+                    relativeY[mapID] -= speed;
+                }
+                // Camera is "above"/at the middle of the canvas: move camera down
+                else {
+                    cameraY[mapID] += speed;
+                }
+            }
+            // Map is at the lower end: move camera down
+            else {
+                cameraY[mapID] += speed;
+            }
+            
+            // Bottom Boundry Check
+            if (charY[mapID] > canvasHeight-32) {
+                charY[mapID] = canvasHeight-32;
+            }
+            else {
+                charY[mapID] += speed;               
+            }
+            if (cameraY[mapID] > canvasHeight-32) {
+                cameraY[mapID] = canvasHeight-32;
+                character_is_moving = false;
+            }
+            else {
+                character_is_moving = true;
+            }
         }
+        
         else if (key.left || key.a) {
-            charX[mapID] -= speed;
             character_direction |= DIR_W;
-            character_look[mapID] = DIR_W;
-            character_is_moving = true;
+            character_look[mapID] = DIR_W; 
+            
+            // Map is not at the left end
+            if (relativeX[mapID] < 0) {
+                // Camera is right of the middle of the canvas: move camera left
+                if (cameraX[mapID] > Math.floor(canvasWidth/2)) {
+                    cameraX[mapID] -= speed;
+                }
+                // Camera is left of the middle of the canvas: move map right
+                else {
+                    relativeX[mapID] += speed;
+                }
+            }
+            // Map is at the left end: move camera left
+            else {
+                cameraX[mapID] -= speed;
+            }
+            
+            // Left Boundry Check
+            if (charX[mapID] < -4) {
+                charX[mapID] = -4;
+            }
+            else {
+                charX[mapID] -= speed;
+            }
+            if (cameraX[mapID] < -4) {
+                cameraX[mapID] = -4;
+                character_is_moving = false;
+            }
+            else {
+                character_is_moving = true;
+            }
         }
+        
         else if (key.right || key.d) {
-            charX[mapID] += speed;
             character_direction |= DIR_E;
             character_look[mapID] = DIR_E;
-            character_is_moving = true;
+            
+            // Map is not at the right end
+            if (tileWidth[mapID] * mapWidth[mapID] + relativeX[mapID] > canvasWidth) {
+                // Camera is right of the middle of the canvas:
+                if (cameraX[mapID] > Math.floor(canvasWidth/2)) {
+                    relativeX[mapID] -= speed;                    
+                }
+                // Camera is left of the middle of the canvas:
+                else {
+                    cameraX[mapID] += speed;
+                }
+            }
+            // Map is at the right end: move camera right
+            else {
+                cameraX[mapID] += speed;
+            }
+            
+            // Right Boundry Check
+            if (charX[mapID] > canvasWidth-20) {
+                charX[mapID] = canvasWidth-20;                
+            }
+            else {
+                charX[mapID] += speed;
+            }
+            if (cameraX[mapID] > canvasWidth-20) {
+                cameraX[mapID] = canvasWidth-20;
+                character_is_moving = false;
+            }
+            else {
+                character_is_moving = true;
+            }
         }
     }
-    
-    // Character boundry check
-    if (charY[mapID] < -16) {
-        charY[mapID] = -16;
-        character_is_moving = false;
-    }
-    if (charY[mapID] > canvasHeight-32) {
-        charY[mapID] = canvasHeight-32;
-        character_is_moving = false;
-    }
-    if (charX[mapID] < -4) {
-        charX[mapID] = -4;
-        character_is_moving = false;
-    }
-    if (charX[mapID] > canvasWidth-20) {
-        charX[mapID] = canvasWidth-20;
-        character_is_moving = false;
-    }
-    
-    // Map boundry check
-    /*
-    if (cameraX[mapID] < Math.floor(canvasWidth/2)) {
-        if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] > canvasWidth) {
-            relativeX[mapID] = 0;
-        }
-    }
-    else {
-        if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] < canvasWidth) {
-            relativeX[mapID] = 0;            
-        }
-    }
-    */
-    
-    cameraX[mapID] = charX[mapID];
-    cameraY[mapID] = charY[mapID];
-    
-    // Animated characters
+    // Draw Animated characters
     var char_seq = 0;
     var char_look = [25, 25];
     
-    if (character_is_moving)
-    {
+    if (character_is_moving) {
         if (character_direction & DIR_W) char_seq = [36,37,38];
         if (character_direction & DIR_E) char_seq = [12,13,14];
         if (character_direction & DIR_N) char_seq = [0,1,2];
@@ -164,8 +253,7 @@ function characterMotion() {
         
         character.draw(cameraX[mapID], cameraY[mapID], char_seq);
     }
-    else
-    {
+    else {
         if (character_look[mapID] == DIR_W) char_look = 37;
         if (character_look[mapID] == DIR_E) char_look = 13;    
         if (character_look[mapID] == DIR_N) char_look = 1;
@@ -173,7 +261,6 @@ function characterMotion() {
         
         if(!isGravity)
             character.draw(cameraX[mapID], cameraY[mapID], char_look);
-    
     }
 }
 

@@ -1,5 +1,5 @@
 // to move the map on the canvas
-var relativeX = [4*16, 0];
+var relativeX = [0, 0];
 var relativeY = [0, 0];
 
 var charTileX = 0;
@@ -44,49 +44,29 @@ function DrawBackgroundMap() {
 // Layer 3
 function DrawObjects() {
     // Collison Box of the character
-    var char_collision_box = new Rectangle(charX[mapID], charY[mapID], character.spriteWidth, character.spriteWidth);
+    var char_collision_box = new Rectangle(charX[mapID]+relativeX[mapID], charY[mapID]+relativeY[mapID], character.spriteWidth, character.spriteWidth);
     
     if (mapID == 0) {
-    // Rectangle 1 blue
-    var rect1 = new Rectangle(100+relativeX[mapID], 100+relativeY[mapID], 10, 10);
-    rect1.draw('blue', true, 'blue',false);
-    // Rectangle-Char-Collision
-    if (char_collision_box.rectInside(rect1)) {
-        rect1.draw('red',true,'red',false);
-        DrawDialog("Bananaphone", bananaphone);
-        audio1.play();
-    }
-    else
-        audio1.pause();
-    // Rectangle 2 green
-    var rect2 = new Rectangle(200+relativeX[mapID], 100+relativeY[mapID], 10, 10);
-    rect2.draw('green',true,'green',false);
-    // Rectangle-Char-Collision
-    if (char_collision_box.rectInside(rect2)) {
-        rect2.draw('yellow',true,'yellow',false);
-        DrawDialog("Forest", forest);
-        audio2.play();
-    }
-    else
-        audio2.pause();
-    }
-    else {
-        audio1.pause();
-        audio2.pause();
+        // Rectangle 1 blue
+        var rect1 = new Rectangle(100+relativeX[mapID], 100+relativeY[mapID], 10, 10);
+        rect1.draw('blue', true, 'blue',false);
+        // Rectangle-Char-Collision
+        if (char_collision_box.rectInside(rect1)) {
+            rect1.draw('red',true,'red',false);
+            DrawDialog("Bananaphone", bananaphone);
+            audio2.pause();
+            audio1.play();
+        }
+        else {
+            audio1.pause();
+            audio2.play();
+        }
     }
     
     if (mapID == 1) {
-        var rect1 = new Rectangle(100+relativeX[mapID], 100+relativeY[mapID], 10, 10);
-    rect1.draw('yellow', true, 'yellow',false);
-    // Rectangle-Char-Collision
-    if (char_collision_box.rectInside(rect1)) {
-        rect1.draw('red',true,'red',false);
-        DrawDialog("Snow", snowflake);
-        audio3.play();
-    }
-        else
-            audio3.pause();
-        
+        audio1.pause();
+        audio2.pause();
+        audio3.play();   
     }
     else {
         audio3.pause();
