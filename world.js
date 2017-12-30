@@ -2,6 +2,10 @@
 var relativeX = [0, 0];
 var relativeY = [0, 0];
 
+// Character movement change relativeX/Y so take old value for DrawForeground to prevent unsyncron map moving 
+var prevRelX = 0;
+var prevRelY = 0;
+
 var charTileX = 0;
 var charTileY = 0;
 
@@ -9,11 +13,16 @@ var allAnimations = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,
 
 // Layer 1
 function DrawBackgroundMap() {
+    // Save relativeX/Y
+    prevRelX = relativeX[mapID];
+    prevRelY = relativeY[mapID];
+    
     var mapIndex = 0;        
     for (var h = 0; h < mapHeight[mapID]; h++) {
         for (var w = 0; w < mapWidth[mapID]; w++, mapIndex++) {
             var tile_w = w * tileWidth[mapID] - relativeX[mapID];
             var tile_h = h * tileHeight[mapID] - relativeY[mapID];
+            // Don't draw no-tile
             if (map[mapID][mapIndex]-1 >= 0)
                 chipset[mapID].draw(tile_w, tile_h, map[mapID][mapIndex]-1);
         }
@@ -79,8 +88,8 @@ function DrawForegroundMap() {
     var mapIndex = 0;        
     for (var h = 0; h < mapHeight[mapID]; h++) {
         for (var w = 0; w < mapWidth[mapID]; w++, mapIndex++) {
-            var tile_w = w * tileWidth[mapID] - relativeX[mapID];
-            var tile_h = h * tileHeight[mapID] - relativeY[mapID];
+            var tile_w = w * tileWidth[mapID] - prevRelX;
+            var tile_h = h * tileHeight[mapID] - prevRelY;
             if (map[mapID+2][mapIndex]-1 >= 0)
                 chipset[mapID].draw(tile_w, tile_h, map[mapID+2][mapIndex]-1);
         }
