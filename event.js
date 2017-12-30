@@ -38,11 +38,10 @@ function gameEvents() {
     }
     
     if (key.key6) {
-        console.log("camera: [" + cameraX[mapID] + ", " + cameraY[mapID] + "]");
     }
         
     if (key.key0) {
-        console.log("mapWidth: " + mapWidth[mapID] + ", relativeX: " + relativeX[mapID] + ", canvasWidth: " + canvasWidth + ", mapHeight: " + mapHeight[mapID] + ", relativeY: " + relativeY[mapID] + ", canvasHeight: " + canvasHeight);
+        
     }    
     
     if (key.plus) {
@@ -66,7 +65,7 @@ function gameEvents() {
     
     if (key.p) {
         // Position debug
-        console.log("charX[mapID]: " +charX[mapID]+", charY[mapID]" +charY[mapID]);
+        console.log("charX=" +Math.floor(charX[mapID])+", charY=" +Math.floor(charY[mapID]) +" | camX=" +cameraX[mapID] +", camY=" + cameraY[mapID] +" | relX=" +relativeX[mapID]+", relY=" + relativeY[mapID]);
     }
     /*
     // Move Map
@@ -104,14 +103,14 @@ function characterMotion() {
             character_look[mapID] = DIR_N;
             
             // Map is not at the upper end
-            if (relativeY[mapID] < 0) {
+            if (relativeY[mapID] > 0) {
                 // Camera is below the middle of the canvas: move camera up
                 if (cameraY[mapID] > Math.floor(canvasHeight/2)) {
                     cameraY[mapID] -= speed;
                 }
                 // Camera is "above"/at the middle of the canvas: move map downwards + character move on spot
                 else {
-                    relativeY[mapID] += speed;
+                    relativeY[mapID] -= speed;
                 }
             }
             // Map is at the upper end: move camera up
@@ -140,10 +139,10 @@ function characterMotion() {
             character_look[mapID] = DIR_S;
             
             // Map is not at the lower end
-            if (tileHeight[mapID] * mapHeight[mapID] + relativeY[mapID] > canvasHeight) {
+            if (tileHeight[mapID] * mapHeight[mapID] - relativeY[mapID] > canvasHeight) {
                 // Camera is below the middle of the canvas: move map upwards
                 if (cameraY[mapID] > Math.floor(canvasHeight/2)) {
-                    relativeY[mapID] -= speed;
+                    relativeY[mapID] += speed;
                 }
                 // Camera is "above"/at the middle of the canvas: move camera down
                 else {
@@ -176,14 +175,14 @@ function characterMotion() {
             character_look[mapID] = DIR_W; 
             
             // Map is not at the left end
-            if (relativeX[mapID] < 0) {
+            if (relativeX[mapID] > 0) {
                 // Camera is right of the middle of the canvas: move camera left
                 if (cameraX[mapID] > Math.floor(canvasWidth/2)) {
                     cameraX[mapID] -= speed;
                 }
                 // Camera is left of the middle of the canvas: move map right
                 else {
-                    relativeX[mapID] += speed;
+                    relativeX[mapID] -= speed;
                 }
             }
             // Map is at the left end: move camera left
@@ -212,10 +211,10 @@ function characterMotion() {
             character_look[mapID] = DIR_E;
             
             // Map is not at the right end
-            if (tileWidth[mapID] * mapWidth[mapID] + relativeX[mapID] > canvasWidth) {
+            if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] > canvasWidth) {
                 // Camera is right of the middle of the canvas:
                 if (cameraX[mapID] > Math.floor(canvasWidth/2)) {
-                    relativeX[mapID] -= speed;                    
+                    relativeX[mapID] += speed;                    
                 }
                 // Camera is left of the middle of the canvas:
                 else {

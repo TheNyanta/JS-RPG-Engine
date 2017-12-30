@@ -8,16 +8,7 @@ var charTileY = 0;
 var allAnimations = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95];
 
 function moveMap() {
-    /*
-    charTileX = Math.floor((charX[mapID] + character.spriteWidth/2)/16);
-    charTileY = Math.floor((charY[mapID] + character.spriteHeight/2)/16);
-    if ((charTileX > (canvasWidth/16) )) {
-        relativeX[mapID] = charTileX - canvasWidth/16;
-    }
-    if ((charTileY > (canvasHeight/16) )) {
-        relativeY[mapID] = charTileY - canvasHeight/16;
-    }
-    */
+    
 }
                                 
 
@@ -28,8 +19,8 @@ function DrawBackgroundMap() {
     var mapIndex = 0;        
     for (var h = 0; h < mapHeight[mapID]; h++) {
         for (var w = 0; w < mapWidth[mapID]; w++, mapIndex++) {
-            var tile_w = w * tileWidth[mapID] + relativeX[mapID];
-            var tile_h = h * tileHeight[mapID] + relativeY[mapID];
+            var tile_w = w * tileWidth[mapID] - relativeX[mapID];
+            var tile_h = h * tileHeight[mapID] - relativeY[mapID];
             if (map[mapID][mapIndex]-1 >= 0)
                 chipset[mapID].draw(tile_w, tile_h, map[mapID][mapIndex]-1);
         }
@@ -52,7 +43,7 @@ function DrawObjects() {
     
     if (mapID == 0) {
         // Rectangle 1 blue
-        var rect1 = new Rectangle(100+relativeX[mapID], 100+relativeY[mapID], 10, 10);
+        var rect1 = new Rectangle(100-relativeX[mapID], 100-relativeY[mapID], 10, 10);
         rect1.draw('blue', true, 'blue',false);
         // Rectangle-Char-Collision
         if (char_collision_box.rectInside(rect1)) {
@@ -65,9 +56,9 @@ function DrawObjects() {
             audio1.pause();
             audio2.play();
         }
-        var catiBox = new Rectangle(200+relativeX[mapID], 200+relativeY[mapID], cat.spriteWidth, cat.spriteHeight);
+        var catiBox = new Rectangle(200-relativeX[mapID], 200-relativeY[mapID], cat.spriteWidth, cat.spriteHeight);
         catiBox.draw('white', false, 'black', true);
-        cat.draw(200+relativeX[mapID], 200+relativeY[mapID], allAnimations);
+        cat.draw(200-relativeX[mapID], 200-relativeY[mapID], allAnimations);
         
         if (char_collision_box.rectInside(catiBox)) {
             DrawDialog("Press Enter");
