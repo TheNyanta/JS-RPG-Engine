@@ -71,12 +71,16 @@ function LoadGamestate() {
         character_look[0] = parseInt(getCookie("charLook[0]"));
         relativeX[0] = parseInt(getCookie("relX[0]"));
         relativeY[0] = parseInt(getCookie("relY[0]"));
+        cameraX[0] = parseInt(getCookie("camX[0]"));
+        cameraY[0] = parseInt(getCookie("camY[0]"));
         
         charX[1] = parseInt(getCookie("charX[1]"));
         charY[1] = parseInt(getCookie("charY[1]"));
         character_look[1] = parseInt(getCookie("charLook[1]"));
         relativeX[1] = parseInt(getCookie("relX[1]"));
         relativeY[1] = parseInt(getCookie("relY[1]"));
+        cameraX[1] = parseInt(getCookie("camX[1]"));
+        cameraY[1] = parseInt(getCookie("camY[1]"));
         
         console.log("Loaded Cookie");
     }
@@ -93,12 +97,16 @@ function SaveGamestate() {
     setCookie("charLook[0]", character_look[0]);
     setCookie("relX[0]", relativeX[0]);
     setCookie("relY[0]", relativeY[0]);
+    setCookie("camX[0]", cameraX[0]);
+    setCookie("camY[0]", cameraY[0]);
     
     setCookie("charX[1]", charX[1], 30);
     setCookie("charY[1]", charY[1], 30);
     setCookie("charLook[1]", character_look[1]);
     setCookie("relX[1]", relativeX[1]);
     setCookie("relY[1]", relativeY[1]);
+    setCookie("camX[1]", cameraX[1]);
+    setCookie("camY[1]", cameraY[1]);
     
     // Saved message
     chatSequence = true;
