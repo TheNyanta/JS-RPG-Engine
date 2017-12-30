@@ -8,10 +8,10 @@ function gameEvents() {
         setTimeout(function() { chatSequence = false;}, 4000);
         */
     }
-    /*
+    
     if(chatSequence){
         DrawDialog(dialogText, undefined, true);
-    }*/
+    }
     
     if (key.esc) {
         EnableScrollbar();
