@@ -44,7 +44,14 @@ function DrawBackgroundMap() {
 // Layer 3
 function DrawObjects() {
     // Collison Box of the character
-    var char_collision_box = new Rectangle(charX[mapID]+relativeX[mapID], charY[mapID]+relativeY[mapID], character.spriteWidth, character.spriteWidth);
+    var char_collision_box = new Rectangle(cameraX[mapID], cameraY[mapID], character.spriteWidth, character.spriteHeight);
+    // Draw Collision Box
+    char_collision_box.draw('white', false, 'black', true);
+    
+    // Center of Collision Box
+    var ccb_center = new Point (char_collision_box.centerX, char_collision_box.centerY);
+    // ccb_center.draw(20, 'black');
+    
     
     if (mapID == 0) {
         // Rectangle 1 blue
@@ -56,6 +63,7 @@ function DrawObjects() {
             DrawDialog("Bananaphone", bananaphone);
             audio2.pause();
             audio1.play();
+            console.log(character.spriteWidth +", "+ character.spriteHeight);
         }
         else {
             audio1.pause();
@@ -76,5 +84,5 @@ function DrawObjects() {
 // Layer 4
 function DrawForegroundMap() {
     var mouseRect = new Rectangle(mouse_x, mouse_y, character.spriteWidth, character.spriteHeight);
-    mouseRect.draw('white', false, 'black',true);
+    mouseRect.draw('white', false, 'white',true);
 }

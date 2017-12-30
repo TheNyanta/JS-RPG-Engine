@@ -35,6 +35,10 @@ function gameEvents() {
     }
     
     if (key.key5) {
+        LoadGamestate();
+    }
+    
+    if (key.key6) {
         console.log("camera: [" + cameraX[mapID] + ", " + cameraY[mapID] + "]");
     }
         

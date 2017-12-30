@@ -83,6 +83,11 @@ function LoadGamestate() {
         cameraY[1] = parseInt(getCookie("camY[1]"));
         
         console.log("Loaded Cookie");
+        
+        // Load message
+        chatSequence = true;
+        dialogText = "Loaded gamestate!";
+        setTimeout(function() {chatSequence = false;}, 1000);
     }
     else
         console.log("New game");
