@@ -81,5 +81,5 @@ function DrawObjects() {
 // Layer 4
 function DrawForegroundMap() {
     var mouseRect = new Rectangle(mouse_x, mouse_y, character.spriteWidth, character.spriteHeight);
-    mouseRect.draw('white', false, 'white',true);
+    //mouseRect.draw('white', false, 'white',true);
 }

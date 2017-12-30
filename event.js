@@ -1,4 +1,10 @@
 function gameEvents() {
+    // Draw dialogText if chatSequence is true
+    if(chatSequence){
+        DrawDialog(dialogText, undefined, true);
+    }
+    
+    
     // Events on input
     if (key.enter) {
         /*
@@ -7,10 +13,6 @@ function gameEvents() {
         setTimeout(function() { dialogText = "You can't move while it runs!"; }, 2000);
         setTimeout(function() { chatSequence = false;}, 4000);
         */
-    }
-    
-    if(chatSequence){
-        DrawDialog(dialogText, undefined, true);
     }
     
     if (key.esc) {
@@ -45,14 +47,14 @@ function gameEvents() {
     }    
     
     if (key.plus) {
-        speed++;
-        if (speed > 10) {
-            speed = 10;
+        speed+=1;
+        if (speed > 16) {
+            speed = 16;
         }
     }
     
     if (key.minus) {
-        speed--;
+        speed-=1;
         if (speed < 1) {
             speed = 1;
         }
@@ -132,6 +134,8 @@ function characterMotion() {
             else {
                 character_is_moving = true;
             }
+            if (relativeY[mapID] < 0)
+                relativeY[mapID] = 0;
         }
         
         else if (key.down || key.s) {
@@ -168,6 +172,8 @@ function characterMotion() {
             else {
                 character_is_moving = true;
             }
+            if (tileHeight[mapID] * mapHeight[mapID] - relativeY[mapID] < canvasHeight)
+                relativeY[mapID] = tileHeight[mapID] * mapHeight[mapID] - canvasHeight;
         }
         
         else if (key.left || key.a) {
@@ -204,6 +210,8 @@ function characterMotion() {
             else {
                 character_is_moving = true;
             }
+            if (relativeX[mapID] < 0)
+                relativeX[mapID] = 0;
         }
         
         else if (key.right || key.d) {
@@ -240,6 +248,9 @@ function characterMotion() {
             else {
                 character_is_moving = true;
             }
+            if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] < canvasWidth)
+                relativeX[mapID] = tileWidth[mapID] * mapWidth[mapID] - canvasWidth;
+            
         }
     }
     // Draw Animated characters
