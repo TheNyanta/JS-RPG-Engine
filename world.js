@@ -39,7 +39,7 @@ function DrawBackgroundMap() {
 
 function DrawObjects() {
     // Collison Box of the character
-    var char_collision_box = new Rectangle(cameraX[mapID], cameraY[mapID], character.spriteWidth, character.spriteHeight);
+    var char_collision_box = new Rectangle(cameraX[mapID]+4, cameraY[mapID]+16, 16, 16);
     // Draw Collision Box
     char_collision_box.draw('white', false, 'black', true);
     
@@ -73,6 +73,17 @@ function DrawObjects() {
                 catsound.play();
             }
         }
+        
+        // Hardcoded obstacle for testing
+        var leftwall = new Rectangle(0-prevRelX, 270-prevRelY, 158, 32);
+        // Rectangle-Char-Collision
+        if (char_collision_box.rectInside(leftwall))collision = true;
+        
+        var middlewall = new Rectangle(178-prevRelX, 270-prevRelY, 380, 32);
+        if (char_collision_box.rectInside(middlewall)) collision = true;
+        
+        var rightwall = new Rectangle(580-prevRelX, 270-prevRelY, 64, 32);
+        if (char_collision_box.rectInside(rightwall)) collision = true;
     }
     
     if (mapID == 1) {

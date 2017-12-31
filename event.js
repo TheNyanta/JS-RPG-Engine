@@ -83,6 +83,9 @@ function gameEvents() {
 var cameraX = [200, 100];
 var cameraY = [100, 100];
 
+var prevCamX = 0;
+var prevCamY = 0;
+
 // Character Properties
 
 var character_is_moving = false;
@@ -94,6 +97,11 @@ var speed = 2;
 
 // Draw character motion WASD + Arrow Keys
 function characterMotion() {
+    
+    prevCamX = cameraX[mapID];
+    prevCamY = cameraY[mapID];
+    prevX = charX[mapID];
+    prevY = charY[mapID];
     
     character_is_moving = false;
     character_direction = 0;
@@ -178,7 +186,7 @@ function characterMotion() {
         
         else if (key.left || key.a) {
             character_direction |= DIR_W;
-            character_look[mapID] = DIR_W; 
+            character_look[mapID] = DIR_W;
             
             // Map is not at the left end
             if (relativeX[mapID] > 0) {
@@ -222,7 +230,7 @@ function characterMotion() {
             if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] > canvasWidth) {
                 // Camera is right of the middle of the canvas:
                 if (cameraX[mapID] > Math.floor(canvasWidth/2)) {
-                    relativeX[mapID] += speed;                    
+                    relativeX[mapID] += speed;
                 }
                 // Camera is left of the middle of the canvas:
                 else {
@@ -253,6 +261,22 @@ function characterMotion() {
             
         }
     }
+    // Collision check
+    DrawObjects();
+    
+    if (collision) {
+        charX[mapID] = prevX;
+        charY[mapID] = prevY;
+        cameraX[mapID] = prevCamX;
+        cameraY[mapID] = prevCamY;
+        relativeX[mapID] = prevRelX;
+        relativeY[mapID] = prevRelY;
+        
+        character_is_moving =false;
+        collision = false;
+    }
+
+    
     // Draw Animated characters
     var char_seq = 0;
     var char_look = [25, 25];

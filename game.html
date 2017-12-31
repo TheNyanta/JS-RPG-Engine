@@ -25,8 +25,11 @@
             var Context = null;
             var framerate = 24;
             
-            var canvasWidth = 480;
-            var canvasHeight = 352;
+            var canvasWidth = 480;//480;
+            var canvasHeight = 352;//352;
+            
+            // TODO: fix bug: if canvas is bigger than tilemap map moves to the responding end
+            // Or make Tilemap always bigger than canvas
             
             var sheeps = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
             var sunset = new Sprite("Panorama/sunset1.png", 320, 240, 1, 1);
@@ -43,13 +46,17 @@
             audio2.volume = 0.2;
             audio3.volume = 0.2;
             catsound.volume = 0.2;
-
+            
+            var collision = false;
             
             var mouse_x = 0;
             var mouse_y = 0;
             
             var charX = [200, 100];
             var charY = [100, 100];
+            
+            var prevX = 0;
+            var prevY = 0;
             
             $(document).ready(function() {
                 
@@ -91,7 +98,7 @@
                 //TODO: add in world.js
                 
                 // Layer 3: character & objects
-                DrawObjects();                
+                //DrawObjects();                
 
                 // Draws motion of moveable objects
                 DrawEvents();
@@ -129,6 +136,7 @@
             <div>- Add NPCs/Objects properly</div>
             <div>- Refine Dialogs</div>
             <div>- Implement Enter/Touch-Interaction with NPCs/Objects</div>
+            <div>- Implement Event System</div>
             <div>- Implement Movement via Touch</div>
             <div>- New Save/Load Gamestate or refine solution using cookies</div>
             <div>- Implement proper Audio Select/Play System</div>
