@@ -11,6 +11,7 @@
         <script src="rectangle.js" type="text/javascript"></script>
         <script src="spritesheet.js" type="text/javascript"></script>
         <script src="sprite.js" type="text/javascript"></script>
+        <script src="spriteData.js" type="text/javascript"></script>
         <script src="animate.js" type="text/javascript"></script>
         <script src="maps.js" type="text/javascript"></script>
         <script src="world.js" type="text/javascript"></script>
@@ -24,22 +25,24 @@
             var Context = null;
             var framerate = 24;
             
-            var canvasWidth = 1200;
-            var canvasHeight = 800;
+            var canvasWidth = 800;
+            var canvasHeight = 600;
             
-            var speed = 2;
+            var sunset = new Sprite("Panorama/sunset1.png", 320, 240, 1, 1);
             
-            var panorama = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
+            // Edit size parameter: Width, Height, numberSpritesX, numberSpritesY
+            var sprite_test = new Sprite("CharSet/test_sprite.png", 320, 363, 3, 1);
             
-            var character = new Sprite("CharSet/Mannschgerl.png", 320, 360, 3, 3);
-            var motionEnabled = true;
-            var character_is_moving = false;
+            var collision = false;
             
             var mouse_x = 0;
             var mouse_y = 0;
             
-            var charX = [0, 0];
-            var charY = [0, 0];
+            var charX = [200, 100];
+            var charY = [100, 100];
+            
+            var prevX = 0;
+            var prevY = 0;
             
             $(document).ready(function() {
                 
@@ -60,15 +63,10 @@
             setInterval(function() {
                 // Background: TODO: Implement moving background
                 // Stretch panorama to canavas size for a background
-                panorama.draw2(0, 0, canvasWidth, canvasHeight);
-                
-                DrawEvents();
-                
-                
+                sunset.draw2(0, 0, canvasWidth, canvasHeight);
+
                 ResetAnimationCounter();
-                character_is_moving = false;
-                
-                
+                character_is_moving = false;                
                 
                 // <if else> for four direction movement
                 if (motionEnabled) {
@@ -100,42 +98,19 @@
                         }
                         character_is_moving = true;
                     }
-                }
-                
-                
-                
-                if (key.plus) {
-                    speed++;
-                    if (speed > 10) {
-                        speed = 10;
-                    }
-                }
-                if (key.minus) {
-                    speed--;
-                    if (speed < 1) {
-                        speed = 1;
-                    }
-                }
-                if (key.o) {
-                    // Mouse position
-                    console.log("mouse_x: " +mouse_x+", mouse_y" +mouse_y);
-                }
-                
-                if (key.p) {
-                    // Position debug
-                    console.log("charX[mapID]: " +cameraX[mapID]+", charY[mapID]" +cameraY[mapID]);
-                }                
+                }               
                 
                 // Animated characters
                 var char_seq = 0;
                 
                 if (character_is_moving) {
+                    // Edit move sequence
                     char_seq = [0,1,2];
                     
-                    character.draw(cameraX[mapID], cameraY[mapID], char_seq);
+                    sprite_test.draw(charX[mapID], charY[mapID], char_seq);
                 }
                 else
-                    character.draw(cameraX[mapID], cameraY[mapID], 0);
+                    sprite_test.draw(charX[mapID], charY[mapID], 0);
                 
                 
             }, framerate);
