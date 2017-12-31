@@ -85,7 +85,7 @@ function gameEvents() {
 }
 
 // GLOBAL VARIABLES
-var cameraX = [200, 100];
+var cameraX = [300, 100];
 var cameraY = [100, 100];
 
 var prevCamX = 0;
@@ -234,16 +234,13 @@ function characterMotion() {
     DrawObjects();
     
     // Resolve collision by setting char to back to position without collision
-    if (collision) {
+    if (!isWalkable()) {
         charX[mapID] = prevX;
         charY[mapID] = prevY;
         cameraX[mapID] = prevCamX;
         cameraY[mapID] = prevCamY;
         relativeX[mapID] = prevRelX;
         relativeY[mapID] = prevRelY;
-        
-        character_is_moving =false;
-        collision = false;
     }
 
     
