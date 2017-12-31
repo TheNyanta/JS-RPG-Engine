@@ -97,11 +97,6 @@ var character_is_moving = false;
 var character_direction = 0;
 var character_look = [0, 0];
 var motionEnabled = true;
-
-var walkUp = true;
-var walkDown = true;
-var walkLeft = true;
-var walkRight = true;
             
 var speed = 2;
 
@@ -119,12 +114,10 @@ function characterMotion() {
     // <if else> for single direction movement at the same time only
     if (motionEnabled && !key.shift) {
         if (key.up || key.w) {
-            if(canWalkTile(0) && walkUp) {
+            if(canWalkTile(0)) {
                 character_direction |= DIR_N;
                 character_look[mapID] = DIR_N;
                 character_is_moving = true;
-                //walkUp = false;
-                //setTimeout(function() { walkUp = true;}, 100);
                 
                 // Map is not at the upper end
                 if (relativeY[mapID] > 0) {
@@ -147,12 +140,10 @@ function characterMotion() {
         }
         
         else if (key.down || key.s) {
-            if(canWalkTile(1) && walkDown) {
+            if(canWalkTile(1)) {
                 character_direction |= DIR_S;
                 character_look[mapID] = DIR_S;
                 character_is_moving = true;
-                //walkDown = false;
-                //setTimeout(function() { walkDown = true;}, 100);
                 
                 // Map is not at the lower end
                 if (tileHeight[mapID] * mapHeight[mapID] - relativeY[mapID] > canvasHeight) {
@@ -175,12 +166,10 @@ function characterMotion() {
         }
         
         else if (key.left || key.a) {
-            if(canWalkTile(2) && walkLeft) {
+            if(canWalkTile(2)) {
                 character_direction |= DIR_W;
                 character_look[mapID] = DIR_W;   
                 character_is_moving = true;
-                //walkLeft = false;
-                //setTimeout(function() { walkLeft = true;}, 100);
                 
                 // Map is not at the left end
                 if (relativeX[mapID] > 0) {
@@ -203,12 +192,10 @@ function characterMotion() {
         }
         
         else if (key.right || key.d) {
-            if(canWalkTile(3) && walkRight) {
+            if(canWalkTile(3)) {
                 character_direction |= DIR_E;
                 character_look[mapID] = DIR_E;
                 character_is_moving = true;
-                //walkRight = false;
-                //setTimeout(function() { walkRight = true;}, 100);
                 
                 // Map is not at the right end
                 if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] > canvasWidth) {
@@ -252,70 +239,15 @@ function characterMotion() {
         if (character_direction & DIR_W) char_seq = [36,37,38];
         if (character_direction & DIR_E) char_seq = [12,13,14];
         if (character_direction & DIR_N) char_seq = [0,1,2];
-        if (character_direction & DIR_S) char_seq = [24,25,26];                 
-        
-        character.draw(cameraX[mapID], cameraY[mapID], char_seq);
+        if (character_direction & DIR_S) char_seq = [24,25,26];           character.draw(cameraX[mapID], cameraY[mapID], char_seq);
     }
     else {
         if (character_look[mapID] == DIR_W) char_look = 37;
         if (character_look[mapID] == DIR_E) char_look = 13;    
         if (character_look[mapID] == DIR_N) char_look = 1;
         if (character_look[mapID] == DIR_S) char_look = 25;
-        
-        if(!isGravity)
-            character.draw(cameraX[mapID], cameraY[mapID], char_look);
+        character.draw(cameraX[mapID], cameraY[mapID], char_look);
     }
-}
-
-// Draw pseudo gravity
-var isGravity = false;
-function gravity() {
-    if (!chatSequence) {
-        if (mapID == 0) {
-            if (charX[mapID] < 44-relativeX[mapID]) {
-                motionEnabled = false;
-                isGravity = true;
-                if (charY[mapID] < 320-relativeY[mapID]) {
-                    charY[mapID] = charY[mapID] + 4;
-                    character_look[mapID] = DIR_S;
-                }
-                else {
-                    motionEnabled = true;
-                    isGravity = false; 
-                }
-            }
-            else if (charX[mapID] > 410-relativeX[mapID]) {
-                motionEnabled = false;
-                isGravity = true;
-                if (charY[mapID] < 320-relativeY[mapID]) {
-            charY[mapID] = charY[mapID] + 4;
-                    character_look[mapID] = DIR_S;
-                }
-                else {
-                    motionEnabled = true;
-                    isGravity = false;
-                }
-            }
-            else if (charY[mapID] < 40-relativeY[mapID]) {
-                motionEnabled = false;
-                isGravity = true;
-                charY[mapID] = charY[mapID] + 4;
-                character_look[mapID] = DIR_S;
-            }
-            else {
-                motionEnabled = true;
-                isGravity = false;
-            }
-        }
-        else {
-            motionEnabled = true;
-            isGravity = false;
-        }
-    }
-    
-    // Character falling animation
-    if (!motionEnabled && isGravity)
-        character.draw(charX[mapID], charY[mapID], 31);
 }
 
 // Draw all motions
@@ -327,7 +259,6 @@ function DrawEvents() {
         motionEnabled = true;
     }
     
-    //gravity();
     characterMotion();
     gameEvents();
 }
