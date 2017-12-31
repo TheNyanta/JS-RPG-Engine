@@ -48,6 +48,7 @@
             catsound.volume = 0.2;
             
             var collision = false;
+            var staticGrid = false;
             
             var mouse_x = 0;
             var mouse_y = 0;
@@ -105,7 +106,8 @@
                 
                 DrawForegroundMap();
                 
-                //DrawGrid();
+                if (staticGrid)
+                    DrawGrid();
                 
                 // Layer 4: Objects over Layer 3 - i.e. stand behind a tree
                 // TODO: add in world.js

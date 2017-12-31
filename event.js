@@ -41,9 +41,13 @@ function gameEvents() {
     
     if (key.key6) {
     }
+    
+    if (key.key9) {
+        staticGrid = true;
+    }
         
     if (key.key0) {
-        
+        staticGrid = false;
     }    
     
     if (key.plus) {

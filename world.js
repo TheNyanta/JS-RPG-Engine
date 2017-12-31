@@ -90,31 +90,34 @@ function DrawObjects() {
 
 // Collision-Testing; direction: UP=0, DOWN=1, LEFT=2, RIGHT=3
 // if standing on a tile only need to check the adj. tile of the given direction
-// if standing on two tiles check the two adj. tiles of the given direction
+// if standing on two tiles check the two adj. tiles of the given direction TODO!!!
 function canWalkTile(direction) {
-    var x = Math.floor((cameraX[mapID]+relativeX[mapID]+4)/16);
-    var y = Math.floor((cameraY[mapID]+relativeY[mapID]+16)/16);
+    var x1 = Math.floor((cameraX[mapID]+relativeX[mapID]+4)/16);
+    var y1 = Math.floor((cameraY[mapID]+relativeY[mapID]+16)/16);
+    
+    var x2 = x1 + 1;
+    var y2 = y1 + 1;
+    
+    //console.log("[x1,y1]=["+x1+","+y1+"] | [x1,y2]=["+x1+","+y2+"] | [x2,y1]=["+x2+","+y1+"] | [x2,y2]=["+x2+","+y2+"]");
     
     if (direction==0) {
-        if (y == -1) return false; //reached upper end of map
-        return map[mapID][3][xy2i(x,y,mapWidth[mapID])];
+        if (y1 == -1) return false; //reached upper end of map
+        return (map[mapID][3][xy2i(x1,y1,mapWidth[mapID])] && map[mapID][3][xy2i(x2,y1,mapWidth[mapID])]);
     }
     
     if (direction==1) {
-        if (y == mapHeight[mapID]-1) return false; //reached lower end of map
-        y++;
-        return map[mapID][3][xy2i(x,y,mapWidth[mapID])];
+        if (y1 == mapHeight[mapID]-1) return false; //reached lower end of map
+        return (map[mapID][3][xy2i(x1,y2,mapWidth[mapID])] && map[mapID][3][xy2i(x2,y2,mapWidth[mapID])]);
     }
     
     if (direction==2) {
-        if (x == -1) return false; //reached left end of map
-        return map[mapID][3][xy2i(x,y,mapWidth[mapID])];
+        if (x1 == -1) return false; //reached left end of map
+        return (map[mapID][3][xy2i(x1,y1,mapWidth[mapID])] && map[mapID][3][xy2i(x1,y2,mapWidth[mapID])]);
     }
     
     if (direction==3) {
-        if (x == mapWidth[mapID]-1) return false; //reached right end of map
-        x++;
-        return map[mapID][3][xy2i(x,y,mapWidth[mapID])];
+        if (x1 == mapWidth[mapID]-1) return false; //reached right end of map
+        return (map[mapID][3][xy2i(x2,y1,mapWidth[mapID])] && map[mapID][3][xy2i(x2,y2,mapWidth[mapID])]);
     }
     
     return true;
