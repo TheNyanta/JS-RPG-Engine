@@ -73,17 +73,6 @@ function DrawObjects() {
                 catsound.play();
             }
         }
-        
-        // Hardcoded obstacle for testing
-        var leftwall = new Rectangle(0-prevRelX, 270-prevRelY, 158, 32);
-        // Rectangle-Char-Collision
-        if (char_collision_box.rectInside(leftwall))collision = true;
-        
-        var middlewall = new Rectangle(178-prevRelX, 270-prevRelY, 380, 32);
-        if (char_collision_box.rectInside(middlewall)) collision = true;
-        
-        var rightwall = new Rectangle(580-prevRelX, 270-prevRelY, 64, 32);
-        if (char_collision_box.rectInside(rightwall)) collision = true;
     }
     
     if (mapID == 1) {
@@ -99,6 +88,38 @@ function DrawObjects() {
     //mouseRect.draw('white', false, 'white',true);
 }
 
+// Collision-Testing; direction: UP=0, DOWN=1, LEFT=2, RIGHT=3
+// if standing on a tile only need to check the adj. tile of the given direction
+// if standing on two tiles check the two adj. tiles of the given direction
+function canWalkTile(direction) {
+    var x = Math.floor((cameraX[mapID]+relativeX[mapID]+4)/16);
+    var y = Math.floor((cameraY[mapID]+relativeY[mapID]+16)/16);
+    
+    if (direction==0) {
+        if (y == -1) return false; //reached upper end of map
+        return map[mapID][3][xy2i(x,y,mapWidth[mapID])];
+    }
+    
+    if (direction==1) {
+        if (y == mapHeight[mapID]-1) return false; //reached lower end of map
+        y++;
+        return map[mapID][3][xy2i(x,y,mapWidth[mapID])];
+    }
+    
+    if (direction==2) {
+        if (x == -1) return false; //reached left end of map
+        return map[mapID][3][xy2i(x,y,mapWidth[mapID])];
+    }
+    
+    if (direction==3) {
+        if (x == mapWidth[mapID]-1) return false; //reached right end of map
+        x++;
+        return map[mapID][3][xy2i(x,y,mapWidth[mapID])];
+    }
+    
+    return true;
+}
+
 // Layer 3
 function DrawForegroundMap() {
     var mapIndex = 0;        
@@ -109,5 +130,70 @@ function DrawForegroundMap() {
             if (map[mapID][2][mapIndex]-1 >= 0)
                 chipset[mapID].draw(tile_w, tile_h, map[mapID][2][mapIndex]-1);
         }
-    }
+    }    
+}
+
+//Static grid for testing
+function DrawGrid() {
+    var seg1 = new Segment(0, 16, canvasWidth, 0);
+    var seg2 = new Segment(0, 32, canvasWidth, 0);
+    var seg3 = new Segment(0, 48, canvasWidth, 0);
+    var seg4 = new Segment(0, 64, canvasWidth, 0);
+    var seg5 = new Segment(0, 80, canvasWidth, 0);
+    var seg6 = new Segment(0, 96, canvasWidth, 0);
+    var seg7 = new Segment(0, 112, canvasWidth, 0);
+    var seg8 = new Segment(0, 128, canvasWidth, 0);
+    var seg9 = new Segment(0, 144, canvasWidth, 0);
+    var seg10 = new Segment(0, 160, canvasWidth, 0);
+    var seg11 = new Segment(0, 176, canvasWidth, 0);
+    var seg12 = new Segment(0, 192, canvasWidth, 0);
+    var seg13 = new Segment(0, 208, canvasWidth, 0);
+    var seg14 = new Segment(0, 224, canvasWidth, 0);
+    var seg15 = new Segment(0, 240, canvasWidth, 0);
+    var seg16 = new Segment(0, 256, canvasWidth, 0);
+    var seg17 = new Segment(0, 272, canvasWidth, 0);
+    var seg18 = new Segment(0, 288, canvasWidth, 0);
+    var seg19 = new Segment(0, 304, canvasWidth, 0);
+    var seg20 = new Segment(0, 320, canvasWidth, 0);
+    var seg21 = new Segment(0, 336, canvasWidth, 0);
+    
+    seg1.draw(); seg2.draw(); seg3.draw(); seg4.draw(); seg5.draw(); seg6.draw(); seg7.draw();
+    seg8.draw(); seg9.draw(); seg10.draw(); seg11.draw(); seg12.draw(); seg13.draw(); seg14.draw();
+    seg15.draw(); seg16.draw(); seg17.draw(); seg18.draw(); seg19.draw(); seg20.draw(); seg21.draw();
+    
+    var seg22 = new Segment(16, 0, 0, canvasHeight);
+    var seg23 = new Segment(32, 0, 0, canvasHeight);
+    var seg24 = new Segment(48, 0, 0, canvasHeight);
+    var seg25 = new Segment(64, 0, 0, canvasHeight);
+    var seg26 = new Segment(80, 0, 0, canvasHeight);
+    var seg27 = new Segment(96, 0, 0, canvasHeight);
+    var seg28 = new Segment(112, 0, 0, canvasHeight);
+    var seg29 = new Segment(128, 0, 0, canvasHeight);
+    var seg30 = new Segment(144, 0, 0, canvasHeight);
+    var seg31 = new Segment(160, 0, 0, canvasHeight);
+    var seg32 = new Segment(176, 0, 0, canvasHeight);
+    var seg33 = new Segment(192, 0, 0, canvasHeight);
+    var seg34 = new Segment(208, 0, 0, canvasHeight);
+    var seg35 = new Segment(224, 0, 0, canvasHeight);
+    var seg36 = new Segment(240, 0, 0, canvasHeight);
+    var seg37 = new Segment(256, 0, 0, canvasHeight);
+    var seg38 = new Segment(272, 0, 0, canvasHeight);
+    var seg39 = new Segment(288, 0, 0, canvasHeight);
+    var seg40 = new Segment(304, 0, 0, canvasHeight);
+    var seg41 = new Segment(320, 0, 0, canvasHeight);
+    var seg42 = new Segment(336, 0, 0, canvasHeight);
+    var seg43 = new Segment(352, 0, 0, canvasHeight);
+    var seg44 = new Segment(368, 0, 0, canvasHeight);
+    var seg45 = new Segment(384, 0, 0, canvasHeight);
+    var seg46 = new Segment(400, 0, 0, canvasHeight);
+    var seg47 = new Segment(416, 0, 0, canvasHeight);
+    var seg48 = new Segment(432, 0, 0, canvasHeight);
+    var seg49 = new Segment(448, 0, 0, canvasHeight);
+    var seg50 = new Segment(464, 0, 0, canvasHeight);
+    
+    seg22.draw();
+    seg23.draw(); seg24.draw(); seg25.draw(); seg26.draw(); seg27.draw(); seg28.draw(); seg29.draw();
+    seg30.draw(); seg31.draw(); seg32.draw(); seg33.draw(); seg34.draw(); seg35.draw(); seg36.draw();
+    seg37.draw(); seg38.draw(); seg39.draw(); seg40.draw(); seg41.draw(); seg42.draw(); seg43.draw();
+    seg44.draw(); seg45.draw(); seg46.draw(); seg47.draw(); seg48.draw(); seg49.draw(); seg50.draw();
 }

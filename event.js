@@ -61,8 +61,8 @@ function gameEvents() {
     }
     
     if (key.o) {
-        // Mouse position
-        console.log("mouse_x: " +mouse_x+", mouse_y" +mouse_y);
+        // Char Tile position
+        console.log("Standing on Tile["+ Math.floor((cameraX[mapID]+relativeX[mapID]+4)/16) +","+ Math.floor((cameraY[mapID]+relativeY[mapID]+16)/16) +"]");
     }
     
     if (key.p) {
@@ -80,6 +80,7 @@ function gameEvents() {
             
 }
 
+// GLOBAL VARIABLES
 var cameraX = [200, 100];
 var cameraY = [100, 100];
 
@@ -92,6 +93,11 @@ var character_is_moving = false;
 var character_direction = 0;
 var character_look = [0, 0];
 var motionEnabled = true;
+
+var walkUp = true;
+var walkDown = true;
+var walkLeft = true;
+var walkRight = true;
             
 var speed = 2;
 
@@ -109,161 +115,121 @@ function characterMotion() {
     // <if else> for single direction movement at the same time only
     if (motionEnabled && !key.shift) {
         if (key.up || key.w) {
-            character_direction |= DIR_N;
-            character_look[mapID] = DIR_N;
-            
-            // Map is not at the upper end
-            if (relativeY[mapID] > 0) {
-                // Camera is below the middle of the canvas: move camera up
-                if (cameraY[mapID] > Math.floor(canvasHeight/2)) {
+            if(canWalkTile(0) && walkUp) {
+                character_direction |= DIR_N;
+                character_look[mapID] = DIR_N;
+                character_is_moving = true;
+                //walkUp = false;
+                //setTimeout(function() { walkUp = true;}, 100);
+                
+                // Map is not at the upper end
+                if (relativeY[mapID] > 0) {
+                    // Camera is below the middle of the canvas: move camera up
+                    if (cameraY[mapID] > Math.floor(canvasHeight/2)) {
+                        cameraY[mapID] -= speed;
+                    }
+                    // Camera is "above"/at the middle of the canvas: move map downwards + character move on spot
+                    else {
+                        relativeY[mapID] -= speed;
+                    }
+                }
+                // Map is at the upper end: move camera up
+                else {
                     cameraY[mapID] -= speed;
                 }
-                // Camera is "above"/at the middle of the canvas: move map downwards + character move on spot
-                else {
-                    relativeY[mapID] -= speed;
-                }
-            }
-            // Map is at the upper end: move camera up
-            else {
-                cameraY[mapID] -= speed;
-            }
-            
-            // Top Boundry Check 
-            if (charY[mapID] < -16) {
-                charY[mapID] = -16;
-            }
-            else {
+                
                 charY[mapID] -= speed;
             }
-            if (cameraY[mapID] < -16) {
-                cameraY[mapID] = -16;
-                character_is_moving = false;
-            }
-            else {
-                character_is_moving = true;
-            }
-            if (relativeY[mapID] < 0)
-                relativeY[mapID] = 0;
         }
         
         else if (key.down || key.s) {
-            character_direction |= DIR_S;
-            character_look[mapID] = DIR_S;
-            
-            // Map is not at the lower end
-            if (tileHeight[mapID] * mapHeight[mapID] - relativeY[mapID] > canvasHeight) {
-                // Camera is below the middle of the canvas: move map upwards
-                if (cameraY[mapID] > Math.floor(canvasHeight/2)) {
-                    relativeY[mapID] += speed;
+            if(canWalkTile(1) && walkDown) {
+                character_direction |= DIR_S;
+                character_look[mapID] = DIR_S;
+                character_is_moving = true;
+                //walkDown = false;
+                //setTimeout(function() { walkDown = true;}, 100);
+                
+                // Map is not at the lower end
+                if (tileHeight[mapID] * mapHeight[mapID] - relativeY[mapID] > canvasHeight) {
+                    // Camera is below the middle of the canvas: move map upwards
+                    if (cameraY[mapID] > Math.floor(canvasHeight/2)) {
+                        relativeY[mapID] += speed;
+                    }
+                    // Camera is "above"/at the middle of the canvas: move camera down
+                    else {
+                        cameraY[mapID] += speed;
+                    }
                 }
-                // Camera is "above"/at the middle of the canvas: move camera down
+                // Map is at the lower end: move camera down
                 else {
                     cameraY[mapID] += speed;
                 }
-            }
-            // Map is at the lower end: move camera down
-            else {
-                cameraY[mapID] += speed;
-            }
-            
-            // Bottom Boundry Check
-            if (charY[mapID] > canvasHeight-32) {
-                charY[mapID] = canvasHeight-32;
-            }
-            else {
+                
                 charY[mapID] += speed;               
             }
-            if (cameraY[mapID] > canvasHeight-32) {
-                cameraY[mapID] = canvasHeight-32;
-                character_is_moving = false;
-            }
-            else {
-                character_is_moving = true;
-            }
-            if (tileHeight[mapID] * mapHeight[mapID] - relativeY[mapID] < canvasHeight)
-                relativeY[mapID] = tileHeight[mapID] * mapHeight[mapID] - canvasHeight;
         }
         
         else if (key.left || key.a) {
-            character_direction |= DIR_W;
-            character_look[mapID] = DIR_W;
-            
-            // Map is not at the left end
-            if (relativeX[mapID] > 0) {
-                // Camera is right of the middle of the canvas: move camera left
-                if (cameraX[mapID] > Math.floor(canvasWidth/2)) {
+            if(canWalkTile(2) && walkLeft) {
+                character_direction |= DIR_W;
+                character_look[mapID] = DIR_W;   
+                character_is_moving = true;
+                //walkLeft = false;
+                //setTimeout(function() { walkLeft = true;}, 100);
+                
+                // Map is not at the left end
+                if (relativeX[mapID] > 0) {
+                    // Camera is right of the middle of the canvas: move camera left
+                    if (cameraX[mapID] > Math.floor(canvasWidth/2)) {
+                        cameraX[mapID] -= speed;
+                    }
+                    // Camera is left of the middle of the canvas: move map right
+                    else {
+                        relativeX[mapID] -= speed;
+                    }
+                }
+                // Map is at the left end: move camera left
+                else {
                     cameraX[mapID] -= speed;
                 }
-                // Camera is left of the middle of the canvas: move map right
-                else {
-                    relativeX[mapID] -= speed;
-                }
-            }
-            // Map is at the left end: move camera left
-            else {
-                cameraX[mapID] -= speed;
-            }
-            
-            // Left Boundry Check
-            if (charX[mapID] < -4) {
-                charX[mapID] = -4;
-            }
-            else {
+                
                 charX[mapID] -= speed;
             }
-            if (cameraX[mapID] < -4) {
-                cameraX[mapID] = -4;
-                character_is_moving = false;
-            }
-            else {
-                character_is_moving = true;
-            }
-            if (relativeX[mapID] < 0)
-                relativeX[mapID] = 0;
         }
         
         else if (key.right || key.d) {
-            character_direction |= DIR_E;
-            character_look[mapID] = DIR_E;
-            
-            // Map is not at the right end
-            if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] > canvasWidth) {
-                // Camera is right of the middle of the canvas:
-                if (cameraX[mapID] > Math.floor(canvasWidth/2)) {
-                    relativeX[mapID] += speed;
+            if(canWalkTile(3) && walkRight) {
+                character_direction |= DIR_E;
+                character_look[mapID] = DIR_E;
+                character_is_moving = true;
+                //walkRight = false;
+                //setTimeout(function() { walkRight = true;}, 100);
+                
+                // Map is not at the right end
+                if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] > canvasWidth) {
+                    // Camera is right of the middle of the canvas: move map right
+                    if (cameraX[mapID] > Math.floor(canvasWidth/2)) {
+                        relativeX[mapID] += speed;
+                    }
+                    // Camera is left of the middle of the canvas: move camera right
+                    else {
+                        cameraX[mapID] += speed;
+                    }
                 }
-                // Camera is left of the middle of the canvas:
+                // Map is at the right end: move camera right
                 else {
                     cameraX[mapID] += speed;
                 }
-            }
-            // Map is at the right end: move camera right
-            else {
-                cameraX[mapID] += speed;
-            }
-            
-            // Right Boundry Check
-            if (charX[mapID] > canvasWidth-20) {
-                charX[mapID] = canvasWidth-20;                
-            }
-            else {
+                
                 charX[mapID] += speed;
             }
-            if (cameraX[mapID] > canvasWidth-20) {
-                cameraX[mapID] = canvasWidth-20;
-                character_is_moving = false;
-            }
-            else {
-                character_is_moving = true;
-            }
-            if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] < canvasWidth)
-                relativeX[mapID] = tileWidth[mapID] * mapWidth[mapID] - canvasWidth;
-            
         }
     }
-    // Collision check
+    // Check for collision
     DrawObjects();
     
+    // Resolve collision by setting char to back to position without collision
     if (collision) {
         charX[mapID] = prevX;
         charY[mapID] = prevY;

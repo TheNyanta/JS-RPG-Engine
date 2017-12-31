@@ -142,17 +142,20 @@ function InitalizeMouse() {
         mouse_y = event.clientY - dim.top;
     }                            
     
-    // single click/touch event
+    // single click event
     $(document.getElementById("game")).click(function(e) {
         DisableScrollbar();
         
-        cameraX[mapID] = mouse_x;
-        cameraY[mapID] = mouse_y;
+        //cameraX[mapID] = mouse_x;
+        //cameraY[mapID] = mouse_y;
         
-        charX[mapID] = relativeX[mapID] + cameraX[mapID];
-        charY[mapID] = relativeY[mapID] + cameraY[mapID];
+        // update charX/Y 
+        //charX[mapID] = relativeX[mapID] + cameraX[mapID];
+        //charY[mapID] = relativeY[mapID] + cameraY[mapID];
         
-        console.log("click: " + mouse_x + ", " + mouse_y);
+        //"click: " + (mouse_x+relativeX[mapID]) + ", " + (mouse_y+relativeY[mapID]) + 
+        
+        console.log("Clicked on Tile[" + Math.floor((mouse_x+relativeX[mapID])/16) + ", " + Math.floor((mouse_y+relativeY[mapID])/16)+"]");
     });
     
     // double click event
