@@ -67,14 +67,6 @@ function gameEvents() {
         // Position debug
         console.log("charX=" +Math.floor(charX[mapID])+", charY=" +Math.floor(charY[mapID]) +" | camX=" +cameraX[mapID] +", camY=" + cameraY[mapID] +" | relX=" +relativeX[mapID]+", relY=" + relativeY[mapID]);
     }
-    /*
-    // Move Map
-    if (key.shift) {
-        if (key.w) relativeY[mapID] -= speed;
-        if (key.s) relativeY[mapID] += speed;
-        if (key.a) relativeX[mapID] -= speed;
-        if (key.d) relativeX[mapID] += speed;
-    }*/
             
 }
 
@@ -96,11 +88,6 @@ var speed = 2;
 
 // Draw character motion WASD + Arrow Keys
 function characterMotion() {
-    
-    prevCamX = cameraX[mapID];
-    prevCamY = cameraY[mapID];
-    prevX = charX[mapID];
-    prevY = charY[mapID];
     
     character_is_moving = false;
     character_direction = 0;
@@ -201,8 +188,15 @@ function characterMotion() {
     }
     DrawObjects();
     
+    // Save last collision-free position
+    if (isWalkable()) {
+        prevX = charX[mapID];
+        prevY = charY[mapID];
+        prevCamX = cameraX[mapID];
+        prevCamY = cameraY[mapID];
+    }
     // Resolve collision by setting char back to previous position without collision
-    if (!isWalkable()) {
+    else  {
         charX[mapID] = prevX;
         charY[mapID] = prevY;
         cameraX[mapID] = prevCamX;
