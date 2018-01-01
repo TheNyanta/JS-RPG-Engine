@@ -21,7 +21,6 @@ function EnableScrollbar() {
     document.body.scroll = "yes";
 }
 
-
 function enterFullscreen(element) {
     if(element.requestFullscreen) {
         element.requestFullscreen();
@@ -32,11 +31,18 @@ function enterFullscreen(element) {
     } else if(element.msRequestFullscreen) {
         element.msRequestFullscreen();
     }
-    //TODO resize canvas if fullscreen
-    //canvasHeight = $(window).height();
-    //canvasWidth = $(window).width();
-    //Context.context.width = canvasWidth;
-    //Context.context.height = canvasHeight; 
+    /*
+    //resize canvas if fullscreen
+    canvasWidth = $(window).width();
+    if (canvasWidth > tileWidth[mapID] * mapWidth[mapID])
+        canvasWidth = tileWidth[mapID] * mapWidth[mapID];
+    
+    canvasHeight = $(window).height();
+    if (canvasHeight > tileHeight[mapID] * mapHeight[mapID])
+        canvasHeight = tileHeight[mapID] * mapHeight[mapID];
+    
+    Context = new HTML("game", canvasWidth, canvasHeight);
+    */
 }
 
 function setCookie(cname,cvalue,exdays) {
