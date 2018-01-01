@@ -51,17 +51,11 @@ function gameEvents() {
     }    
     
     if (key.plus) {
-        speed+=1;
-        if (speed > 16) {
-            speed = 16;
-        }
+        
     }
     
     if (key.minus) {
-        speed-=1;
-        if (speed < 1) {
-            speed = 1;
-        }
+        
     }
     
     if (key.o) {
