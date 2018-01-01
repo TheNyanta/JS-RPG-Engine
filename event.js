@@ -16,7 +16,7 @@ function gameEvents() {
     }
     
     if (key.esc) {
-        EnableScrollbar();
+        
     }
     
     if (key.key1) {
@@ -42,12 +42,20 @@ function gameEvents() {
     if (key.key6) {
     }
     
-    if (key.key9) {
+    if (key.key7) {
         staticGrid = true;
+    }
+    
+    if (key.key8) {
+        staticGrid = false;
+    }
+    
+    if (key.key9) {
+        DisableScrollbar();
     }
         
     if (key.key0) {
-        staticGrid = false;
+        EnableScrollbar();
     }    
     
     if (key.plus) {

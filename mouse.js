@@ -144,7 +144,7 @@ function InitalizeMouse() {
     
     // single click event
     $(document.getElementById("game")).click(function(e) {
-        DisableScrollbar();
+        //DisableScrollbar();
         
         //cameraX[mapID] = mouse_x;
         //cameraY[mapID] = mouse_y;
