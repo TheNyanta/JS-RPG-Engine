@@ -69,20 +69,13 @@
                 
                 InitalizeMouse();
                 
-                //InitalizeTouch();
+                InitalizeTouch();
                 
                 LoadGamestate();
                 
             });
             
             $(window).on('load', function () {});
-            
-            window.addEventListener('touchmove', function (e) {
-                cameraX[mapID] = e.touches[0].screenX;
-                cameraY[mapID] = e.touches[0].screenY;
-                charX[mapID] = relativeX[mapID] + cameraX[mapID];
-                charY[mapID] = relativeY[mapID] + cameraY[mapID];
-            });
             
             setInterval(function() {
                 
