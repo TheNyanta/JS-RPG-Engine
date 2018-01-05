@@ -148,6 +148,14 @@
                 key.left = false;
                 key.right = false;
             }
+
+            function enterOn() {
+                key.enter = true;
+            }
+            
+            function enterOff() {
+                key.enter = false;
+            }
         </script>
         
     </head>
@@ -177,6 +185,9 @@
             <button onmousedown="moveright()" onmouseup="stopmove()">RIGHT</button><br><br>
             <button onmousedown="movedown()" onmouseup="stopmove()">DOWN</button>
         </div>
+        
+        <button onmousedown="enterOn()" onmouseup="enterOff()">Enter</button>
+
         
         <h5>            
             TODO:            

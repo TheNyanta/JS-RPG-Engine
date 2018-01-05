@@ -2,7 +2,7 @@
 var relativeX = [0, 0];
 var relativeY = [0, 0];
 
-// Character movement change relativeX/Y so take old value for DrawForeground to prevent unsyncron map moving 
+// Character movement changes relativeX/Y so take old value for DrawForeground to prevent unsyncron map moving 
 var prevRelX = 0;
 var prevRelY = 0;
 
@@ -105,7 +105,8 @@ function DrawObjects() {
     //mouseRect.draw('white', false, 'white',true);
 }
 
-// Character can stand on atmost 4 different tiles, only returns true if all 4 are walkable TODO: take two parameter to apply it for any moveable object (not only the character)
+// Character can stand on atmost 4 different tiles, only returns true if all 4 are walkable
+// TODO: take two parameter to apply it for any moveable object (not only the character)
 function isWalkable() {
     var x1 = Math.floor((cameraX[mapID]+relativeX[mapID]+ 4)/16);
     var y1 = Math.floor((cameraY[mapID]+relativeY[mapID]+16)/16);
