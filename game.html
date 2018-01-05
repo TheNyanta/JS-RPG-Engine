@@ -125,6 +125,30 @@
             }, framerate);
         
         </script>
+        <script>
+            function moveup() {
+                key.up = true;
+            }
+            
+            function movedown() {
+                key.down = true;
+            }
+            
+            function moveleft() {
+                key.left = true;
+            }
+            
+            function moveright() {
+                key.right = true;
+            }
+            
+            function stopmove() {
+                key.up = false;
+                key.down = false;
+                key.left = false;
+                key.right = false;
+            }
+        </script>
         
     </head>
 
@@ -141,6 +165,10 @@
         </h5>
         
         <canvas id="game"></canvas>
+        <button onmousedown="moveup()" onmouseup="stopmove()">UP</button>
+        <button onmousedown="movedown()" onmouseup="stopmove()">DOWN</button>
+        <button onmousedown="moveleft()" onmouseup="stopmove()">LEFT</button>
+        <button onmousedown="moveright()" onmouseup="stopmove()">RIGHT</button>
         
         <h5>            
             TODO:            
