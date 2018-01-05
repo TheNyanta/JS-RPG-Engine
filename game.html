@@ -164,11 +164,19 @@
             <div>Press "4" to save gamestate using cookies; Press "5" to load gamestate</div>
         </h5>
         
+        <div>
+            <button onclick="EnableScrollbar()">Scrollbar On</button>
+            <button onclick="DisableScrollbar()">Scrollbar Off</button>
+        </div>
+        
         <canvas id="game"></canvas>
-        <button onmousedown="moveup()" onmouseup="stopmove()">UP</button>
-        <button onmousedown="movedown()" onmouseup="stopmove()">DOWN</button>
-        <button onmousedown="moveleft()" onmouseup="stopmove()">LEFT</button>
-        <button onmousedown="moveright()" onmouseup="stopmove()">RIGHT</button>
+        
+        <div style="text-align: center; width: 480px;">
+            <button onmousedown="moveup()" onmouseup="stopmove()">UP</button><br><br>
+            <button onmousedown="moveleft()" onmouseup="stopmove()">LEFT</button>
+            <button onmousedown="moveright()" onmouseup="stopmove()">RIGHT</button><br><br>
+            <button onmousedown="movedown()" onmouseup="stopmove()">DOWN</button>
+        </div>
         
         <h5>            
             TODO:            
