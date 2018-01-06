@@ -41,16 +41,11 @@ function DrawBackgroundMap() {
 }
 
 // Layer 2
-
 function DrawObjects() {
     // Collison Box of the character
-    var char_collision_box = new Rectangle(cameraX[mapID]+4, cameraY[mapID]+16, 16, 16);
+    var char_collision_box = new Rectangle(charX[mapID]-relativeX[mapID]+4, charY[mapID]-relativeY[mapID]+16, 16, 16);
     // Draw Collision Box
     char_collision_box.draw('white', false, 'black', true);
-    
-    // Center of Collision Box
-    var ccb_center = new Point (char_collision_box.centerX, char_collision_box.centerY);
-    // ccb_center.draw(20, 'black');
     
     
     if (mapID == 0) {
@@ -107,17 +102,24 @@ function DrawObjects() {
 
 // Character can stand on atmost 4 different tiles, only returns true if all 4 are walkable
 // TODO: take two parameter to apply it for any moveable object (not only the character)
-function isWalkable() {
-    var x1 = Math.floor((cameraX[mapID]+relativeX[mapID]+ 4)/16);
-    var y1 = Math.floor((cameraY[mapID]+relativeY[mapID]+16)/16);
+function isWalkable(param1, param2) {
+    //var x = (cameraX[mapID]+relativeX[mapID]+ 4)/16;
+    //var y = (cameraY[mapID]+relativeY[mapID]+16)/16;
+    var x = (param1+relativeX[mapID]+ 4)/16;
+    var y = (param2+relativeY[mapID]+16)/16;
+    var x1 = Math.floor(x);
+    var y1 = Math.floor(y);
     var x2 = x1 + 1;
     var y2 = y1 + 1;
     
     // Check if standing exactly on a tile-axis
-    if (x1 - ((cameraX[mapID]+relativeX[mapID]+ 4)/16) == 0)
+    if (x1 - x == 0)
         x2 = x1;
-    if (y1 - ((cameraX[mapID]+relativeX[mapID]+16)/16) == 0)
+    if (y1 - y == 0)
         y2 = y1;
+    
+    if (x1 < 0 || y1 < 0 || x2 > mapWidth[mapID] - 1 || y2 > mapHeight[mapID] - 1)
+        return false;
     
     return (map[mapID][3][xy2i(x1,y1,mapWidth[mapID])] && map[mapID][3][xy2i(x1,y2,mapWidth[mapID])] && map[mapID][3][xy2i(x2,y1,mapWidth[mapID])] && map[mapID][3][xy2i(x2,y2,mapWidth[mapID])]);
 }

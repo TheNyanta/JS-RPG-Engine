@@ -17,13 +17,6 @@ var Sprite = function(fn, spriteWidth, spriteHeight, spritesX,spritesY) {
     this.image = null;
     this.spritesheet = null;
 
-
-    /* Tutorial 7 Code Start */
-    // this.animationDelay = 0;
-    // this.animationIndexCounter = 0;
-    // this.animationCurrentFrame = 0;
-    /* Tutorial 7 Code End */
-
     // Load from spritesheet
     if (fn instanceof Spritesheet)
     {
@@ -35,11 +28,11 @@ var Sprite = function(fn, spriteWidth, spriteHeight, spritesX,spritesY) {
     if (fn != undefined && fn != "" && fn != null)
     {
         this.load(fn);
-        console.log("Loaded sprite " + fn);
+        //console.log("Loaded sprite " + fn);
     }
     else
     {
-        console.log("Unable to load sprite. Filename '" + fn + "' is undefined or null.");
+        //console.log("Unable to load sprite. Filename '" + fn + "' is undefined or null.");
     }
 
     // Normal draw
@@ -48,7 +41,7 @@ var Sprite = function(fn, spriteWidth, spriteHeight, spritesX,spritesY) {
     };
     
     this.drawMap = function(x, y, index) {
-                Context.context.drawImage(this.image, res[0]*16, res[1]*16, 16, 16, tile_x, tile_y, 16, 16);         
+        Context.context.drawImage(this.image, res[0]*16, res[1]*16, 16, 16, tile_x, tile_y, 16, 16);         
     };
 
     this.draw = function(x, y, various)

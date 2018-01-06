@@ -9,12 +9,14 @@ var cameraY = [100, 100];
 var prevCamX = 0;
 var prevCamY = 0;
 
+var cameraLocked = true;
+
 // Character Properties
 
 var character_is_moving = false;
 var character_direction = 0;
 var character_look = [0, 0];
-var motionEnabled = true;
+var characterMotionEnabled = true;
 
 // Draw Animations
 var char_seq = 0;
@@ -29,16 +31,16 @@ function DrawCharacter() {
     character_direction = 0;
     
     if (chatSequence)
-        motionEnabled = false;
+        characterMotionEnabled = false;
     else
-        motionEnabled = true;
+        characterMotionEnabled = true;
     
     //##############################
     //## Using WASD or Arrow Keys ##
     //##############################
     
     // <if else> for single direction movement at the same time only
-    if (motionEnabled && !key.shift) {
+    if (characterMotionEnabled && !key.shift) {
         if (key.up || key.w) {
             character_direction |= DIR_N;
             character_look[mapID] = DIR_N;
@@ -68,7 +70,7 @@ function DrawCharacter() {
             character_is_moving = true;
             
             // Map is not at the lower end
-            if (tileHeight[mapID] * mapHeight[mapID] - relativeY[mapID] > canvasHeight) {
+            if (tileHeight[mapID] * mapHeight[mapID] - canvasHeight > relativeY[mapID]) {
                 // Camera is below the middle of the canvas: move map upwards
                 if (cameraY[mapID] > Math.floor(canvasHeight/2)) {
                     relativeY[mapID] += speed;
@@ -114,7 +116,7 @@ function DrawCharacter() {
             character_is_moving = true;
             
             // Map is not at the right end
-            if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] > canvasWidth) {
+            if (tileWidth[mapID] * mapWidth[mapID] - canvasWidth > relativeX[mapID]) {
                 // Camera is right of the middle of the canvas: move map right
                 if (cameraX[mapID] > Math.floor(canvasWidth/2)) {
                     relativeX[mapID] += speed;
@@ -139,7 +141,7 @@ function DrawCharacter() {
     //TODO
     /*
     // <if else> for single direction movement at the same time only
-    if (motionEnabled && !key.shift) {
+    if (characterMotionEnabled && !key.shift) {
         if (key.up || key.w) {
             character_direction |= DIR_N;
             character_look[mapID] = DIR_N;
@@ -169,7 +171,7 @@ function DrawCharacter() {
             character_is_moving = true;
             
             // Map is not at the lower end
-            if (tileHeight[mapID] * mapHeight[mapID] - relativeY[mapID] > canvasHeight) {
+            if (tileHeight[mapID] * mapHeight[mapID] - canvasHeight > relativeY[mapID]) {
                 // Camera is below the middle of the canvas: move map upwards
                 if (cameraY[mapID] > Math.floor(canvasHeight/2)) {
                     relativeY[mapID] += speed;
@@ -215,7 +217,7 @@ function DrawCharacter() {
             character_is_moving = true;
             
             // Map is not at the right end
-            if (tileWidth[mapID] * mapWidth[mapID] - relativeX[mapID] > canvasWidth) {
+            if (tileWidth[mapID] * mapWidth[mapID] - canvasWidth > relativeX[mapID]) {
                 // Camera is right of the middle of the canvas: move map right
                 if (cameraX[mapID] > Math.floor(canvasWidth/2)) {
                     relativeX[mapID] += speed;
@@ -235,18 +237,22 @@ function DrawCharacter() {
     */
     
     // Save last collision-free position
-    if (isWalkable()) {
+    if (isWalkable(charX[mapID]-relativeX[mapID], charY[mapID]-relativeY[mapID])) {
         prevX = charX[mapID];
         prevY = charY[mapID];
-        prevCamX = cameraX[mapID];
-        prevCamY = cameraY[mapID];
+        if (cameraLocked) {
+            prevCamX = cameraX[mapID];
+            prevCamY = cameraY[mapID];
+        }
     }
     // Resolve collision by setting char back to previous position without collision
     else  {
         charX[mapID] = prevX;
         charY[mapID] = prevY;
-        cameraX[mapID] = prevCamX;
-        cameraY[mapID] = prevCamY;
+        if (cameraLocked) {
+            cameraX[mapID] = prevCamX;
+            cameraY[mapID] = prevCamY;
+        }
         relativeX[mapID] = prevRelX;
         relativeY[mapID] = prevRelY;
         character_is_moving = false;
@@ -262,18 +268,27 @@ function DrawCharacter() {
     if (cameraY[mapID] > canvasHeight-16)
         cameraY[mapID] = canvasHeight-16;
     
+    if (relativeX[mapID] < 0)
+        relativeX[mapID] = 0;
+    if (relativeX[mapID] > tileWidth[mapID] * mapWidth[mapID] - canvasWidth)
+        relativeX[mapID] = tileWidth[mapID] * mapWidth[mapID] - canvasWidth;
+    if (relativeY[mapID] < 0)
+        relativeY[mapID] = 0;
+    if (relativeY[mapID] > tileHeight[mapID] * mapHeight[mapID] - canvasHeight)
+        relativeY[mapID] = tileHeight[mapID] * mapHeight[mapID] - canvasHeight;
+    
     if (character_is_moving) {
         if (character_direction & DIR_W) char_seq = [36,37,38];
         if (character_direction & DIR_E) char_seq = [12,13,14];
         if (character_direction & DIR_N) char_seq = [0,1,2];
         if (character_direction & DIR_S) char_seq = [24,25,26];
-        character.draw(cameraX[mapID], cameraY[mapID], char_seq);
+        character.draw(charX[mapID]-relativeX[mapID], charY[mapID]-relativeY[mapID], char_seq);
     }
     else {
         if (character_look[mapID] == DIR_W) char_look = 37;
         if (character_look[mapID] == DIR_E) char_look = 13;    
         if (character_look[mapID] == DIR_N) char_look = 1;
         if (character_look[mapID] == DIR_S) char_look = 25;
-        character.draw(cameraX[mapID], cameraY[mapID], char_look);
+        character.draw(charX[mapID]-relativeX[mapID], charY[mapID]-relativeY[mapID], char_look);
     }
 }

@@ -88,36 +88,37 @@ function LoadGamestate() {
         cameraX[1] = parseInt(getCookie("camX[1]"));
         cameraY[1] = parseInt(getCookie("camY[1]"));
         
-        console.log("Loaded Cookie");
+        //console.log("Loaded Cookie");
         
         // Load message
         chatSequence = true;
         dialogText = "Loaded gamestate!";
         setTimeout(function() {chatSequence = false;}, 1000);
     }
-    else
-        console.log("New game");
+    else {
+        //console.log("New game");
+    }
         
 }
 
 function SaveGamestate() {
     setCookie("mapID", mapID);
     
-    setCookie("charX[0]", charX[0], 30);
-    setCookie("charY[0]", charY[0], 30);
-    setCookie("charLook[0]", character_look[0]);
-    setCookie("relX[0]", relativeX[0]);
-    setCookie("relY[0]", relativeY[0]);
-    setCookie("camX[0]", cameraX[0]);
-    setCookie("camY[0]", cameraY[0]);
+    setCookie("charX[0]", charX[0], 365);
+    setCookie("charY[0]", charY[0], 365);
+    setCookie("charLook[0]", character_look[0], 365);
+    setCookie("relX[0]", relativeX[0], 365);
+    setCookie("relY[0]", relativeY[0], 365);
+    setCookie("camX[0]", cameraX[0], 365);
+    setCookie("camY[0]", cameraY[0], 365);
     
-    setCookie("charX[1]", charX[1], 30);
-    setCookie("charY[1]", charY[1], 30);
-    setCookie("charLook[1]", character_look[1]);
-    setCookie("relX[1]", relativeX[1]);
-    setCookie("relY[1]", relativeY[1]);
-    setCookie("camX[1]", cameraX[1]);
-    setCookie("camY[1]", cameraY[1]);
+    setCookie("charX[1]", charX[1], 365);
+    setCookie("charY[1]", charY[1], 365);
+    setCookie("charLook[1]", character_look[1], 365);
+    setCookie("relX[1]", relativeX[1], 365);
+    setCookie("relY[1]", relativeY[1], 365);
+    setCookie("camX[1]", cameraX[1], 365);
+    setCookie("camY[1]", cameraY[1], 365);
     
     // Saved message
     chatSequence = true;

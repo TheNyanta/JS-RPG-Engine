@@ -4,6 +4,19 @@ function gameEvents() {
         DrawDialog(dialogText, undefined, true);
     }
     
+    if (key.shift) {
+        cameraLocked = false;
+        if (key.w) relativeY[mapID]--;
+        if (key.s) relativeY[mapID]++;
+        if (key.a) relativeX[mapID]--;
+        if (key.d) relativeX[mapID]++;
+    }
+    else {
+        cameraLocked = true;
+        cameraX[mapID] = charX[mapID] - relativeX[mapID];
+        cameraY[mapID] = charY[mapID] - relativeY[mapID];        
+    }
+    
     
     // Events on input
     if (key.enter) {
@@ -40,7 +53,7 @@ function gameEvents() {
     }
     
     if (key.key6) {
-        console.log()
+        console.log((charX[mapID] - relativeX[mapID]) + ", " + (charY[mapID] - relativeY[mapID]));
     }
     
     if (key.key7) {
@@ -52,11 +65,11 @@ function gameEvents() {
     }
     
     if (key.key9) {
-        DisableScrollbar();
+        
     }
         
     if (key.key0) {
-        EnableScrollbar();
+        
     }    
     
     if (key.plus) {
@@ -76,9 +89,4 @@ function gameEvents() {
         // Position debug
         console.log("charX=" +Math.floor(charX[mapID])+", charY=" +Math.floor(charY[mapID]) +" | camX=" +cameraX[mapID] +", camY=" + cameraY[mapID] +" | relX=" +relativeX[mapID]+", relY=" + relativeY[mapID]);
     }           
-}
-
-// Draw all motions
-function DrawEvents() {
-    gameEvents();
 }

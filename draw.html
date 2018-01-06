@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>RPG GAME</title>
+        <title>DRAW MODE</title>
         <link rel="icon" href="favicon.ico">
         <link rel="icon" href="panorama/icon.png">
         <script src="utility.js" type="text/javascript"></script>
@@ -36,8 +36,7 @@
             $(document).ready(function() {
                 
                 Context = new HTML("game", canvasWidth, canvasHeight);
-                
-                // Easy access to grafics (gfx)
+
                 window.gfx = Context.context;
                 
                 InitializeKeyboard();
@@ -50,12 +49,9 @@
             $(window).on('load', function () {});
             
             setInterval(function() {
-                // Background: TODO: Implement moving background
-                // Stretch panorama to canavas size for a background
-                panorama.draw2(0, 0, canvasWidth, canvasHeight);
                 
                 var startmove = document.querySelector('.game');
-                var moves = document.getElementById('moves');
+                var moves = document.getElementById('game');
                 var startx = 0;
                 var starty = 0;
                 var dist = 0;
@@ -71,10 +67,12 @@
         <h1 id="title" >draw.html</h1>
         
         <p>
-            Draw Points and Lines.
+            TODO: Add drawing
         </p>
     
         <canvas id="game"></canvas>
+        
+        <canvas id="tiles"></canvas>
         
     </body>    
 </html>

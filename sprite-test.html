@@ -70,7 +70,7 @@
                 character_is_moving = false;                
                 
                 // <if else> for four direction movement
-                if (motionEnabled) {
+                if (characterMotionEnabled) {
                     if (key.up || key.w) {
                         charY[mapID] -= speed;
                         if (charY[mapID] < -16) {

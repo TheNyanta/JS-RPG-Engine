@@ -2,8 +2,9 @@
     <head>
         <title>RPG HTML-JS</title>
         <link rel="icon" href="favicon.ico">
-        <script src="utility.js" type="text/javascript"></script>
         <script src="jquery-3.2.1.js" type="text/javascript"></script>
+        <script src="utility.js" type="text/javascript"></script>
+        <script src="keyboard.js" type="text/javascript"></script>
         <script src="canvas.js" type="text/javascript"></script>
         <script src="point.js" type="text/javascript"></script>
         <script src="vector.js" type="text/javascript"></script>
@@ -16,26 +17,25 @@
         <script src="maps.js" type="text/javascript"></script>
         <script src="world.js" type="text/javascript"></script>
         <script src="dialog.js" type="text/javascript"></script>
-        <script src="keyboard.js" type="text/javascript"></script>
         <script src="mouse.js" type="text/javascript"></script>
         <script src="touch.js" type="text/javascript"></script>
         <script src="character.js" type="text/javascript"></script>
         <script src="event.js" type="text/javascript"></script>
-        
+
         <script language = "javascript">
-            
+
             var Context = null;
             var framerate = 24;
-            
+
             var canvasWidth = 480;//480;
             var canvasHeight = 352;//352;
-            
+
             // TODO: fix bug: if canvas is bigger than tilemap map moves to the responding end
             // Or make Tilemap always bigger than canvas
-            
+
             var sheeps = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
             var sunset = new Sprite("Panorama/sunset1.png", 320, 240, 1, 1);
-               
+
             var audio1 = new Audio('Music/banana-phone.ogg');
             var audio2 = new Audio('Music/forest.ogg');
             var audio3 = new Audio('Music/snow.ogg');
@@ -44,50 +44,53 @@
             audio2.volume = 0.2;
             audio3.volume = 0.2;
             catsound.volume = 0.2;
-            
+
             var staticGrid = false;
-            
+
             var mouse_x = 0;
             var mouse_y = 0;
-            
+
             var charX = [300, 100];
             var charY = [100, 100];
-            
+
             var prevX = 0;
             var prevY = 0;
-            
+
             $(document).ready(function() {
-                
+
                 Context = new HTML("game", canvasWidth, canvasHeight);
-                
+
                 // Easy access to grafics (gfx)
                 window.gfx = Context.context;
-                
+
                 InitializeKeyboard();
-                
+
                 InitalizeAnimationCounters();
-                
+
                 InitalizeMouse();
-                
+
                 //InitalizeTouch();
-                
+            });
+
+            $(window).on('load', function () {
                 LoadGamestate();
-                
             });
             
-            $(window).on('load', function () {});
+            $(window).on('unload', function() {
+                SaveGamestate();
+            });
             
             setInterval(function() {
-                
+
                 /*
                 // Resize Screen on leaving Fullscreen Mode
                 canvasWidth = 480;
                 canvasHeight = 352;
                 Context = new HTML("game", canvasWidth, canvasHeight);
                 */
-                
+
                 ResetAnimationCounter();
-                
+
                 // Layer 0: Panorama
                 // Background: TODO: Implement moving background
                 // Stretch panorama to canavas size for a background
@@ -97,51 +100,45 @@
                 if (mapID == 1) {
                     sheeps.draw2(0, 0, canvasWidth, canvasHeight);
                 }
-                
-                // Layer 1.1: Walkable ground 
+
+                // Layer 1: Map below the character & objects
                 DrawBackgroundMap();
                 
-                // Layer 1.2: Objects on the ground below Layer 3
-                //TODO: add in world.js
-                
-                // Layer 3: character & objects
-                //DrawObjects();                
+                // Standard Events on key-input
+                gameEvents();
 
-                // Draws motion of moveable objects
-                DrawEvents();
+                // Layer 2: character & objects                
                 DrawObjects();
                 DrawCharacter();
-                
+
+                // Layer 3: Map above the character & objects
                 DrawForegroundMap();
-                
+
+                // Draw Grid for testing
                 if (staticGrid)
                     DrawGrid();
-                
-                // Layer 4: Objects over Layer 3 - i.e. stand behind a tree
-                // TODO: add in world.js
-                
 
-                
             }, framerate);
-        
+
         </script>
+
         <script>
             function moveup() {
                 key.up = true;
             }
-            
+
             function movedown() {
                 key.down = true;
             }
-            
+
             function moveleft() {
                 key.left = true;
             }
-            
+
             function moveright() {
                 key.right = true;
             }
-            
+
             function stopmove() {
                 key.up = false;
                 key.down = false;
@@ -152,47 +149,46 @@
             function enterOn() {
                 key.enter = true;
             }
-            
+
             function enterOff() {
                 key.enter = false;
             }
         </script>
-        
+
     </head>
 
 
     <body background="Panorama/Background.jpg">
         <h1 id="title" >Testing</h1>
         <p><button onclick="enterFullscreen(document.getElementById('game'))" id="exit">Fullscreen</button></p>
-        
+
         <h5>
             <div>Press "9" to disable scrollbar. Press "0" to enable it.</div>
             <div>Control: WASD or Arrow-Key</div>
             <div>Press "1" for Grassmap. Press "2" for Snowmap.</div>
             <div>Press "4" to save gamestate using cookies; Press "5" to load gamestate</div>
         </h5>
-        
+
         <div>
             <button onclick="EnableScrollbar()">Scrollbar On</button>
             <button onclick="DisableScrollbar()">Scrollbar Off</button>
         </div>
-        
+
         <canvas id="game"></canvas>
-        
+
         <div style="text-align: center; width: 480px;">
             <button onmousedown="moveup()" ontouchstart="moveup()" onmouseup="stopmove()" ontouchend="stopmove()" ontouchcancel="stopmove()" unselectable="on">UP</button><br><br>
             <button onmousedown="moveleft()" ontouchstart="moveleft()" onmouseup="stopmove()"ontouchend="stopmove()" ontouchcancel="stopmove()" unselectable="on">LEFT</button>
             <button onmousedown="moveright()" ontouchstart="moveright()" onmouseup="stopmove()" ontouchend="stopmove()" ontouchcancel="stopmove()" unselectable="on">RIGHT</button><br><br>
             <button onmousedown="movedown()" ontouchstart="movedown()" onmouseup="stopmove()" ontouchend="stopmove()" ontouchcancel="stopmove()" unselectable="on">DOWN</button>
         </div>
-        
-        <button onmousedown="enterOn()" ontouchstart="enterOn()" onmouseup="enterOff()" ontouchend="enterOff()" ontouchcancel="enterOff()" unselectable="on">Enter</button>
-        <butto
 
-        
+        <button onmousedown="enterOn()" ontouchstart="enterOn()" onmouseup="enterOff()" ontouchend="enterOff()" ontouchcancel="enterOff()" unselectable="on">Enter</button>
+
+
         <h5>            
             TODO:            
-            <div>- Refine Collision Detection</div>
+            <div>- Collision Detection and Resolving with Objects</div>
             <div>- Add NPCs/Objects properly</div>
             <div>- Refine Dialogs</div>
             <div>- Implement Enter/Touch-Interaction with NPCs/Objects</div>
@@ -203,6 +199,6 @@
             <div>- Implement System Menu on Esc + Character Stats</div>
             <div>- Implement Battle System</div>
         </h5>    
-        
+
     </body>    
 </html>
