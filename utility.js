@@ -31,7 +31,7 @@ function enterFullscreen(element) {
     } else if(element.msRequestFullscreen) {
         element.msRequestFullscreen();
     }
-    /*
+    
     //resize canvas if fullscreen
     canvasWidth = $(window).width();
     if (canvasWidth > tileWidth[mapID] * mapWidth[mapID])
@@ -41,8 +41,19 @@ function enterFullscreen(element) {
     if (canvasHeight > tileHeight[mapID] * mapHeight[mapID])
         canvasHeight = tileHeight[mapID] * mapHeight[mapID];
     
+    Context = new HTML("game", canvasWidth, canvasHeight);   
+}
+
+function resizeCanvas() {
+    canvasWidth = $(window).width();
+    if (canvasWidth > tileWidth[mapID] * mapWidth[mapID])
+        canvasWidth = tileWidth[mapID] * mapWidth[mapID];
+    
+    canvasHeight = $(window).height();
+    if (canvasHeight > tileHeight[mapID] * mapHeight[mapID])
+        canvasHeight = tileHeight[mapID] * mapHeight[mapID];
+    
     Context = new HTML("game", canvasWidth, canvasHeight);
-    */
 }
 
 function setCookie(cname,cvalue,exdays) {

@@ -45,8 +45,6 @@
             audio3.volume = 0.2;
             catsound.volume = 0.2;
 
-            var staticGrid = false;
-
             var mouse_x = 0;
             var mouse_y = 0;
 
@@ -70,24 +68,21 @@
                 InitalizeMouse();
 
                 //InitalizeTouch();
-            });
-
-            $(window).on('load', function () {
-                LoadGamestate();
-            });
+                
+                // Deactivate Tab
+                $(document).keydown(function(objEvent) {
+                    if (objEvent.keyCode == 9) {  //tab pressed
+                        objEvent.preventDefault(); // stops its action
+                    }
+                });
+            });            
             
-            $(window).on('unload', function() {
-                SaveGamestate();
-            });
+
+            $(window).on('load', function () {});
+            
+            $(window).on('unload', function() {});
             
             setInterval(function() {
-
-                /*
-                // Resize Screen on leaving Fullscreen Mode
-                canvasWidth = 480;
-                canvasHeight = 352;
-                Context = new HTML("game", canvasWidth, canvasHeight);
-                */
 
                 ResetAnimationCounter();
 
@@ -103,9 +98,6 @@
 
                 // Layer 1: Map below the character & objects
                 DrawBackgroundMap();
-                
-                // Standard Events on key-input
-                gameEvents();
 
                 // Layer 2: character & objects                
                 DrawObjects();
@@ -113,46 +105,12 @@
 
                 // Layer 3: Map above the character & objects
                 DrawForegroundMap();
-
-                // Draw Grid for testing
-                if (staticGrid)
-                    DrawGrid();
+                
+                // Standard Events on key-input
+                gameEvents();
 
             }, framerate);
 
-        </script>
-
-        <script>
-            function moveup() {
-                key.up = true;
-            }
-
-            function movedown() {
-                key.down = true;
-            }
-
-            function moveleft() {
-                key.left = true;
-            }
-
-            function moveright() {
-                key.right = true;
-            }
-
-            function stopmove() {
-                key.up = false;
-                key.down = false;
-                key.left = false;
-                key.right = false;
-            }
-
-            function enterOn() {
-                key.enter = true;
-            }
-
-            function enterOff() {
-                key.enter = false;
-            }
         </script>
 
     </head>
@@ -160,30 +118,28 @@
 
     <body background="Panorama/Background.jpg">
         <h1 id="title" >Testing</h1>
-        <p><button onclick="enterFullscreen(document.getElementById('game'))" id="exit">Fullscreen</button></p>
-
         <h5>
-            <div>Press "9" to disable scrollbar. Press "0" to enable it.</div>
             <div>Control: WASD or Arrow-Key</div>
             <div>Press "1" for Grassmap. Press "2" for Snowmap.</div>
-            <div>Press "4" to save gamestate using cookies; Press "5" to load gamestate</div>
         </h5>
 
         <div>
-            <button onclick="EnableScrollbar()">Scrollbar On</button>
-            <button onclick="DisableScrollbar()">Scrollbar Off</button>
+            <button onclick="enterFullscreen(document.getElementById('game'))" unselectable="on">Fullscreen</button>
+            <button onclick="resizeCanvas()" unselectable="on">Resize</button>
+            <button onclick="EnableScrollbar()" unselectable="on">Scrollbar On</button>
+            <button onclick="DisableScrollbar()" unselectable="on">Scrollbar Off</button>
         </div>
 
         <canvas id="game"></canvas>
 
         <div style="text-align: center; width: 480px;">
-            <button onmousedown="moveup()" ontouchstart="moveup()" onmouseup="stopmove()" ontouchend="stopmove()" ontouchcancel="stopmove()" unselectable="on">UP</button><br><br>
-            <button onmousedown="moveleft()" ontouchstart="moveleft()" onmouseup="stopmove()"ontouchend="stopmove()" ontouchcancel="stopmove()" unselectable="on">LEFT</button>
-            <button onmousedown="moveright()" ontouchstart="moveright()" onmouseup="stopmove()" ontouchend="stopmove()" ontouchcancel="stopmove()" unselectable="on">RIGHT</button><br><br>
-            <button onmousedown="movedown()" ontouchstart="movedown()" onmouseup="stopmove()" ontouchend="stopmove()" ontouchcancel="stopmove()" unselectable="on">DOWN</button>
+            <button onmousedown="key.up = true" ontouchstart="key.up = true" onmouseup="key.up = false" ontouchend="key.up = false" ontouchcancel="key.up = false" unselectable="on">UP</button><br><br>
+            <button onmousedown="key.left = true" ontouchstart="key.left = true" onmouseup="key.left = false"  ontouchend="key.left = false" ontouchcancel="key.left = false" unselectable="on">LEFT</button>
+            <button onmousedown="key.right = true" ontouchstart="key.right = true" onmouseup="key.right = false" ontouchend="key.right = false" ontouchcancel="key.right = false" unselectable="on">RIGHT</button><br><br>
+            <button onmousedown="key.down = true" ontouchstart="key.down = true" onmouseup="key.down = false" ontouchend="key.down = false" ontouchcancel="key.down = false" unselectable="on">DOWN</button>
         </div>
 
-        <button onmousedown="enterOn()" ontouchstart="enterOn()" onmouseup="enterOff()" ontouchend="enterOff()" ontouchcancel="enterOff()" unselectable="on">Enter</button>
+        <button onmousedown="key.enter = true" ontouchstart="key.enter = true" onmouseup="key.enter = false" ontouchend="key.enter = false" ontouchcancel="key.enter = false" unselectable="on">Enter</button>
 
 
         <h5>            

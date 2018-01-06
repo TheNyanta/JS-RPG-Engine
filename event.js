@@ -29,7 +29,7 @@ function gameEvents() {
     }
     
     if (key.esc) {
-        
+        isFullscreen = false;        
     }
     
     if (key.key1) {
@@ -41,15 +41,15 @@ function gameEvents() {
     }
     
     if (key.key3) {
-        console.log("Cookies: "+ document.cookie);
+        
     }
     
     if (key.key4) {
-        SaveGamestate();        
+        
     }
     
     if (key.key5) {
-        LoadGamestate();
+        
     }
     
     if (key.key6) {
