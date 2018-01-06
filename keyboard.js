@@ -1,5 +1,6 @@
 var Keyboard = function() {
     this.enter = false;
+    this.enterUp = true;
     this.shift = false;
     this.esc = false;
     this.space = false;
@@ -117,7 +118,7 @@ function InitializeKeyboard() {
     $(document).keydown(function(e) {
         //console.log("event.keyCode=" + e.keyCode); //Lookup unknown keyCode
               
-        if (e.keyCode == KEY_ENTER) { key.enter = true; }
+        if (e.keyCode == KEY_ENTER) { key.enter = true; key.enterUp = false; }
         if (e.keyCode == KEY_SHIFT) { key.shift = true; }
         if (e.keyCode == KEY_ESC) { key.esc = true; }
         if (e.keyCode == KEY_SPACE) { key.space = true; }
@@ -131,6 +132,7 @@ function InitializeKeyboard() {
         if (e.keyCode == KEY_D) { key.d = true; }
         if (e.keyCode == KEY_PLUS) { key.plus = true; }
         if (e.keyCode == KEY_MINUS) { key.minus = true; }
+        if (e.keyCode == KEY_I) { key.i = true; }
         if (e.keyCode == KEY_O) { key.o = true; }
         if (e.keyCode == KEY_P) { key.p = true; }
         
@@ -149,7 +151,7 @@ function InitializeKeyboard() {
     
     $(document).keyup(function(e) {
               
-        if (e.keyCode == KEY_ENTER) { key.enter = false; } 
+        if (e.keyCode == KEY_ENTER) { key.enter = false; key.enterUp = true; } 
         if (e.keyCode == KEY_SHIFT) { key.shift = false; }
         if (e.keyCode == KEY_ESC) { key.esc = false; }
         if (e.keyCode == KEY_SPACE) { key.space = false; }
@@ -163,6 +165,7 @@ function InitializeKeyboard() {
         if (e.keyCode == KEY_D) { key.d = false; }
         if (e.keyCode == KEY_PLUS) { key.plus = false; }
         if (e.keyCode == KEY_MINUS) { key.minus = false; }
+        if (e.keyCode == KEY_I) { key.i = false; }
         if (e.keyCode == KEY_O) { key.o = false; }
         if (e.keyCode == KEY_P) { key.p = false; }
         

@@ -5,16 +5,24 @@ function gameEvents() {
     }
     
     if (key.shift) {
+        if (key.w) catY-=speed;
+        if (key.s) catY+=speed;
+        if (key.a) catX-=speed;
+        if (key.d) catX+=speed;
+        /*
         cameraLocked = false;
         if (key.w) relativeY[mapID]--;
         if (key.s) relativeY[mapID]++;
         if (key.a) relativeX[mapID]--;
         if (key.d) relativeX[mapID]++;
+        */
     }
     else {
+        /*
         cameraLocked = true;
         cameraX[mapID] = charX[mapID] - relativeX[mapID];
-        cameraY[mapID] = charY[mapID] - relativeY[mapID];        
+        cameraY[mapID] = charY[mapID] - relativeY[mapID];
+        */
     }
     
     
@@ -29,7 +37,7 @@ function gameEvents() {
     }
     
     if (key.esc) {
-        isFullscreen = false;        
+        
     }
     
     if (key.key1) {
@@ -53,23 +61,25 @@ function gameEvents() {
     }
     
     if (key.key6) {
-        console.log((charX[mapID] - relativeX[mapID]) + ", " + (charY[mapID] - relativeY[mapID]));
+        
     }
     
     if (key.key7) {
-        staticGrid = true;
+        
     }
     
     if (key.key8) {
-        staticGrid = false;
+        
     }
     
     if (key.key9) {
-        
+        // Char Tile position
+        console.log("Standing on Tile["+ Math.floor((cameraX[mapID]+relativeX[mapID]+4)/16) +","+ Math.floor((cameraY[mapID]+relativeY[mapID]+16)/16) +"]");
     }
         
     if (key.key0) {
-        
+        // Position debug
+        console.log("charX=" +Math.floor(charX[mapID])+", charY=" +Math.floor(charY[mapID]) +" | camX=" +cameraX[mapID] +", camY=" + cameraY[mapID] +" | relX=" +relativeX[mapID]+", relY=" + relativeY[mapID]);
     }    
     
     if (key.plus) {
@@ -80,13 +90,27 @@ function gameEvents() {
         
     }
     
+    if (key.i) {
+        var Inventory = new Rectangle(100, 100, 100, 100);
+        Inventory.draw('black', true, 'yellow', true);
+        if (collectedPhone)
+            bananaphone.draw2(100, 100, 25, 25);
+    }
+    
     if (key.o) {
-        // Char Tile position
-        console.log("Standing on Tile["+ Math.floor((cameraX[mapID]+relativeX[mapID]+4)/16) +","+ Math.floor((cameraY[mapID]+relativeY[mapID]+16)/16) +"]");
+        
     }
     
     if (key.p) {
-        // Position debug
-        console.log("charX=" +Math.floor(charX[mapID])+", charY=" +Math.floor(charY[mapID]) +" | camX=" +cameraX[mapID] +", camY=" + cameraY[mapID] +" | relX=" +relativeX[mapID]+", relY=" + relativeY[mapID]);
+        if (collectedPhone) {
+            if (!displayed)
+            displayPlay = true;
+            setTimeout(function() {
+                displayPlay = false;
+            }, 2000);
+            displayed = true;
+            audio2.pause();
+            audio1.play();
+        }
     }           
 }

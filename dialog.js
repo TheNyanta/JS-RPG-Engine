@@ -3,6 +3,7 @@ var dialogText = "";
 
 function DrawDialog(text, img, isChat) {
     var box = new Rectangle(0, 0, canvasWidth, 50);
+    var chatCounter = 0;
     box.draw('black',true);
     
     var dialog = document.getElementById('game').getContext('2d');
@@ -13,7 +14,6 @@ function DrawDialog(text, img, isChat) {
     if (img != undefined) {
         img.draw2(0, 0, 50, 50);
     }
-    
     // Stop all motions if its a chat sequence
     if (isChat) {
         chatSequence = true;

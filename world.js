@@ -2,17 +2,31 @@
 var relativeX = [0, 0];
 var relativeY = [0, 0];
 
-// Character movement changes relativeX/Y so take old value for DrawForeground to prevent unsyncron map moving 
+// Character movement changes relativeX/Y so take old value for DrawForeground to prevent unsync map moving 
 var prevRelX = 0;
 var prevRelY = 0;
 
-var charTileX = 0;
-var charTileY = 0;
+// Character position on each map
+var charX = [300, 100];
+var charY = [100, 100];
 
-var catRX = 0;
-var catRXt = 1;
-var catRY = 0;
-var catRYt = 1;
+var noCollision = true;
+
+var prevX = 0;
+var prevY = 0;
+
+// Map 1
+var catX = 200;
+var catY = 200;
+
+var prevCatX = 200;
+var prevCatY = 200;
+
+var collectedPhone = false;
+var displayGotPhone = false;
+
+var displayPlay = false;
+var displayed = false;
 
 var allAnimations = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95];
 
@@ -49,62 +63,87 @@ function DrawObjects() {
     
     
     if (mapID == 0) {
-        // Rectangle 1 blue
-        var rect1 = new Rectangle(100-relativeX[mapID], 100-relativeY[mapID], 10, 10);
-        rect1.draw('blue', true, 'blue',false);
-        // Rectangle-Char-Collision
-        if (char_collision_box.rectInside(rect1)) {
-            rect1.draw('red',true,'red',false);
+        if (displayPlay)
             DrawDialog("Bananaphone", bananaphone);
-            audio2.pause();
-            audio1.play();
-        }
-        else {
-            audio1.pause();
+        
+        if (audio1.paused) {
             audio2.play();
         }
+    
         /*
-        if(Math.round(Math.random(1)) == 1)
-            catRXt = 1;
-        else catRXt = -1;
+        if(Math.round(Math.random() * 10) == 1) {
+        if(Math.round(Math.random()) == 1)
+            catX+=speed;
+        else catX-=speed;
+        }
         
-        if(Math.round(Math.random(1)) == 1)
-            catRYt = 1;
-        else catRYt = -1;        
+        else if(Math.round(Math.random() * 10) == 1) {
+        if(Math.round(Math.random()) == 1)
+            catY+=speed;
+        else catY-=speed;
+        }
+        */
+        if (!collectedPhone)
+            bananaphone.draw2(100-relativeX[mapID], 200-relativeY[mapID], 25, 25);
+        var bananaRect = new Rectangle(100-relativeX[mapID], 200-relativeY[mapID], 25, 25);
+        //bananaRect.draw('white', false, 'black', true);
+        if (char_collision_box.rectInside(bananaRect)) {
+            if (!collectedPhone) {
+                displayGotPhone = true;  
+                setTimeout(function() {
+                    displayGotPhone = false;
+                }, 2000);
+            }
+            collectedPhone = true;
+        }
+        if (displayGotPhone)
+            DrawDialog("Got Phone!");
         
-        catRX+=Math.round(Math.random(2))*catRXt;
-        catRY+=Math.round(Math.random(2))*catRYt;*/
-        
-        var catiBox = new Rectangle(200-relativeX[mapID], 200-relativeY[mapID], cat.spriteWidth, cat.spriteHeight);
+        var catiBox = new Rectangle(catX-relativeX[mapID]+4, catY-relativeY[mapID]+16, 16, 16);
         catiBox.draw('white', false, 'black', true);
-        cat.draw(200-relativeX[mapID]+catRX, 200-relativeY[mapID]+catRY, allAnimations);
+        
+        if (isWalkable(catX-relativeX[mapID], catY-relativeY[mapID])) {
+            prevCatX = catX;
+            prevCatY = catY;
+        }
+        else {
+            catX = prevCatX;
+            catY = prevCatY;
+            charX[mapID] = prevX;
+            charY[mapID] = prevY;
+        }
+        
+        cat.draw(catX-relativeX[mapID], catY-relativeY[mapID], allAnimations);
         
         if (char_collision_box.rectInside(catiBox)) {
+            noCollision = false;
             DrawDialog("Press Enter");
             if (key.enter) {
                 catsound.play();
             }
         }
+        else noCollision = true;
     }
     
     if (mapID == 1) {
-        audio1.pause();
         audio2.pause();
-        audio3.play();   
+        if (audio1.paused) {
+            audio3.play();
+        }  
     }
     else {
         audio3.pause();
     }
+    
+    if (audio1.ended)
+        displayed = false;
     
     //var mouseRect = new Rectangle(mouse_x, mouse_y, character.spriteWidth, character.spriteHeight);
     //mouseRect.draw('white', false, 'white',true);
 }
 
 // Character can stand on atmost 4 different tiles, only returns true if all 4 are walkable
-// TODO: take two parameter to apply it for any moveable object (not only the character)
 function isWalkable(param1, param2) {
-    //var x = (cameraX[mapID]+relativeX[mapID]+ 4)/16;
-    //var y = (cameraY[mapID]+relativeY[mapID]+16)/16;
     var x = (param1+relativeX[mapID]+ 4)/16;
     var y = (param2+relativeY[mapID]+16)/16;
     var x1 = Math.floor(x);

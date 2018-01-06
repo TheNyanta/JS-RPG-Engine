@@ -27,34 +27,17 @@
             var Context = null;
             var framerate = 24;
 
-            var canvasWidth = 480;//480;
-            var canvasHeight = 352;//352;
-
-            // TODO: fix bug: if canvas is bigger than tilemap map moves to the responding end
-            // Or make Tilemap always bigger than canvas
-
-            var sheeps = new Sprite("Panorama/AngrySheeps.jpg", 320, 240, 1, 1);
-            var sunset = new Sprite("Panorama/sunset1.png", 320, 240, 1, 1);
-
-            var audio1 = new Audio('Music/banana-phone.ogg');
-            var audio2 = new Audio('Music/forest.ogg');
-            var audio3 = new Audio('Music/snow.ogg');
-            var catsound = new Audio('Sound/cat.m4a');
-            audio1.volume = 0.2;
-            audio2.volume = 0.2;
-            audio3.volume = 0.2;
-            catsound.volume = 0.2;
-
-            var mouse_x = 0;
-            var mouse_y = 0;
-
-            var charX = [300, 100];
-            var charY = [100, 100];
-
-            var prevX = 0;
-            var prevY = 0;
+            var canvasWidth = 480;
+            var canvasHeight = 352;
 
             $(document).ready(function() {
+                
+                // Map size = max canvas size
+                if (canvasWidth > tileWidth[mapID] * mapWidth[mapID])
+                    canvasWidth = tileWidth[mapID] * mapWidth[mapID];
+                
+                if (canvasHeight > tileHeight[mapID] * mapHeight[mapID])
+                    canvasHeight = tileHeight[mapID] * mapHeight[mapID];
 
                 Context = new HTML("game", canvasWidth, canvasHeight);
 
@@ -121,6 +104,8 @@
         <h5>
             <div>Control: WASD or Arrow-Key</div>
             <div>Press "1" for Grassmap. Press "2" for Snowmap.</div>
+            <div>Collect the phone and press "P" to play bananaphone-song</div>
+            <div>Press "I" to check the Inventory</div>
         </h5>
 
         <div>

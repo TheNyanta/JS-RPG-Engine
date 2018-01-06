@@ -237,7 +237,8 @@ function DrawCharacter() {
     */
     
     // Save last collision-free position
-    if (isWalkable(charX[mapID]-relativeX[mapID], charY[mapID]-relativeY[mapID])) {
+    if (isWalkable(charX[mapID]-relativeX[mapID], charY[mapID]-relativeY[mapID]))
+    {
         prevX = charX[mapID];
         prevY = charY[mapID];
         if (cameraLocked) {

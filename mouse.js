@@ -118,6 +118,9 @@ var Mouse = new MouseControls();
     }
 })();*/
 
+var mouse_x = 0;
+var mouse_y = 0;
+
 var Mouse = function() {
     //TODO: implement below
     this.leftclick = false;
