@@ -3,22 +3,6 @@
     <head>
         <title>RPG HTML-JS</title>
         <link rel="icon" href="favicon.ico">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <style>
-            canvas {
-                border:1px solid #d3d3d3;
-                background-color: #f1f1f1;
-            }
-        </style>
-        <div>
-            <button onclick="enterFullscreen()" unselectable="on">Fullscreen</button>
-            <button onclick="EnableScrollbar()" unselectable="on">Scrollbar On</button>
-            <button onclick="DisableScrollbar()" unselectable="on">Scrollbar Off</button>
-            <button onclick="audio1.play()">Click Music Tablet Test</button>
-        </div>
-    </head>
-    
-    <body onload="startGame()" background="Panorama/Background.jpg">
         <script src="constants.js"></script>
         <script src="camera.js"></script>
         <script src="utility.js"></script>
@@ -27,6 +11,22 @@
         <script src="map.js"></script>
         <script src="data.js"></script>        
         <script src="game.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <style>
+            canvas {
+                border:1px solid #d3d3d3;
+                background-color: #f1f1f1;
+            }
+        </style>
+    </head>
     
+    <body onload="startGame()" background="Panorama/Background.jpg">
+        <canvas id="game"></canvas>        
+        <div>
+            <button onclick="enterFullscreen()" unselectable="on">Fullscreen</button>
+            <button onclick="EnableScrollbar()" unselectable="on">Scrollbar On</button>
+            <button onclick="DisableScrollbar()" unselectable="on">Scrollbar Off</button>
+            <button onclick="audio1.play()">Click Music Tablet Test</button>
+        </div>
     </body>
 </html>

@@ -4,8 +4,10 @@ function startGame() {
 }
 
 var myGameArea = {
-    canvas : document.createElement("canvas"),
+    //canvas : document.createElement("canvas"), // if canvas is not in the html file
     start : function() {
+        this.canvas = document.getElementById("game");
+        //this.control = document.getElementById("control");
         this.canvas.width = 480;
         this.canvas.height = 270;
         //this.canvas.style.cursor = "none"; //hide the original cursor
