@@ -38,8 +38,8 @@ var myGameArea = {
             //myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
         })
         window.addEventListener('touchstart', function (e) {
-            myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.x = e.pageX;
+            myGameArea.y = e.pageY;
         })
         window.addEventListener('touchend', function (e) {
             myGameArea.x = false;
