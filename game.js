@@ -1,26 +1,42 @@
-function startGame() {    
-    InitalizeAnimationCounters();
+function startGame() {
+    myGameArea.init();
     myGameArea.start();
 }
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
-    start : function() {
+    init : function() {
+        // INITIALIZE CANVAS
         //this.canvas = document.getElementById("game"); // if canvas is in the html file
         this.canvas.width = 480;
         this.canvas.height = 270;
         this.canvas.id = "game";
         
+        // Pause game if not selected
+        document.active = true;
+        $(window).focus(function() {document.active = true;});
+        $(window).blur(function() {document.active = false;});
+        
         //this.canvas.style.cursor = "none"; //hide the original cursor
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-        this.interval = setInterval(function() {
-            ResetAnimationCounter();
-            updateGameArea();
-        }, 20);
+        
         this.frameNo = 0;
         
-        // Add Listeners for user inputs       
+        // ANIMATIONCOUNTER
+        InitalizeAnimationCounters();
+        
+        window.requestAnimationFrame = window.requestAnimationFrame
+    || window.mozRequestAnimationFrame
+    || window.webkitRequestAnimationFrame
+    || window.msRequestAnimationFrame
+    || function(f){return setTimeout(f, 1000/60)}; // simulate calling code 60 
+ 
+window.cancelAnimationFrame = window.cancelAnimationFrame
+    || window.mozCancelAnimationFrame
+    || function(requestID){clearTimeout(requestID)}; //fall back
+        
+        // INITIALIZE USER INPUT       
         window.addEventListener('keydown', function (e) {
             myGameArea.keys = (myGameArea.keys || []);
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
@@ -56,10 +72,30 @@ var myGameArea = {
             myGameArea.x = e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().left;
             myGameArea.y = e.touches[0].clientY - myGameArea.canvas.getBoundingClientRect().top;
         })
+        
     },
+    
+    start : function() {
+        
+        // Old gameLoop
+        //this.interval = setInterval(function() { ResetAnimationCounter(); updateGameArea();} , 20);
+
+        // New gameLoop
+        function gameLoop() {
+            requestAnimationFrame(gameLoop);
+            if (document.active) {
+                ResetAnimationCounter();
+                updateGameArea();
+            }
+        }
+        
+        gameLoop();      
+    },
+    
     stop : function() {
-        clearInterval(this.interval);
-    },    
+        
+    },
+        
     clear : function() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
@@ -73,14 +109,13 @@ function everyinterval(n) {
 var turn = 1;
 // Update Canvas
 function updateGameArea() {
-    //myGameArea.clear();
     myGameArea.frameNo += 1;
     
     char_control.update();
     cat_control.update();
     
     // Moving cat left and right
-    //cat.speedX = cat.speed * turn;
+    cat.speedX = cat.speed * turn;
     if (myGameArea.frameNo == 1 || everyinterval(25))
         turn *= (-1);
     
