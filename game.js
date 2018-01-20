@@ -41,31 +41,20 @@ var myGameArea = {
         window.addEventListener('mousemove', function (e) {
             myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
             myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
-            document.getElementById("text1").innerHTML = "pageX: "+e.pageX + ", pageY: " +e.pageY +", clientX: " + e.clientX +", clientY: " +e.clientY;
-            document.getElementById("text3").innerHTML = "Canvas Bounding Rect: Left= "+myGameArea.canvas.getBoundingClientRect().left+", Top=" +myGameArea.canvas.getBoundingClientRect().top;
         })
         window.addEventListener('touchstart', function (e) {
             myGameArea.touchdown = true;
-            myGameArea.x = e.pageX;
-            myGameArea.y = e.pageY;
-            // Correct for fullscreen on tablet
-            myGameArea.x2 = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.y2 = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
+            myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
         })
         window.addEventListener('touchend', function (e) {
             myGameArea.touchdown = false;
-            myGameArea.x = e.pageX;
-            myGameArea.y = e.pageY;
-            myGameArea.x2 = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.y2 = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
+            myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
         })
         window.addEventListener('touchmove', function (e) {
-            myGameArea.x = e.touches[0].clientX;
-            myGameArea.y = e.touches[0].clientY;
-            myGameArea.x2 = e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.y2 = e.touches[0].clientY - myGameArea.canvas.getBoundingClientRect().top;
-            document.getElementById("text2").innerHTML = "touches: screenX: "+e.touches[0].screenX + ", screenY: " +e.touches[0].screenY + "clientX: "+e.touches[0].clientX + ", clientY: " +e.touches[0].clientY;
-            document.getElementById("text3").innerHTML = "Canvas Bounding Rect: Left= "+myGameArea.canvas.getBoundingClientRect().left+", Top=" +myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.x = e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().left;
+            myGameArea.y = e.touches[0].clientY - myGameArea.canvas.getBoundingClientRect().top;
         })
     },
     stop : function() {
