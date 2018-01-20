@@ -25,6 +25,7 @@ function map(chipset, mapWidth, mapHeight, x, y, tileWidth, tileHeight, spritesX
     
     this.updateBackground = function() {
         ctx = myGameArea.context;
+        
         //ctx.drawImage("image", "canvas x", "canvas y", "on canvas width", "on canvas height", "image x", "image y", "on image x", "on image y");
         
         var mapIndex = 0;
@@ -36,10 +37,7 @@ function map(chipset, mapWidth, mapHeight, x, y, tileWidth, tileHeight, spritesX
                 res = i2xy(this.layer1[mapIndex]-1, Math.max(this.spritesX, this.spritesY));
                 ctx.drawImage(this.image, res[0]*this.tileWidth, res[1]*this.tileHeight, this.tileWidth, this.tileHeight, tile_w, tile_h, this.tileWidth, this.tileHeight);
                 res = i2xy(this.layer2[mapIndex]-1, Math.max(this.spritesX, this.spritesY));
-                ctx.drawImage(this.image, res[0]*this.tileWidth, res[1]*this.tileHeight, this.tileWidth, this.tileHeight, tile_w, tile_h, this.tileWidth, this.tileHeight);
-                res = i2xy(this.layer3[mapIndex]-1, Math.max(this.spritesX, this.spritesY));
-                ctx.drawImage(this.image, res[0]*this.tileWidth, res[1]*this.tileHeight, this.tileWidth, this.tileHeight, tile_w, tile_h, this.tileWidth, this.tileHeight);
-                
+                ctx.drawImage(this.image, res[0]*this.tileWidth, res[1]*this.tileHeight, this.tileWidth, this.tileHeight, tile_w, tile_h, this.tileWidth, this.tileHeight);                
             }
         }
     }

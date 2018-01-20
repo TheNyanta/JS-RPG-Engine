@@ -46,13 +46,18 @@ window.cancelAnimationFrame = window.cancelAnimationFrame
         })
         window.addEventListener('mousedown', function (e) {
             myGameArea.mousedown = true;
-            myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.clickX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
+            myGameArea.clickY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            if (myGameArea.clickX > 0 && 
+                myGameArea.clickY > 0 &&
+                myGameArea.clickX < document.getElementById("game").width &&
+                myGameArea.clickY < document.getElementById("game").height)
+                astarPath = astar_test();
         })
         window.addEventListener('mouseup', function (e) {
             myGameArea.mousedown = false;
-            myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            //myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
+            //myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
         })
         window.addEventListener('mousemove', function (e) {
             myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
@@ -60,13 +65,13 @@ window.cancelAnimationFrame = window.cancelAnimationFrame
         })
         window.addEventListener('touchstart', function (e) {
             myGameArea.touchdown = true;
-            myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.clickX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
+            myGameArea.clickY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
         })
         window.addEventListener('touchend', function (e) {
             myGameArea.touchdown = false;
-            myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            //myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
+            //myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
         })
         window.addEventListener('touchmove', function (e) {
             myGameArea.x = e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().left;
@@ -126,13 +131,15 @@ function updateGameArea() {
     if (myGameArea.frameNo == 1 || everyinterval(30)) {fps=Math.round(1000/(now-before)); }
     before=now;
     
-    char_control.update();
-    cat_control.update();
+    control1.update();
+    control2.update();
     
     // Moving cat left and right
-    cat.speedX = cat.speed * turn;
+    //cat.speedX = cat.speed * turn;
     if (myGameArea.frameNo == 1 || everyinterval(60))
         turn *= (-1);
+    
+    // astar-move
     
     if (myGameArea.x && myGameArea.y) {        
         if (myUpBtn.clicked()) character.speedY = -character.speed;
@@ -157,6 +164,38 @@ function updateGameArea() {
     panorama.update();
     
     maps[mapID].updateBackground();
+    
+    char_standing.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
+    char_standing.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
+    char_standing.draw("black", false, "black", true);
+    
+    cat_standing.x = Math.floor((cat.x+ 4)/16)*16 - gameCamera.x;
+    cat_standing.y = Math.floor((cat.y+16)/16)*16 - gameCamera.y;
+    cat_standing.draw("black", false, "black", true);
+    
+    if (character.direction == DIR_N) {
+        char_front.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
+        char_front.y = Math.floor((character.y+16-16)/16)*16 - gameCamera.y;
+    }
+    if (character.direction == DIR_S) {
+        char_front.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
+        char_front.y = Math.floor((character.y+16+16)/16)*16 - gameCamera.y;
+    }
+    if (character.direction == DIR_W) {
+        char_front.x = Math.floor((character.x+ 4-16)/16)*16 - gameCamera.x;
+        char_front.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
+    }
+    if (character.direction == DIR_E) {
+        char_front.x = Math.floor((character.x+ 4+15)/16)*16 - gameCamera.x;
+        char_front.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
+    }
+    char_front.draw("black", false, "red", true);
+    
+    if (char_front.x == cat_standing.x && char_front.y == cat_standing.y)
+        if ((myGameArea.keys && myGameArea.keys[KEY_ENTER]) || GlobalEnter)
+            catsound.play();
+    
+    
     
     // Objects incl. character: TODO: Automatic Order update() after Y-coordinate - smaller y first
     if (character.y > cat.y) {
@@ -193,6 +232,11 @@ function updateGameArea() {
         cursor2.update();
     }
     
-   showFPS();
+    tile_selected.x = Math.floor(myGameArea.x/16)*16;
+    tile_selected.y = Math.floor(myGameArea.y/16)*16;
+    tile_selected.draw("black", false, "black", true);
+
+    GlobalEnter = false;
+    showFPS();
 
 }

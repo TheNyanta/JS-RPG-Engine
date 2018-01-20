@@ -11,6 +11,35 @@ function i2xy(index, width) {
     return [x,y];
 }
 
+//convert mapCL to graph
+function getGraph() {
+    var mapCL = maps[mapID].layerC;
+    var mapWidth = maps[mapID].mapWidth;
+    var mapHeight = maps[mapID].mapHeight;
+    
+    var arr = Array();
+    for (var j = 0; j < mapHeight; j++) {
+        arr.push(Array());
+    }
+    for (var i = 0; i < mapWidth*mapHeight; i++) {
+        if (mapCL[i])
+            arr[Math.floor(i / mapWidth)][i % mapWidth] = 1;
+        else
+            arr[Math.floor(i / mapWidth)][i % mapWidth] = 0;
+    }
+    return arr;
+}
+
+// Use Astar
+function astar_test() {
+    var graph = new Graph(getGraph());
+    var start = graph.grid[Math.floor((character.y+16)/16)][Math.floor((character.x+4)/16)];
+    //console.log("Start = ["+Math.floor((character.y+16)/16)+"]["+Math.floor((character.x+4)/16)+"]");
+    var end = graph.grid[Math.floor((myGameArea.clickY+gameCamera.y)/16)][Math.floor((myGameArea.clickX+gameCamera.x)/16)];
+    //console.log("End = ["+Math.floor((myGameArea.clickY+gameCamera.y)/16)+"]["+Math.floor((myGameArea.clickX+gameCamera.x)/16)+"]");
+    return astar.search(graph, start, end);
+}
+
 function DisableScrollbar() {
     document.documentElement.style.overflow = 'hidden';
     document.body.scoll = "no";

@@ -6,17 +6,27 @@ var character = new component(24, 32, "CharSet/character.png", 75, 100, "sprite"
 character.animations = standardAnimation;
 
 // Cat
-var cat = new component(24, 32, "CharSet/cat.png", 300, 100, "sprite", 24, 32, 8, 12);
+var cat = new component(24, 32, "CharSet/cat.png", 160, 160, "sprite", 24, 32, 8, 12);
 cat.animations = standardAnimation;
+cat.walkthrough = true;
 
 // Camera
 var gameCamera = new camera(character, 0, 0);
 
 // Control
-var char_control = new control(character, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
-var cat_control = new control(cat, KEY_W, KEY_S, KEY_A, KEY_D);
+var control1 = new control(character, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
+var control2 = new control(character, KEY_W, KEY_S, KEY_A, KEY_D);
 
 var myObstacles = [];
+
+var GlobalEnter = false;
+
+var char_standing = new Rectangle(0, 0, 16, 16);
+var char_front = new Rectangle(0, 0, 16, 16);
+var tile_selected = new Rectangle(0, 0, 16, 16);
+var cat_standing = new Rectangle(0, 0, 16, 16);
+
+var astarPath;
 
 var cursor = new component(5, 5, "yellow", -5, -5);
 var cursor2 = new component(5, 5, "green", -5, -5);
