@@ -1,6 +1,6 @@
 # HTML-JAVASCRIPT
 
-Prototype Engine for an top-down rpg game or a plattformer
+Prototype Engine for a top-down rpg or a plattformer
 
 ## TODO:            
 Refine Collision Detection and Resolving with Objects
