@@ -16,3 +16,14 @@ function InitalizeAnimationCounters() {
 function ResetAnimationCounter() {
     AnimationCounterIndex = 0;
 }
+
+function animation(idleUp, idleDown, idleLeft, idleRight, moveUp, moveDown, moveLeft, moveRight) {
+    this.idleUp = idleUp;
+    this.idleDown = idleDown;
+    this.idleLeft = idleLeft;
+    this.idleRight = idleRight;
+    this.moveUp = moveUp;
+    this.moveDown = moveDown;
+    this.moveLeft = moveLeft;
+    this.moveRight = moveRight;
+}
