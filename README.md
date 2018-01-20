@@ -19,6 +19,8 @@ Implement proper GUI + Gamemenu (i.e. it opens by pressing "Esc")
 
 Implement Battle System (Realtime and/or Roundbased) + Stats (Health, Mana, Strength, etc.)
 
+Increase performance by only rendering the parts of the canvas that change
+
 ## TILE BASED RPG GAME
 
 https://thenyanta.github.io/
