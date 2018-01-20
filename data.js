@@ -1,20 +1,32 @@
-// character & camera
+// Animations
+var standardAnimation = new animation(1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14]);
+
+// Character
 var character = new component(24, 32, "CharSet/character.png", 75, 100, "sprite", 24, 32, 8, 12);
+character.animations = standardAnimation;
+
+// Cat
+var cat = new component(24, 32, "CharSet/cat.png", 300, 100, "sprite", 24, 32, 8, 12);
+cat.animations = standardAnimation;
+
+// Camera
 var gameCamera = new camera(character, 0, 0);
 
-//
-var cat = new component(24, 32, "CharSet/cat.png", 100, 100, "sprite", 24, 32, 8, 12);
-
+// Control
+var char_control = new control(character, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
+var cat_control = new control(cat, KEY_W, KEY_S, KEY_A, KEY_D);
 
 var myObstacles = [];
 
 var cursor = new component(5, 5, "yellow", -5, -5);
-var background = new component(480, 270, "Panorama/sunset1.png", 0, 0, "background");
-    
-var myUpBtn = new component(30, 30, "blue", 50, 10);    
-var myDownBtn = new component(30, 30, "blue", 50, 70);    
-var myLeftBtn = new component(30, 30, "blue", 20, 40);    
-var myRightBtn = new component(30, 30, "blue", 80, 40);
+var cursor2 = new component(5, 5, "green", -5, -5);
+var panorama = new component(480, 270, "Panorama/sunset1.png", 0, 0, "background");
+
+// On-canvas Control buttons
+var myUpBtn = new component(30, 30, "black", 30, 0);    
+var myDownBtn = new component(30, 30, "black", 30, 60);    
+var myLeftBtn = new component(30, 30, "black", 0, 30);    
+var myRightBtn = new component(30, 30, "black", 60, 30);
 
 // Music
 var audio1 = new Audio('Music/banana-phone.ogg');

@@ -8,6 +8,7 @@
         <script src="utility.js"></script>
         <script src="animate.js"></script>
         <script src="component.js"></script>
+        <script src="control.js"></script>
         <script src="map.js"></script>
         <script src="data.js"></script>        
         <script src="game.js"></script>
@@ -25,8 +26,17 @@
             <button onclick="enterFullscreen()" unselectable="on">Fullscreen</button>
             <button onclick="EnableScrollbar()" unselectable="on">Scrollbar On</button>
             <button onclick="DisableScrollbar()" unselectable="on">Scrollbar Off</button>
-            <button onclick="audio1.play()">Click Music Tablet Test</button>
+            <button onclick="audio1.play()">Play Music</button>
+            <button onclick="audio1.pause()">Pause Music</button>            
+        </div>
+        
+        <div>
+            <button onclick="gameCamera.target=character">Camera on Character</button>
+            <button onclick="gameCamera.target=cat">Camera on Cat</button>
         </div>
         <a href="https://github.com/TheNyanta/thenyanta.github.io">Visit the Repository</a>
+        <div>
+            <a>Nice TO-TRY/DO: Increase performance by only rendering the parts of the canvas that change</a>
+        </div>
     </body>
 </html>
