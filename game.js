@@ -64,7 +64,7 @@ var myGameArea = {
             myGameArea.y = e.touches[0].screenY;
             myGameArea.x2 = e.touches[0].screenX - myGameArea.canvas.getBoundingClientRect().left;
             myGameArea.y2 = e.touches[0].screenY - myGameArea.canvas.getBoundingClientRect().top;
-            document.getElementById("text2").innerHTML = "pageX: "+e.pageX + ", pageY: " +e.pageY +", clientX: " + e.clientX +", clientY: " +e.clientY;
+            document.getElementById("text2").innerHTML = "touches: screenX: "+e.touches[0].screenX + ", screenY: " +e.touches[0].screenY;
             document.getElementById("text3").innerHTML = "Canvas Bounding Rect: Left= "+myGameArea.canvas.getBoundingClientRect().left+", Top=" +myGameArea.canvas.getBoundingClientRect().top;
         })
     },
