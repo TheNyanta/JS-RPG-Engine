@@ -9,6 +9,8 @@ var myGameArea = {
         //this.canvas = document.getElementById("game"); // if canvas is in the html file
         this.canvas.width = 480;
         this.canvas.height = 270;
+        this.canvas.id = "game";
+        
         //this.canvas.style.cursor = "none"; //hide the original cursor
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
@@ -39,11 +41,14 @@ var myGameArea = {
         window.addEventListener('mousemove', function (e) {
             myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
             myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            document.getElementById("text1").innerHTML = "pageX: "+e.pageX + ", pageY: " +e.pageY +", clientX: " + e.clientX +", clientY: " +e.clientY;
+            document.getElementById("text3").innerHTML = "Canvas Bounding Rect: Left= "+myGameArea.canvas.getBoundingClientRect().left+", Top=" +myGameArea.canvas.getBoundingClientRect().top;
         })
         window.addEventListener('touchstart', function (e) {
             myGameArea.touchdown = true;
             myGameArea.x = e.pageX;
             myGameArea.y = e.pageY;
+            // Correct for fullscreen on tablet
             myGameArea.x2 = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
             myGameArea.y2 = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
         })
@@ -59,6 +64,8 @@ var myGameArea = {
             myGameArea.y = e.touches[0].screenY;
             myGameArea.x2 = e.touches[0].screenX - myGameArea.canvas.getBoundingClientRect().left;
             myGameArea.y2 = e.touches[0].screenY - myGameArea.canvas.getBoundingClientRect().top;
+            document.getElementById("text2").innerHTML = "pageX: "+e.pageX + ", pageY: " +e.pageY +", clientX: " + e.clientX +", clientY: " +e.clientY;
+            document.getElementById("text3").innerHTML = "Canvas Bounding Rect: Left= "+myGameArea.canvas.getBoundingClientRect().left+", Top=" +myGameArea.canvas.getBoundingClientRect().top;
         })
     },
     stop : function() {
