@@ -78,7 +78,7 @@ window.cancelAnimationFrame = window.cancelAnimationFrame
     start : function() {
         
         // Old gameLoop
-        //this.interval = setInterval(function() { ResetAnimationCounter(); updateGameArea();} , 20);
+        //this.interval = setInterval(function() { ResetAnimationCounter(); updateGameArea();} , 16);
 
         // New gameLoop
         function gameLoop() {
@@ -106,17 +106,32 @@ function everyinterval(n) {
     return false;
 }
 
+var before,now,fps;
+before=Date.now();
+fps=0;
+
+function showFPS() {
+    ctx = myGameArea.context;
+    ctx.font =  "bold 20px red";
+    ctx.fillStyle = "black";
+    ctx.fillText("FPS : " + fps, 400, 20);
+}
+
 var turn = 1;
 // Update Canvas
 function updateGameArea() {
     myGameArea.frameNo += 1;
+      
+    now=Date.now();
+    if (myGameArea.frameNo == 1 || everyinterval(30)) {fps=Math.round(1000/(now-before)); }
+    before=now;
     
     char_control.update();
     cat_control.update();
     
     // Moving cat left and right
     cat.speedX = cat.speed * turn;
-    if (myGameArea.frameNo == 1 || everyinterval(25))
+    if (myGameArea.frameNo == 1 || everyinterval(60))
         turn *= (-1);
     
     if (myGameArea.x && myGameArea.y) {        
@@ -177,5 +192,7 @@ function updateGameArea() {
         cursor2.y = myGameArea.y2;
         cursor2.update();
     }
+    
+   showFPS();
 
 }
