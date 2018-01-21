@@ -136,12 +136,13 @@ function updateGameArea() {
     control2.update();
     control3.update();
     
+    /*
     if (myGameArea.x && myGameArea.y) {        
         if (myUpBtn.clicked()) character.speedY = -character.speed;
         else if (myDownBtn.clicked()) character.speedY = character.speed;
         else if (myLeftBtn.clicked()) character.speedX = -character.speed;
         else if (myRightBtn.clicked()) character.speedX = character.speed;
-    }
+    }*/
     
     // Object Object Collison TODO: generalize for all objects on the current map
     /*if (character.crashWith(cat, character.speedX, character.speedY)) {
@@ -209,11 +210,13 @@ function updateGameArea() {
     
     gameCamera.update();
     
+    /*
     // Control Buttons
     myUpBtn.update();        
     myDownBtn.update();        
     myLeftBtn.update();        
     myRightBtn.update();
+    */
     
     
     // Cursor

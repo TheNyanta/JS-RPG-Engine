@@ -42,6 +42,7 @@ cat_standing.rectangle(16, 16, "black", false, "black", true);
 var cursor = new component();
 cursor.rectangle(5, 5, "yellow");
 
+/*
 // On-canvas Control buttons
 var myUpBtn = new component(32, 0);
 myUpBtn.rectangle(32, 32, "black");
@@ -51,6 +52,7 @@ var myLeftBtn = new component(0, 32);
 myLeftBtn.rectangle(32, 32, "black");
 var myRightBtn = new component(64, 32);
 myRightBtn.rectangle(32, 32, "black");
+*/
 
 // Music
 var audio1 = new Audio('Assets/Audio/banana-phone.m4a');
