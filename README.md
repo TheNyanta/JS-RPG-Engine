@@ -9,7 +9,7 @@ Implement Events + Dialogs-Events
 
 Implement Enter/Touch-Interaction with Objects
 
-Implement Touch Control
+Refine Touch Control
 
 Implement Save & Load Gamestate (maybe by using cookies?)
 
