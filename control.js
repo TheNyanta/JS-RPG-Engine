@@ -128,6 +128,13 @@ function control(target, up, down, left, right, followee) {
                 }
             }
         }
+        else {
+            //console.log("Not Reachable");
+            this.route = undefined;
+            myGameArea.clickX = undefined;
+            myGameArea.clickY = undefined;
+            myGameArea.clicked = false;
+        }
         if (this.target.collided) {
             //console.log("Collided");
             this.route = undefined;
