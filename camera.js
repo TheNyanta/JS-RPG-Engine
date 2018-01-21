@@ -1,5 +1,4 @@
-function camera(target, x, y) {
-    this.target = target;
+function camera(x, y) {
     this.x = x;
     this.y = y;
     
@@ -9,7 +8,7 @@ function camera(target, x, y) {
             this.x = this.target.x - myGameArea.canvas.width/2;
             this.y = this.target.y - myGameArea.canvas.height/2;
         }
-        // Keep inside the map
+        // Keep camera view inside the map
         if (this.x < 0)
             this.x = 0;
         if (this.x > maps[mapID].mapWidth * maps[mapID].tileWidth-myGameArea.canvas.width)

@@ -1,54 +1,64 @@
-// Animations
-var standardAnimation = new animation(1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14]);
+// Setup Character
+var character = new component(112, 176);
+character.sprite("Assets/Image/character.png", 24, 32, 8, 12);
+character.animation = new addAnimation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14]);
+var character_collision = new collision(character, 4, 16, 16, 16);
 
-// Character
-var character = new component(24, 32, "CharSet/character.png", 75, 100, "sprite", 24, 32, 8, 12);
-character.animations = standardAnimation;
-
-// Cat
-var cat = new component(24, 32, "CharSet/cat.png", 160, 160, "sprite", 24, 32, 8, 12);
-cat.animations = standardAnimation;
-cat.walkthrough = true;
+// Setup Cat
+var cat = new component(160, 160);
+cat.sprite("Assets/Image/cat.png", 24, 32, 8, 12);
+cat.animation = new addAnimation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14]);
+var cat_collision = new collision(cat, 4, 16, 16, 16);
 
 // Camera
-var gameCamera = new camera(character, 0, 0);
+var gameCamera = new camera(0, 0);
+gameCamera.target = character;
 
 // Control
 var control1 = new control(character, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
+control1.goto = true;
+
 var control2 = new control(character, KEY_W, KEY_S, KEY_A, KEY_D);
+
+// Chase character
+var control3 = new control(cat, 0, 0, 0, 0, character);
 
 var myObstacles = [];
 
 var GlobalEnter = false;
 
-var char_standing = new Rectangle(0, 0, 16, 16);
-var char_front = new Rectangle(0, 0, 16, 16);
-var tile_selected = new Rectangle(0, 0, 16, 16);
-var cat_standing = new Rectangle(0, 0, 16, 16);
+var char_standing = new component();
+char_standing.rectangle(16, 16, "black", false, "black", true);
 
-var astarPath;
+var char_front = new component();
+char_front.rectangle(16, 16, "black", false, "red", true);
 
-var cursor = new component(5, 5, "yellow", -5, -5);
-var cursor2 = new component(5, 5, "green", -5, -5);
-var panorama = new component(480, 270, "Panorama/sunset1.png", 0, 0, "background");
+var tile_selected = new component();
+tile_selected.rectangle(16, 16, "black", false, "black", true);
+
+var cat_standing = new component();
+cat_standing.rectangle(16, 16, "black", false, "black", true);
+
+var cursor = new component();
+cursor.rectangle(5, 5, "yellow");
 
 // On-canvas Control buttons
-var myUpBtn = new component(30, 30, "black", 30, 0);    
-var myDownBtn = new component(30, 30, "black", 30, 60);    
-var myLeftBtn = new component(30, 30, "black", 0, 30);    
-var myRightBtn = new component(30, 30, "black", 60, 30);
+var myUpBtn = new component(32, 0);
+myUpBtn.rectangle(32, 32, "black");
+var myDownBtn = new component(32, 64);
+myDownBtn.rectangle(32, 32, "black");
+var myLeftBtn = new component(0, 32);
+myLeftBtn.rectangle(32, 32, "black");
+var myRightBtn = new component(64, 32);
+myRightBtn.rectangle(32, 32, "black");
 
 // Music
-var audio1 = new Audio('Music/banana-phone.ogg');
-var audio2 = new Audio('Music/forest.ogg');
-var audio3 = new Audio('Music/snow.ogg');
+var audio1 = new Audio('Assets/Audio/banana-phone.m4a');
 
 // Sounds
-var catsound = new Audio('Sound/cat.m4a');
+var catsound = new Audio('Assets/Audio/cat.m4a');
 
 audio1.volume = 0.2;
-audio2.volume = 0.2;
-audio3.volume = 0.2;
 catsound.volume = 0.2;
 
 // Maps
@@ -74,7 +84,7 @@ var map2L3 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
 map2LC = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, true, true, true, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, true, true, true, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, true, true, true, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, true, true, true, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true];
 
-var bergwald = new map("ChipSet/bergwald.png", 40, 30, 0, 0, 16, 16, 30, 16, map1L1, map1L2, map1L3, map1LC);
-var snowforest = new map("ChipSet/snowforest.png", 40, 30, 0, 0, 16, 16, 30, 16, map2L1, map2L2, map2L3, map2LC);
+var bergwald = new map("Assets/Image/sunset1.png", "Assets/Image/bergwald.png", 40, 30, 16, 16, 30, 16, map1L1, map1L2, map1L3, map1LC);
+var snowforest = new map(undefined, "Assets/Image/snowforest.png", 40, 30, 16, 16, 30, 16, map2L1, map2L2, map2L3, map2LC);
 var maps = [bergwald, snowforest];
 var mapID = 0;

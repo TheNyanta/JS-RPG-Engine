@@ -7042,7 +7042,7 @@ function Animation( elem, properties, options ) {
 		length = Animation.prefilters.length,
 		deferred = jQuery.Deferred().always( function() {
 
-			// Don't match elem in the :animated selector
+			// Don't match elem in the :animation selector
 			delete tick.elem;
 		} ),
 		tick = function() {
@@ -9897,7 +9897,7 @@ jQuery.each( [
 
 
 
-jQuery.expr.pseudos.animated = function( elem ) {
+jQuery.expr.pseudos.animation = function( elem ) {
 	return jQuery.grep( jQuery.timers, function( fn ) {
 		return elem === fn.elem;
 	} ).length;

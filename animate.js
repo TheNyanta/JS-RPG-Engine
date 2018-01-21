@@ -17,7 +17,8 @@ function ResetAnimationCounter() {
     AnimationCounterIndex = 0;
 }
 
-function animation(idleUp, idleDown, idleLeft, idleRight, moveUp, moveDown, moveLeft, moveRight) {
+function addAnimation(animationTime, idleUp, idleDown, idleLeft, idleRight, moveUp, moveDown, moveLeft, moveRight) {
+    this.animationTime = animationTime;
     this.idleUp = idleUp;
     this.idleDown = idleDown;
     this.idleLeft = idleLeft;
@@ -26,4 +27,5 @@ function animation(idleUp, idleDown, idleLeft, idleRight, moveUp, moveDown, move
     this.moveDown = moveDown;
     this.moveLeft = moveLeft;
     this.moveRight = moveRight;
+    this.direction = DIR_S; // Default Direction
 }

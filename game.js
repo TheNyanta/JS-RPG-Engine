@@ -27,14 +27,14 @@ var myGameArea = {
         InitalizeAnimationCounters();
         
         window.requestAnimationFrame = window.requestAnimationFrame
-    || window.mozRequestAnimationFrame
-    || window.webkitRequestAnimationFrame
-    || window.msRequestAnimationFrame
-    || function(f){return setTimeout(f, 1000/60)}; // simulate calling code 60 
+        || window.mozRequestAnimationFrame
+        || window.webkitRequestAnimationFrame
+        || window.msRequestAnimationFrame
+        || function(f){return setTimeout(f, 1000/60)}; // simulate calling code 60 
  
-window.cancelAnimationFrame = window.cancelAnimationFrame
-    || window.mozCancelAnimationFrame
-    || function(requestID){clearTimeout(requestID)}; //fall back
+        window.cancelAnimationFrame = window.cancelAnimationFrame
+        || window.mozCancelAnimationFrame
+        || function(requestID){clearTimeout(requestID)}; //fall back
         
         // INITIALIZE USER INPUT       
         window.addEventListener('keydown', function (e) {
@@ -48,11 +48,12 @@ window.cancelAnimationFrame = window.cancelAnimationFrame
             myGameArea.mousedown = true;
             myGameArea.clickX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
             myGameArea.clickY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            
             if (myGameArea.clickX > 0 && 
                 myGameArea.clickY > 0 &&
                 myGameArea.clickX < document.getElementById("game").width &&
                 myGameArea.clickY < document.getElementById("game").height)
-                astarPath = astar_test();
+                myGameArea.clicked = true;
         })
         window.addEventListener('mouseup', function (e) {
             myGameArea.mousedown = false;
@@ -122,24 +123,18 @@ function showFPS() {
     ctx.fillText("FPS : " + fps, 400, 20);
 }
 
-var turn = 1;
 // Update Canvas
 function updateGameArea() {
     myGameArea.frameNo += 1;
       
+    // FPS update
     now=Date.now();
     if (myGameArea.frameNo == 1 || everyinterval(30)) {fps=Math.round(1000/(now-before)); }
     before=now;
     
     control1.update();
     control2.update();
-    
-    // Moving cat left and right
-    //cat.speedX = cat.speed * turn;
-    if (myGameArea.frameNo == 1 || everyinterval(60))
-        turn *= (-1);
-    
-    // astar-move
+    control3.update();
     
     if (myGameArea.x && myGameArea.y) {        
         if (myUpBtn.clicked()) character.speedY = -character.speed;
@@ -148,48 +143,51 @@ function updateGameArea() {
         else if (myRightBtn.clicked()) character.speedX = character.speed;
     }
     
-    // Object Object Collison
-    if (character.crashWith(cat, character.speedX, character.speedY)) {
+    // Object Object Collison TODO: generalize for all objects on the current map
+    /*if (character.crashWith(cat, character.speedX, character.speedY)) {
+        character.isFacing();
         character.speedX = 0;
         character.speedY = 0;
         
     }
     if (cat.crashWith(character, cat.speedX, cat.speedY)) {
+        cat.isFacing();
         cat.speedX = 0;
         cat.speedY = 0;
         
-    }
-    //if (myGameArea.frameNo == 1 || everyinterval(2))   
-    
-    panorama.update();
+    }*/
+    character_collision.mapCollsion();
+    cat_collision.mapCollsion();
     
     maps[mapID].updateBackground();
     
     char_standing.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
     char_standing.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
-    char_standing.draw("black", false, "black", true);
+    //char_standing.update();
     
     cat_standing.x = Math.floor((cat.x+ 4)/16)*16 - gameCamera.x;
     cat_standing.y = Math.floor((cat.y+16)/16)*16 - gameCamera.y;
-    cat_standing.draw("black", false, "black", true);
+    //cat_standing.update();
     
-    if (character.direction == DIR_N) {
+    if (character.animation.direction == DIR_N) {
         char_front.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
         char_front.y = Math.floor((character.y+16-16)/16)*16 - gameCamera.y;
     }
-    if (character.direction == DIR_S) {
+    if (character.animation.direction == DIR_S) {
         char_front.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
         char_front.y = Math.floor((character.y+16+16)/16)*16 - gameCamera.y;
     }
-    if (character.direction == DIR_W) {
+    if (character.animation.direction == DIR_W) {
         char_front.x = Math.floor((character.x+ 4-16)/16)*16 - gameCamera.x;
         char_front.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
     }
-    if (character.direction == DIR_E) {
+    if (character.animation.direction == DIR_E) {
         char_front.x = Math.floor((character.x+ 4+15)/16)*16 - gameCamera.x;
         char_front.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
     }
-    char_front.draw("black", false, "red", true);
+    //char_front.update();
+    character_collision.update();
+    cat_collision.update();
     
     if (char_front.x == cat_standing.x && char_front.y == cat_standing.y)
         if ((myGameArea.keys && myGameArea.keys[KEY_ENTER]) || GlobalEnter)
@@ -211,7 +209,6 @@ function updateGameArea() {
     
     gameCamera.update();
     
-    
     // Control Buttons
     myUpBtn.update();        
     myDownBtn.update();        
@@ -225,18 +222,12 @@ function updateGameArea() {
         cursor.y = myGameArea.y;
         cursor.update();
     }
-    // Cursor2
-    if(myGameArea.x2 && myGameArea.y2) {        
-        cursor2.x = myGameArea.x2;
-        cursor2.y = myGameArea.y2;
-        cursor2.update();
-    }
     
     tile_selected.x = Math.floor(myGameArea.x/16)*16;
     tile_selected.y = Math.floor(myGameArea.y/16)*16;
-    tile_selected.draw("black", false, "black", true);
+    tile_selected.update();
 
-    GlobalEnter = false;
+    GlobalEnter = false; //Temp to simulate enter button, replace with clicked/touch later on for interaction
     showFPS();
 
 }

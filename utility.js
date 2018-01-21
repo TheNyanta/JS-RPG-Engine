@@ -11,33 +11,36 @@ function i2xy(index, width) {
     return [x,y];
 }
 
-//convert mapCL to graph
+//convert mapCL to a graph
 function getGraph() {
     var mapCL = maps[mapID].layerC;
     var mapWidth = maps[mapID].mapWidth;
     var mapHeight = maps[mapID].mapHeight;
     
     var arr = Array();
-    for (var j = 0; j < mapHeight; j++) {
+    for (var i = 0; i < mapWidth; i++) {
         arr.push(Array());
     }
     for (var i = 0; i < mapWidth*mapHeight; i++) {
         if (mapCL[i])
-            arr[Math.floor(i / mapWidth)][i % mapWidth] = 1;
+            arr[i % mapWidth][Math.floor(i / mapWidth)] = 1;
         else
-            arr[Math.floor(i / mapWidth)][i % mapWidth] = 0;
+            arr[i % mapWidth][Math.floor(i / mapWidth)] = 0;
     }
     return arr;
 }
 
-// Use Astar
-function astar_test() {
+// Get shortest path using astar algorithm
+function astarPath(startX, startY, endX, endY) {
     var graph = new Graph(getGraph());
-    var start = graph.grid[Math.floor((character.y+16)/16)][Math.floor((character.x+4)/16)];
-    //console.log("Start = ["+Math.floor((character.y+16)/16)+"]["+Math.floor((character.x+4)/16)+"]");
-    var end = graph.grid[Math.floor((myGameArea.clickY+gameCamera.y)/16)][Math.floor((myGameArea.clickX+gameCamera.x)/16)];
-    //console.log("End = ["+Math.floor((myGameArea.clickY+gameCamera.y)/16)+"]["+Math.floor((myGameArea.clickX+gameCamera.x)/16)+"]");
-    return astar.search(graph, start, end);
+    // Check if start and end are valid positions (= not outside of the graph grid)
+    if (startX < 0 || startX >= graph.grid.length || startY < 0 || startY >= graph.grid[0].length) return undefined;
+    if (endX < 0 || endX >= graph.grid.length || endY < 0 || endY >= graph.grid[0].length) return undefined;
+    var start = graph.grid[startX][startY];
+    var end = graph.grid[endX][endY];
+    //console.log("Start = ["+startX+"]["+startY+"]");
+    //console.log("End = ["+endX+"]["+endY+"]");
+    return astar.search(graph, start, end); // "options.closets = true" activating how?
 }
 
 function DisableScrollbar() {
