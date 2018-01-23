@@ -1,23 +1,27 @@
 function startGame() {
     // Load Scripts
-    $.when(
-    $.getScript('astar.js'),
-    $.getScript('constants.js'),
-    $.getScript('camera.js'),
-    $.getScript('utility.js'),
-    $.getScript('animate.js'),
-    $.getScript('component.js'),
-    $.getScript('control.js'),
-    $.getScript('map.js'),
-    $.getScript('collision.js'),
-    $.getScript('data.js')
-    ).done( function() {
-        // Starts after all the scripts are loaded
-        setTimeout(function() {
+    var scripts = ['astar.js','constants.js','camera.js','utility.js','animate.js','component.js','control.js','map.js','collision.js','data.js'];
+    var loadCounter = 0;
+    for (var i = 0; i < scripts.length; i++) {
+        $.getScript(scripts[i], function() {
+            loadCounter++;
+        });
+    }  
+    function loadCheck () {
+        if (scripts.length == loadCounter) {
+            console.log("Finshed loading!");
             myGameArea.init();
             myGameArea.start();
-        }, 500);
-    });
+        }
+        else {
+            console.log("Loading ...");
+            setTimeout(function() {
+                loadCheck();
+            }, 100);
+        }
+    }
+    // Starts after all the scripts are loaded
+    loadCheck();
 }
 
 var myGameArea = {
