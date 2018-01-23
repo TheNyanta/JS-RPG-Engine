@@ -4,7 +4,7 @@
         <title>HTML-JS RPG ENGINE</title>
         <link rel="icon" href="Assets/Image/favicon.ico">
         <script src="jquery-3.2.1.js"></script>       
-        <script src="game.js"></script>
+        
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <style>
             canvas {
@@ -14,17 +14,14 @@
         </style>
     </head>
     
-    <body onload="startGame()" background="Assets/Image/Background.jpg">       
-        <div>
-            <button onclick="enterFullscreen()" unselectable="on">Fullscreen</button>
-            <button onclick="EnableScrollbar()" unselectable="on">Scrollbar On</button>
-            <button onclick="DisableScrollbar()" unselectable="on">Scrollbar Off</button>
-            <button onclick="audio1.play()">Play Music</button>
-            <button onclick="audio1.pause()">Pause Music</button>
-            <br>
-            <button onclick="gameCamera.target=character">Camera on Character</button>
-            <button onclick="gameCamera.target=cat">Camera on Cat</button>
+    <body>       
+        <div id="game container">
+            <button id="startGame" onclick="startGame()">Start Game</button><br>
+            <a href="https://github.com/TheNyanta/thenyanta.github.io">Link to Repository</a>
+            <div id="gameScripts">
+                <script src="scriptLoader.js"></script>            
+            </div>
         </div>
-        <a href="https://github.com/TheNyanta/thenyanta.github.io">Link to Repository</a>
+        
     </body>
 </html>

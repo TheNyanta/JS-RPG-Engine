@@ -1,37 +1,13 @@
 function startGame() {
-    // Load Scripts
-    var scripts = ['astar.js','constants.js','camera.js','utility.js','animate.js','component.js','control.js','map.js','collision.js','data.js'];
-    var loadCounter = 0;
-    for (var i = 0; i < scripts.length; i++) {
-        $.getScript(scripts[i], function() {
-            loadCounter++;
-        });
-    }  
-    function loadCheck () {
-        if (scripts.length == loadCounter) {
-            console.log("Finshed loading!");
-            myGameArea.init();
-            myGameArea.start();
-        }
-        else {
-            console.log("Loading ...");
-            setTimeout(function() {
-                loadCheck();
-            }, 100);
-        }
-    }
-    // Starts after all the scripts are loaded
-    loadCheck();
+    myGameArea.init();
+    myGameArea.start();
 }
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
     init : function() {
-        // INITIALIZE CANVAS
-        //this.canvas = document.getElementById("game"); // if canvas is in the html file
         this.canvas.width = 480;
         this.canvas.height = 270;
-        this.canvas.id = "game";
         
         // Pause game if not selected
         document.active = true;
@@ -40,7 +16,21 @@ var myGameArea = {
         
         //this.canvas.style.cursor = "none"; //hide the original cursor
         this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        
+        // Add buttons
+        var myGameButtons =
+            '<button onclick="enterFullscreen()" unselectable="on">Fullscreen</button>' +
+            '<button onclick="EnableScrollbar()" unselectable="on">Scrollbar On</button>' +
+            '<button onclick="DisableScrollbar()" unselectable="on">Scrollbar Off</button>' +
+            '<button onclick="audio1.play()">Play Music</button>' +
+            '<button onclick="audio1.pause()">Pause Music</button>' +
+            '<br>' +
+            '<button onclick="gameCamera.target=character">Camera on Character</button>' +
+            '<button onclick="gameCamera.target=cat">Camera on Cat</button>';
+        document.getElementById("startGame").insertAdjacentHTML('afterend',myGameButtons);
+        
+        // Replace Start Button with Canvas
+        document.getElementById("startGame").parentElement.replaceChild(this.canvas, document.getElementById("startGame"));
         
         this.frameNo = 0;
         
