@@ -19,6 +19,7 @@ var myGameArea = {
         
         // Add buttons
         var myGameButtons =
+            '<br>' +
             '<button onclick="enterFullscreen()" unselectable="on">Fullscreen</button>' +
             '<button onclick="EnableScrollbar()" unselectable="on">Scrollbar On</button>' +
             '<button onclick="DisableScrollbar()" unselectable="on">Scrollbar Off</button>' +
