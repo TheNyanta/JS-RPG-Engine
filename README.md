@@ -21,6 +21,6 @@ Implement Battle System (Realtime and/or Roundbased) + Stats (Health, Mana, Stre
 
 (Increase performance by only rendering the parts of the canvas that change)
 
-## TILE BASED RPG GAME
+## DEMO
 
-https://thenyanta.github.io/
+https://thenyanta.github.io/HTML-JavaScript-RPG-Engine/
