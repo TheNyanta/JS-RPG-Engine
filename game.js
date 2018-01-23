@@ -63,8 +63,8 @@ var myGameArea = {
             
             if (myGameArea.clickX > 0 && 
                 myGameArea.clickY > 0 &&
-                myGameArea.clickX < document.getElementById("game").width &&
-                myGameArea.clickY < document.getElementById("game").height)
+                myGameArea.clickX < myGameArea.canvas.width &&
+                myGameArea.clickY < myGameArea.canvas.height)
                 myGameArea.clicked = true;
         })
         window.addEventListener('mouseup', function (e) {
