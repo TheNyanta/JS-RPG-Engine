@@ -1,27 +1,35 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>HTML-JS RPG ENGINE</title>
-        <link rel="icon" href="Assets/Image/favicon.ico">
-        <script src="jquery-3.2.1.js"></script>       
-        
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <style>
-            canvas {
-                border:1px solid #d3d3d3;
-                background-color: #f1f1f1;
-            }
-        </style>
-    </head>
-    
-    <body>       
+<title>RPG Engine Testing</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="icon" href="Assets/Image/favicon.ico">
+<body class="w3-content" style="max-width:1300px">
+
+<!-- First Grid: Logo & About -->
+<div class="w3-row">
+  <div class="w3-full w3-blue-grey w3-container" style="height:700px" id="me">
+    <div class="w3-padding-64 w3-center">
+      <h1>Game</h1>
         <div id="game container">
-            <button id="startGame" onclick="startGame()">Start Game</button><br>
-            <a href="https://github.com/TheNyanta/HTML-JavaScript-RPG-Engine" target="_blank">Link to Repository</a>
-            <div id="gameScripts">
-                <script src="scriptLoader.js"></script>            
-            </div>
+        <button id="startGame" onclick="startGame()">Start Game</button><br>
+        <a href="https://github.com/TheNyanta/HTML-JavaScript-RPG-Engine" target="_blank">Repository</a>
+        <div id="gameScripts">
+        <script src="scriptLoader.js"></script>            
         </div>
-        
-    </body>
+        </div>
+    </div>
+  </div>
+    
+</div>
+
+<!-- Footer -->
+<footer class="w3-container w3-black w3-padding-16">
+<div class="w3-center w3-small w3-opacity">
+<a href=https://thenyanta.github.io target="_parent"><img src="/Assets/Image/link.gif" alt="Back"></a>
+</div>
+</footer>
+
+</body>
 </html>
