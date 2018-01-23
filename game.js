@@ -1,6 +1,19 @@
 function startGame() {
-    myGameArea.init();
-    myGameArea.start();
+    // Load Scripts
+    $.getScript('astar.js');
+    $.getScript('constants.js');
+    $.getScript('camera.js');
+    $.getScript('utility.js');
+    $.getScript('animate.js');
+    $.getScript('component.js');
+    $.getScript('control.js');
+    $.getScript('map.js');
+    $.getScript('collision.js');
+    $.getScript('data.js', function() {
+        // Starts after all the scripts are loaded
+        myGameArea.init();
+        myGameArea.start();
+    });
 }
 
 var myGameArea = {
@@ -136,14 +149,6 @@ function updateGameArea() {
     control2.update();
     control3.update();
     
-    /*
-    if (myGameArea.x && myGameArea.y) {        
-        if (myUpBtn.clicked()) character.speedY = -character.speed;
-        else if (myDownBtn.clicked()) character.speedY = character.speed;
-        else if (myLeftBtn.clicked()) character.speedX = -character.speed;
-        else if (myRightBtn.clicked()) character.speedX = character.speed;
-    }*/
-    
     // Object Object Collison TODO: generalize for all objects on the current map
     /*if (character.crashWith(cat, character.speedX, character.speedY)) {
         character.isFacing();
@@ -157,18 +162,11 @@ function updateGameArea() {
         cat.speedY = 0;
         
     }*/
-    character_collision.mapCollsion();
-    cat_collision.mapCollsion();
     
     maps[mapID].updateBackground();
     
-    char_standing.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
-    char_standing.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
-    //char_standing.update();
-    
-    cat_standing.x = Math.floor((cat.x+ 4)/16)*16 - gameCamera.x;
-    cat_standing.y = Math.floor((cat.y+16)/16)*16 - gameCamera.y;
-    //cat_standing.update();
+    character_collision.mapCollsion();
+    cat_collision.mapCollsion();
     
     if (character.animation.direction == DIR_N) {
         char_front.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
@@ -186,14 +184,16 @@ function updateGameArea() {
         char_front.x = Math.floor((character.x+ 4+15)/16)*16 - gameCamera.x;
         char_front.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
     }
-    //char_front.update();
+    
     character_collision.update();
     cat_collision.update();
     
-    if (char_front.x == cat_standing.x && char_front.y == cat_standing.y)
-        if ((myGameArea.keys && myGameArea.keys[KEY_ENTER]) || GlobalEnter)
-            catsound.play();
-    
+    /*
+    maps_objects.sort(this.y);
+    maps_objects.reverse(); // Shows both o.O
+    for (var i = 0; i < maps_objects.length; i++)
+        maps_objects[i].update();
+        */
     
     
     // Objects incl. character: TODO: Automatic Order update() after Y-coordinate - smaller y first
@@ -209,28 +209,7 @@ function updateGameArea() {
     maps[mapID].updateForeground();
     
     gameCamera.update();
-    
-    /*
-    // Control Buttons
-    myUpBtn.update();        
-    myDownBtn.update();        
-    myLeftBtn.update();        
-    myRightBtn.update();
-    */
-    
-    
-    // Cursor
-    if(myGameArea.x && myGameArea.y) {        
-        cursor.x = myGameArea.x;
-        cursor.y = myGameArea.y;
-        cursor.update();
-    }
-    
-    tile_selected.x = Math.floor(myGameArea.x/16)*16;
-    tile_selected.y = Math.floor(myGameArea.y/16)*16;
-    tile_selected.update();
 
-    GlobalEnter = false; //Temp to simulate enter button, replace with clicked/touch later on for interaction
     showFPS();
 
 }

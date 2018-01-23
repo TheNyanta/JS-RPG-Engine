@@ -1,3 +1,5 @@
+var maps_objects = [];
+
 // Setup Character
 var character = new component(112, 176);
 character.sprite("Assets/Image/character.png", 24, 32, 8, 12);
@@ -23,10 +25,6 @@ var control2 = new control(character, KEY_W, KEY_S, KEY_A, KEY_D);
 // Chase character
 var control3 = new control(cat, 0, 0, 0, 0, character);
 
-var myObstacles = [];
-
-var GlobalEnter = false;
-
 var char_standing = new component();
 char_standing.rectangle(16, 16, "black", false, "black", true);
 
@@ -36,23 +34,7 @@ char_front.rectangle(16, 16, "black", false, "red", true);
 var tile_selected = new component();
 tile_selected.rectangle(16, 16, "black", false, "black", true);
 
-var cat_standing = new component();
-cat_standing.rectangle(16, 16, "black", false, "black", true);
-
-var cursor = new component();
-cursor.rectangle(5, 5, "yellow");
-
-/*
-// On-canvas Control buttons
-var myUpBtn = new component(32, 0);
-myUpBtn.rectangle(32, 32, "black");
-var myDownBtn = new component(32, 64);
-myDownBtn.rectangle(32, 32, "black");
-var myLeftBtn = new component(0, 32);
-myLeftBtn.rectangle(32, 32, "black");
-var myRightBtn = new component(64, 32);
-myRightBtn.rectangle(32, 32, "black");
-*/
+maps_objects.push(character, cat);
 
 // Music
 var audio1 = new Audio('Assets/Audio/banana-phone.m4a');
