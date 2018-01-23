@@ -1,15 +1,17 @@
 function startGame() {
     // Load Scripts
-    $.getScript('astar.js');
-    $.getScript('constants.js');
-    $.getScript('camera.js');
-    $.getScript('utility.js');
-    $.getScript('animate.js');
-    $.getScript('component.js');
-    $.getScript('control.js');
-    $.getScript('map.js');
-    $.getScript('collision.js');
-    $.getScript('data.js', function() {
+    $.when(
+    $.getScript('astar.js'),
+    $.getScript('constants.js'),
+    $.getScript('camera.js'),
+    $.getScript('utility.js'),
+    $.getScript('animate.js'),
+    $.getScript('component.js'),
+    $.getScript('control.js'),
+    $.getScript('map.js'),
+    $.getScript('collision.js'),
+    $.getScript('data.js')
+    ).done( function() {
         // Starts after all the scripts are loaded
         myGameArea.init();
         myGameArea.start();
