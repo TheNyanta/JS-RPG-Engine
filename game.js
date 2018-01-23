@@ -13,8 +13,10 @@ function startGame() {
     $.getScript('data.js')
     ).done( function() {
         // Starts after all the scripts are loaded
-        myGameArea.init();
-        myGameArea.start();
+        setTimeout(function() {
+            myGameArea.init();
+            myGameArea.start();
+        }, 500);
     });
 }
 
