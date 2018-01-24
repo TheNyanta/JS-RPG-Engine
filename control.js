@@ -1,3 +1,4 @@
+// TODO: Would be nice to make the structure nicer - the way how you add different types of control like keyboard input, mouse-click, npc-follow
 /**
 * attach it to a component to add control: Keyboard Control, Following, Mouse Control, [TODO: Physics(Gravity & Bouncing)]
 * @param target
@@ -12,8 +13,12 @@ function control(target, up, down, left, right, followee) {
     
     // Follow Properties
     this.followee = followee;
+    this.doFollow = false;
     this.route;
     this.routeIndex;
+    
+    // Mouse/Touch move
+    this.swipMove = false;
     
     // Goto Click
     this.goto = false;
@@ -27,7 +32,7 @@ function control(target, up, down, left, right, followee) {
     // Bounce
     this.bounce = false;
     this.bounceX = 0.0;
-    this.bounceY = 0.0;    
+    this.bounceY = 0.0;
     
     this.update = function() {
         if (this.target != undefined) {
@@ -44,7 +49,8 @@ function control(target, up, down, left, right, followee) {
             }
         }
         if (this.followee != undefined)
-            this.follow();
+            if (this.doFollow)
+                this.follow();
         
         if (this.gravity) {
             this.gravitySpeedX += this.gravityX;
@@ -53,8 +59,27 @@ function control(target, up, down, left, right, followee) {
             this.target.speedY += this.gravitySpeedY;
         }
         
+        if (this.swipMove && myGameArea.mousedown) {
+            this.gestureMove();
+        }
+        
         if (this.goto && myGameArea.clicked) {
             this.gotoClick();
+        }
+    }
+    
+    this.drawSwip = function() {
+        if (myGameArea.mousedown) {
+            ctx = myGameArea.context;
+            ctx.beginPath();
+            ctx.arc(myGameArea.clickdownX, myGameArea.clickdownY, 5, 0, 2 * Math.PI, true);
+            ctx.arc(myGameArea.x, myGameArea.y, 5, 0, 2 * Math.PI, true);
+            // Fill
+            ctx.fillStyle = "black";
+            ctx.fill();
+            // Outline
+            ctx.strokeStyle = "black";
+            ctx.stroke();
         }
     }
     
@@ -98,10 +123,25 @@ function control(target, up, down, left, right, followee) {
         }
     }
     
+    this.gestureMove = function() {
+        if (Math.abs(myGameArea.x - myGameArea.clickdownX) > Math.abs(myGameArea.y - myGameArea.clickdownY)) {
+            if (myGameArea.x < myGameArea.clickdownX - 4)
+                target.speedX -= target.speed;
+            else if (myGameArea.x > myGameArea.clickdownX + 4)
+                target.speedX += target.speed;
+        }
+        else {
+            if (myGameArea.y < myGameArea.clickdownY - 4)
+                target.speedY -= target.speed;
+            else if (myGameArea.y > myGameArea.clickdownY + 4) 
+                target.speedY += target.speed;
+        }
+    }
+    
     this.gotoClick = function() {
-        // Create route
+        // Create routet
         if (this.route == undefined) {
-            this.route = astarPath(Math.floor((this.target.x+4)/16), Math.floor((this.target.y+16)/16), Math.floor((myGameArea.clickX+gameCamera.x)/16), Math.floor((myGameArea.clickY+gameCamera.y)/16));
+            this.route = astarPath(Math.floor((this.target.x+4)/16), Math.floor((this.target.y+16)/16), Math.floor((myGameArea.clickdownX+gameCamera.x)/16), Math.floor((myGameArea.clickdownY+gameCamera.y)/16));
             this.routeIndex = 0;
         }
         // Go route
@@ -122,8 +162,8 @@ function control(target, up, down, left, right, followee) {
                 else {
                     //console.log("Finished");
                     this.route = undefined;
-                    myGameArea.clickX = undefined;
-                    myGameArea.clickY = undefined;
+                    myGameArea.clickdownX = undefined;
+                    myGameArea.clickdownY = undefined;
                     myGameArea.clicked = false;
                 }
             }
@@ -131,15 +171,15 @@ function control(target, up, down, left, right, followee) {
         else {
             //console.log("Not Reachable");
             this.route = undefined;
-            myGameArea.clickX = undefined;
-            myGameArea.clickY = undefined;
+            myGameArea.clickdownX = undefined;
+            myGameArea.clickdownY = undefined;
             myGameArea.clicked = false;
         }
         if (this.target.collided) {
             //console.log("Collided");
             this.route = undefined;
-            myGameArea.clickX = undefined;
-            myGameArea.clickY = undefined;
+            myGameArea.clickdownX = undefined;
+            myGameArea.clickdownY = undefined;
             myGameArea.clicked = false;
         }
         

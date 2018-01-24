@@ -23,8 +23,8 @@ function collision(target, x, y, width, height) {
     this.update = function() {
         this.rect1.update();
         this.rect2.update();
-        this.rect2.update();
         this.rect3.update();
+        this.rect4.update();
     }
     
     // Only for width/height=16: => with tile-height/width=16 only max 4 tiles to stand on; TODO: Adept for all sizes
@@ -35,6 +35,7 @@ function collision(target, x, y, width, height) {
         var y1 = Math.floor((this.y+this.target.y+this.target.speedY)/16);
         var x2 = x1 + 1;
         var y2 = y1 + 1;
+        
         // Check if standing exactly on a tile-axis; tolarance=0.1
         if (Math.abs(x1-(this.x+this.target.x+this.target.speedX)/16) < 0.1) x2 = x1;
         if (Math.abs(y1-(this.y+this.target.y+this.target.speedY)/16) < 0.1) y2 = y1;
@@ -66,6 +67,7 @@ function collision(target, x, y, width, height) {
         }
         // Collision even with component moves only half way
         if (!this.isMapWalkable()) {
+            this.target.isFacing();
             this.target.speedX = 0;
             this.target.speedY = 0;
             this.target.collided = true;

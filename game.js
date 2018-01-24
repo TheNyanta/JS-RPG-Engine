@@ -5,9 +5,11 @@ function startGame() {
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
+    defaultWidth : 560,
+    defaultHeight : 350,
     init : function() {
-        this.canvas.width = 480;
-        this.canvas.height = 270;
+        this.canvas.width = 560;
+        this.canvas.height = 350;
         
         // Pause game if not selected
         document.active = true;
@@ -27,7 +29,9 @@ var myGameArea = {
             '<button onclick="audio1.pause()">Pause Music</button>' +
             '<br>' +
             '<button onclick="gameCamera.target=character">Camera on Character</button>' +
-            '<button onclick="gameCamera.target=cat">Camera on Cat</button>';
+            '<button onclick="gameCamera.target=cat">Camera on Cat</button>' +
+            '<button onclick="control3.doFollow=true">Cat follow</button>' +
+            '<button onclick="control3.doFollow=false">Cat stay</button>';
         document.getElementById("startGame").insertAdjacentHTML('afterend',myGameButtons);
         
         // Replace Start Button with Canvas
@@ -58,19 +62,19 @@ var myGameArea = {
         })
         window.addEventListener('mousedown', function (e) {
             myGameArea.mousedown = true;
-            myGameArea.clickX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.clickY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.clickdownX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
+            myGameArea.clickdownY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
             
-            if (myGameArea.clickX > 0 && 
-                myGameArea.clickY > 0 &&
-                myGameArea.clickX < myGameArea.canvas.width &&
-                myGameArea.clickY < myGameArea.canvas.height)
+            if (myGameArea.clickdownX > 0 && 
+                myGameArea.clickdownY > 0 &&
+                myGameArea.clickdownX < myGameArea.canvas.width &&
+                myGameArea.clickdownY < myGameArea.canvas.height)
                 myGameArea.clicked = true;
         })
         window.addEventListener('mouseup', function (e) {
             myGameArea.mousedown = false;
-            //myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            //myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.clickupX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
+            myGameArea.clickupY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
         })
         window.addEventListener('mousemove', function (e) {
             myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
@@ -78,13 +82,13 @@ var myGameArea = {
         })
         window.addEventListener('touchstart', function (e) {
             myGameArea.touchdown = true;
-            myGameArea.clickX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.clickY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.clickdownX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
+            myGameArea.clickdownY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
         })
         window.addEventListener('touchend', function (e) {
             myGameArea.touchdown = false;
-            //myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            //myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.clickupX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
+            myGameArea.clickupY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
         })
         window.addEventListener('touchmove', function (e) {
             myGameArea.x = e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().left;
@@ -124,7 +128,8 @@ function everyinterval(n) {
     return false;
 }
 
-var before,now,fps;
+var start,before,now,time,fps;
+start=Date.now();
 before=Date.now();
 fps=0;
 
@@ -132,17 +137,25 @@ function showFPS() {
     ctx = myGameArea.context;
     ctx.font =  "bold 20px red";
     ctx.fillStyle = "black";
-    ctx.fillText("FPS : " + fps, 400, 20);
+    ctx.fillText("FPS : " + fps, 470, 40);
+}
+
+function showPosition() {
+    ctx = myGameArea.context;
+    ctx.fillStyle = "black";
+    ctx.fillText("x : " + (character.x + character_collision.x), 5, 20);
+    ctx.fillText("y : " + (character.y + character_collision.y), 5, 40);
+}
+
+function showTime() {
+    ctx = myGameArea.context;
+    ctx.fillStyle = "black";
+    ctx.fillText("Timer : " + Math.round(time/1000), 440, 20);
 }
 
 // Update Canvas
 function updateGameArea() {
     myGameArea.frameNo += 1;
-      
-    // FPS update
-    now=Date.now();
-    if (myGameArea.frameNo == 1 || everyinterval(30)) {fps=Math.round(1000/(now-before)); }
-    before=now;
     
     control1.update();
     control2.update();
@@ -207,8 +220,17 @@ function updateGameArea() {
     
     maps[mapID].updateForeground();
     
+    control3.drawSwip();
+    
     gameCamera.update();
 
+    // FPS update
+    now=Date.now();
+    time=now-start;
+    if (myGameArea.frameNo == 1 || everyinterval(30)) {fps=Math.round(1000/(now-before)); }
+    before=now;
     showFPS();
+    showTime();
+    showPosition();
 
 }

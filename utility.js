@@ -64,21 +64,23 @@ function enterFullscreen() {
     } else if(element.msRequestFullscreen) {
         element.msRequestFullscreen();
     }
-    
-    //resize canvas if fullscreen
-    //myGameArea.canvasWidth = document.body.offsetWidth;
-    //if (canvasWidth > tileWidth[mapID] * mapWidth[mapID]) canvasWidth = tileWidth[mapID] * mapWidth[mapID];
-    
-    //myGameArea.canvasHeight = document.body.offsetHeight;
-    //if (canvasHeight > tileHeight[mapID] * mapHeight[mapID]) canvasHeight = tileHeight[mapID] * mapHeight[mapID];  
 }
 
+// Size the canvas to the size of the map if it fits on the screen
 function resizeCanvas() {
-    //myGameArea.canvas.width = 480;
-    //if (canvasWidth > tileWidth[mapID] * mapWidth[mapID]) canvasWidth = tileWidth[mapID] * mapWidth[mapID];
+    if (document.body.clientWidth > maps[mapID].mapWidth * maps[mapID].tileWidth) {
+        // Screen bigger than map
+        myGameArea.canvas.width = maps[mapID].mapWidth * maps[mapID].tileWidth;
+    }
+    // Screen fits on map
+    else myGameArea.canvas.width = myGameArea.canvas.width = document.body.clientWidth;
     
-    //myGameArea.canvas.height = 270;
-    //if (canvasHeight > tileHeight[mapID] * mapHeight[mapID]) canvasHeight = tileHeight[mapID] * mapHeight[mapID];
+    if (document.body.clientHeight > maps[mapID].mapHeight * maps[mapID].tileHeight) {
+        // Screen bigger than map
+        myGameArea.canvas.height = maps[mapID].mapHeight * maps[mapID].tileHeight;
+    }
+    // Screen fits on map
+    else myGameArea.canvas.height = myGameArea.canvas.height = document.body.clientHeight;
 }
 
 function setCookie(cname,cvalue,exdays) {

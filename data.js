@@ -18,7 +18,8 @@ gameCamera.target = character;
 
 // Control
 var control1 = new control(character, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
-control1.goto = true;
+//control1.goto = true;
+control1.swipMove = true;
 
 var control2 = new control(character, KEY_W, KEY_S, KEY_A, KEY_D);
 
