@@ -71,10 +71,5 @@ map2LC = [false, false, false, false, false, false, false, false, false, false, 
 
 var bergwald = new map("Assets/Image/sunset1.png", "Assets/Image/bergwald.png", 40, 30, 16, 16, 30, 16, map1L1, map1L2, map1L3, map1LC);
 var snowforest = new map(undefined, "Assets/Image/snowforest.png", 40, 30, 16, 16, 30, 16, map2L1, map2L2, map2L3, map2LC);
-
 var maps = [bergwald, snowforest];
 var mapID = 0;
-
-//var lol = new map(undefined, undefined, 610, 509, 10, 10, 609, 509, null, null, null, lol_map_cl);
-//var lol_map = new Image();
-//lol_map.src = "Assets/Image/lol_map.jpg";

@@ -51,7 +51,7 @@ function map(panorama, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tile
                 res = i2xy(this.layer1[mapIndex]-1, Math.max(this.tilesX, this.tilesY));
                 ctx.drawImage(this.tileset, res[0]*this.tileWidth, res[1]*this.tileHeight, this.tileWidth, this.tileHeight, tile_w, tile_h, this.tileWidth, this.tileHeight);
                 res = i2xy(this.layer2[mapIndex]-1, Math.max(this.tilesX, this.tilesY));
-                ctx.drawImage(this.tileset, res[0]*this.tileWidth, res[1]*this.tileHeight, this.tileWidth, this.tileHeight, tile_w, tile_h, this.tileWidth, this.tileHeight);
+                ctx.drawImage(this.tileset, res[0]*this.tileWidth, res[1]*this.tileHeight, this.tileWidth, this.tileHeight, tile_w, tile_h, this.tileWidth, this.tileHeight);                
             }
         }
     }
