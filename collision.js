@@ -20,11 +20,11 @@ function collision(target, x, y, width, height) {
     this.rect3 = new component(); this.rect3.rectangle(16, 16, "black", false, "blue", true);
     this.rect4 = new component(); this.rect4.rectangle(16, 16, "black", false, "blue", true);
     
-    this.update = function() {
-        this.rect1.update();
-        this.rect2.update();
-        this.rect3.update();
-        this.rect4.update();
+    this.draw = function() {
+        this.rect1.draw();
+        this.rect2.draw();
+        this.rect3.draw();
+        this.rect4.draw();
     }
     
     // Only for width/height=16: => with tile-height/width=16 only max 4 tiles to stand on; TODO: Adept for all sizes

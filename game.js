@@ -99,11 +99,34 @@ var myGameArea = {
     
     start : function() {
         
-        // Old gameLoop
-        //this.interval = setInterval(function() { ResetAnimationCounter(); updateGameArea();} , 16);
+        // Start the main loop.
+        MainLoop.setUpdate(update).setDraw(draw).start();
+        //.setDraw(draw).setEnd(end).start();
 
+        /*
+        var lastFrameTimeMs = 0;
+        function mainLoop(timestamp) {
+            // Throttle the frame rate.
+            if (timestamp < lastFrameTimeMs + (1000 / 60)) {
+                requestAnimationFrame(mainLoop);
+                return;
+            }
+            delta = timestamp - lastFrameTimeMs;
+            lastFrameTimeMs = timestamp;
+            
+            ResetAnimationCounter();
+            updateGameArea(delta);
+            //update(delta);
+            //draw();
+            requestAnimationFrame(mainLoop);
+        }
+        
+        requestAnimationFrame(mainLoop);
+        */
+        
+        /*
         // New gameLoop
-        function gameLoop() {
+        function gameLoop(timestamp) {
             requestAnimationFrame(gameLoop);
             if (document.active) {
                 ResetAnimationCounter();
@@ -111,7 +134,8 @@ var myGameArea = {
             }
         }
         
-        gameLoop();      
+        gameLoop();   
+        */
     },
     
     stop : function() {
@@ -154,32 +178,18 @@ function showTime() {
 }
 
 // Update Canvas
-function updateGameArea() {
+function update(delta) {
+    ResetAnimationCounter();
     myGameArea.frameNo += 1;
     
-    control1.update();
-    control2.update();
-    control3.update();
-    
-    // Object Object Collison TODO: generalize for all objects on the current map
-    /*if (character.crashWith(cat, character.speedX, character.speedY)) {
-        character.isFacing();
-        character.speedX = 0;
-        character.speedY = 0;
-        
-    }
-    if (cat.crashWith(character, cat.speedX, cat.speedY)) {
-        cat.isFacing();
-        cat.speedX = 0;
-        cat.speedY = 0;
-        
-    }*/
-    
-    maps[mapID].updateBackground();
+    control1.update(delta);
+    control2.update(delta);
+    control3.update(delta);
     
     character_collision.mapCollsion();
     cat_collision.mapCollsion();
     
+    /*
     if (character.animation.direction == DIR_N) {
         char_front.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
         char_front.y = Math.floor((character.y+16-16)/16)*16 - gameCamera.y;
@@ -195,10 +205,23 @@ function updateGameArea() {
     if (character.animation.direction == DIR_E) {
         char_front.x = Math.floor((character.x+ 4+15)/16)*16 - gameCamera.x;
         char_front.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
-    }
+    }*/
     
-    character_collision.update();
-    cat_collision.update();
+    
+    
+    character.update(delta);
+    cat.update(delta);
+    
+    control3.drawSwip();
+    
+    gameCamera.update();
+}
+
+function draw() {
+    maps[mapID].updateBackground();
+    
+    character_collision.draw();
+    cat_collision.draw();
     
     /*
     maps_objects.sort(this.y);
@@ -210,20 +233,16 @@ function updateGameArea() {
     
     // Objects incl. character: TODO: Automatic Order update() after Y-coordinate - smaller y first
     if (character.y > cat.y) {
-        cat.update(); 
-        character.update();
+        cat.draw(); 
+        character.draw();
     }
     else {
-        character.update(); 
-        cat.update(); 
+        character.draw(); 
+        cat.draw(); 
     }    
     
     maps[mapID].updateForeground();
     
-    control3.drawSwip();
-    
-    gameCamera.update();
-
     // FPS update
     now=Date.now();
     time=now-start;
@@ -232,5 +251,4 @@ function updateGameArea() {
     showFPS();
     showTime();
     showPosition();
-
 }

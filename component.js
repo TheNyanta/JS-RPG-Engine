@@ -47,6 +47,32 @@ function component(x, y) {
     }
     
     /**
+    * line component
+    * @param
+    *//*
+    this.line = function() {
+        this.
+    }
+    
+    this.vecx = vecx;
+    this.vecy = vecy;
+    
+    this.draw = function(width, color) {
+        gfx.beginPath();
+        gfx.lineWidth = width; //2px
+        gfx.moveTo(this.x, this.y);
+        gfx.lineTo(this.x + vecx, this.y + vecy);
+        gfx.strokeStyle = color;
+        gfx.stroke();
+    }
+    
+    this.length = function() {
+        var dx = this.vecx;
+        var dy = this.vecy;
+        return Math.sqrt(dx * dx + dy * dy);
+    }*/
+    
+    /**
     * rectangle component
     * @param width of rectangle
     * @param height of rectangle
@@ -65,17 +91,20 @@ function component(x, y) {
         this.outline = outline;        
     }
     
-    this.update = function() {
+    this.update = function(delta) {
         
         // Update the direction the component is facing
-        this.isFacing();
+        if (this.isMoving()) this.isFacing();
         
         // Resolve Collision with the map
         //mapCollsion();
         
         // Update Position
-        this.x += this.speedX;
-        this.y += this.speedY;        
+        this.x += this.speedX;// * delta); //delta = 16,...
+        this.y += this.speedY;// * delta);
+    }
+    
+    this.draw = function() {
         
         // Sets Animations if defined based on moving and direction
         this.isMoving();
