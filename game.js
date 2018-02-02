@@ -143,8 +143,8 @@ function showFPS() {
 function showPosition() {
     ctx = myGameArea.context;
     ctx.fillStyle = "black";
-    ctx.fillText("x : " + (character.x + character_collision.x), 5, 20);
-    ctx.fillText("y : " + (character.y + character_collision.y), 5, 40);
+    ctx.fillText("x : " + (character.x + character.offset_x), 5, 20);
+    ctx.fillText("y : " + (character.y + character.offset_y), 5, 40);
 }
 
 function showTime() {
@@ -153,16 +153,21 @@ function showTime() {
     ctx.fillText("Timer : " + Math.round(time/1000), 440, 20);
 }
 
+var enterPressed = false;
+
 // Update Canvas
 function updateGameArea() {
     myGameArea.frameNo += 1;
+    
+    maps[mapID].updateBackground();
     
     control1.update();
     control2.update();
     control3.update();
     
+    /*
     // Object Object Collison TODO: generalize for all objects on the current map
-    /*if (character.crashWith(cat, character.speedX, character.speedY)) {
+    if (character.crashWith(cat, character.speedX, character.speedY)) {
         character.isFacing();
         character.speedX = 0;
         character.speedY = 0;
@@ -173,12 +178,8 @@ function updateGameArea() {
         cat.speedX = 0;
         cat.speedY = 0;
         
-    }*/
-    
-    maps[mapID].updateBackground();
-    
-    character_collision.mapCollsion();
-    cat_collision.mapCollsion();
+    }
+    */ 
     
     if (character.animation.direction == DIR_N) {
         char_front.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
@@ -197,18 +198,18 @@ function updateGameArea() {
         char_front.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
     }
     
-    character_collision.update();
-    cat_collision.update();
-    
     /*
+    // Automatic Order update() after Y-coordinate - smaller y first
     maps_objects.sort(this.y);
     maps_objects.reverse(); // Shows both o.O
     for (var i = 0; i < maps_objects.length; i++)
         maps_objects[i].update();
-        */
+    */
     
+    character.showStandingOnTiles();
+    cat.showStandingOnTiles();
     
-    // Objects incl. character: TODO: Automatic Order update() after Y-coordinate - smaller y first
+    // Objects incl. character
     if (character.y > cat.y) {
         cat.update(); 
         character.update();
@@ -223,6 +224,27 @@ function updateGameArea() {
     control3.drawSwip();
     
     gameCamera.update();
+    
+    // Enter KEY 
+    if (myGameArea.keys)
+        if (myGameArea.keys[KEY_ENTER]) {
+            if (!enterPressed) {
+                //console.log("Enter Pressed");
+                testdialog.chatCounter++;
+                chatSequence = true;
+            }
+            enterPressed = true;
+        }
+    else {
+        if (enterPressed) {
+            //console.log("Enter Released");
+            enterPressed = false;
+        }
+    }
+    
+    if (chatSequence)
+        testdialog.update();
+    
 
     // FPS update
     now=Date.now();

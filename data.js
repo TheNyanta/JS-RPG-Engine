@@ -4,13 +4,13 @@ var maps_objects = [];
 var character = new component(112, 176);
 character.sprite("Assets/Image/character.png", 24, 32, 8, 12);
 character.animation = new addAnimation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14]);
-var character_collision = new collision(character, 4, 16, 16, 16);
+character.collision(4,16,16,16);
 
 // Setup Cat
 var cat = new component(160, 160);
 cat.sprite("Assets/Image/cat.png", 24, 32, 8, 12);
 cat.animation = new addAnimation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14]);
-var cat_collision = new collision(cat, 4, 16, 16, 16);
+cat.collision(4, 16, 16, 16);
 
 // Camera
 var gameCamera = new camera(0, 0);
@@ -45,6 +45,9 @@ var catsound = new Audio('Assets/Audio/cat.m4a');
 
 audio1.volume = 0.2;
 catsound.volume = 0.2;
+
+// Dialog [Test]
+var testdialog = new Dialog(["Hello World!","How are you?"]);
 
 // Maps
 
