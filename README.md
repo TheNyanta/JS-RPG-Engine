@@ -17,9 +17,9 @@ Implement proper Audio Select/Play System
 
 Implement proper GUI + Gamemenu (i.e. it opens by pressing "Esc")
 
-Implement Battle System (Realtime and/or Roundbased) + Stats (Health, Mana, Strength, etc.)
+(Implement Custom Keybinding)
 
-(Increase performance by only rendering the parts of the canvas that change)
+Implement Battle System (Realtime and/or Roundbased) + Stats (Health, Mana, Strength, etc.)
 
 ## DEMO
 
