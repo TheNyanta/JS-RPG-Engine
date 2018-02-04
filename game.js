@@ -28,10 +28,10 @@ var myGameArea = {
             '<button onclick="audio1.play()">Play Music</button>' +
             '<button onclick="audio1.pause()">Pause Music</button>' +
             '<br>' +
-            '<button onclick="gameCamera.target=character">Camera on Character</button>' +
-            '<button onclick="gameCamera.target=cat">Camera on Cat</button>' +
-            '<button onclick="control3.doFollow=true">Cat follow</button>' +
-            '<button onclick="control3.doFollow=false">Cat stay</button>';
+            '<button onclick="gameCamera.setTarget(character)">Camera on Character</button>' +
+            '<button onclick="gameCamera.setTarget(cat)">Camera on Cat</button>' +
+            '<button onclick="control2.doFollow=true">Cat follow</button>' +
+            '<button onclick="control2.doFollow=false">Cat stay</button>';
         document.getElementById("startGame").insertAdjacentHTML('afterend',myGameButtons);
         
         // Replace Start Button with Canvas
@@ -39,8 +39,11 @@ var myGameArea = {
         
         this.frameNo = 0;
         
-        // ANIMATIONCOUNTER
+        // Animation Counter
         InitalizeAnimationCounters();
+        
+        // Initalize Maps
+        for (i=0; i<maps.length; i++) maps[i].init();
         
         window.requestAnimationFrame = window.requestAnimationFrame
         || window.mozRequestAnimationFrame
@@ -128,42 +131,38 @@ function everyinterval(n) {
     return false;
 }
 
-var start,before,now,time,fps;
-start=Date.now();
-before=Date.now();
-fps=0;
-
-function showFPS() {
-    ctx = myGameArea.context;
-    ctx.font =  "bold 20px red";
-    ctx.fillStyle = "black";
-    ctx.fillText("FPS : " + fps, 470, 40);
-}
-
-function showPosition() {
-    ctx = myGameArea.context;
-    ctx.fillStyle = "black";
-    ctx.fillText("x : " + (character.x + character.offset_x), 5, 20);
-    ctx.fillText("y : " + (character.y + character.offset_y), 5, 40);
-}
-
-function showTime() {
-    ctx = myGameArea.context;
-    ctx.fillStyle = "black";
-    ctx.fillText("Timer : " + Math.round(time/1000), 440, 20);
-}
-
 var enterPressed = false;
 
 // Update Canvas
 function updateGameArea() {
     myGameArea.frameNo += 1;
     
-    maps[mapID].updateBackground();
+    if (myGameArea.keys) {
+        if (myGameArea.keys[KEY_A]) {
+            offset_x--;
+        }
+        if (myGameArea.keys[KEY_D]) {
+            offset_x++;
+        }
+        if (myGameArea.keys[KEY_W]) {
+            offset_y--;
+        }
+        if (myGameArea.keys[KEY_S]) {
+            offset_y++;
+        }
+    }
     
-    control1.update();
+    maps[mapID].drawBackground();
+    
+    clickControl.update();
     control2.update();
-    control3.update();
+    
+    if (debug) {
+        clickControl.drawRoute();
+        control2.drawRoute();
+    }
+    
+    
     
     /*
     // Object Object Collison TODO: generalize for all objects on the current map
@@ -181,47 +180,50 @@ function updateGameArea() {
     }
     */ 
     
-    if (character.animation.direction == DIR_N) {
+    /*
+    if (character.direction == DIR_N) {
         char_front.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
         char_front.y = Math.floor((character.y+16-16)/16)*16 - gameCamera.y;
     }
-    if (character.animation.direction == DIR_S) {
+    if (character.direction == DIR_S) {
         char_front.x = Math.floor((character.x+ 4)/16)*16 - gameCamera.x;
         char_front.y = Math.floor((character.y+16+16)/16)*16 - gameCamera.y;
     }
-    if (character.animation.direction == DIR_W) {
+    if (character.direction == DIR_W) {
         char_front.x = Math.floor((character.x+ 4-16)/16)*16 - gameCamera.x;
         char_front.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
     }
-    if (character.animation.direction == DIR_E) {
+    if (character.direction == DIR_E) {
         char_front.x = Math.floor((character.x+ 4+15)/16)*16 - gameCamera.x;
         char_front.y = Math.floor((character.y+16)/16)*16 - gameCamera.y;
     }
+    */   
+    
+    cat.update(); 
+    character.update();
     
     /*
     // Automatic Order update() after Y-coordinate - smaller y first
     maps_objects.sort(this.y);
     maps_objects.reverse(); // Shows both o.O
     for (var i = 0; i < maps_objects.length; i++)
-        maps_objects[i].update();
-    */
+        maps_objects[i].draw();*/
     
-    character.showStandingOnTiles();
-    cat.showStandingOnTiles();
     
     // Objects incl. character
     if (character.y > cat.y) {
-        cat.update(); 
-        character.update();
+        cat.draw(); 
+        character.draw();
     }
     else {
-        character.update(); 
-        cat.update(); 
-    }    
+        character.draw(); 
+        cat.draw(); 
+    }
     
-    maps[mapID].updateForeground();
     
-    control3.drawSwip();
+    maps[mapID].drawForeground();
+    
+    //control3.drawSwip();
     
     gameCamera.update();
     
@@ -246,13 +248,14 @@ function updateGameArea() {
         testdialog.update();
     
 
-    // FPS update
-    now=Date.now();
-    time=now-start;
-    if (myGameArea.frameNo == 1 || everyinterval(30)) {fps=Math.round(1000/(now-before)); }
-    before=now;
+    
+    updateFPS();
     showFPS();
+    
     showTime();
-    showPosition();
+    showPosition(character);
+    
+    //offset_x = 0;
+    //offset_y = 0;
 
 }

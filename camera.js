@@ -2,6 +2,11 @@ function camera(x, y) {
     this.x = x;
     this.y = y;
     
+    this.setTarget = function(target) {
+        this.target = target;
+        return this;
+    }
+    
     this.update = function() {
         // Follow target
         if (this.target != undefined) {

@@ -40,7 +40,7 @@ function astarPath(startX, startY, endX, endY) {
     var end = graph.grid[endX][endY];
     //console.log("Start = ["+startX+"]["+startY+"]");
     //console.log("End = ["+endX+"]["+endY+"]");
-    return astar.search(graph, start, end); // "options.closets = true" activating how?
+    return astar.search(graph, start, end, {closest : true});
 }
 
 function DisableScrollbar() {
@@ -104,4 +104,38 @@ function getCookie(cname) {
         }
     }
     return "";
+}
+
+// Init FPS and time
+var start,before,now,time,fps;
+start=Date.now();
+before=Date.now();
+fps=0;    
+
+
+function updateFPS() {
+    now=Date.now();
+    time=now-start;
+    if (myGameArea.frameNo == 1 || everyinterval(30)) {fps=Math.round(1000/(now-before)); }
+    before=now;
+}
+
+function showFPS() {
+    ctx = myGameArea.context;
+    ctx.font =  "bold 20px red";
+    ctx.fillStyle = "black";
+    ctx.fillText("FPS : " + fps, 470, 40);
+}
+
+function showPosition(target) {
+    ctx = myGameArea.context;
+    ctx.fillStyle = "black";
+    ctx.fillText("x:" + (target.x + target.offset_x) + ", y:" + (target.y + target.offset_y), 5, 20);
+    ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x)/16) + ", " + Math.floor((target.y + target.offset_y)/16) + "]", 5, 40);
+}
+
+function showTime() {
+    ctx = myGameArea.context;
+    ctx.fillStyle = "black";
+    ctx.fillText("Timer : " + Math.round(time/1000), 440, 20);
 }

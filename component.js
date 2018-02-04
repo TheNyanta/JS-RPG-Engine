@@ -1,18 +1,22 @@
 /**
-* A component to display in the game: Geometric Objects, Images & Sprites
+* A component in the game that will be drawn
+* For Geometric Objects, Images & Sprites
 * @param x-position
 * @param y-position
 */
 function component(x, y) {
     // Standard Properties of any component
     this.x = x;
-    this.y = y;    
-    this.speedX = 0;
-    this.speedY = 0;
-    this.speed = 2;    
+    this.y = y;
+    
+    this.lastx = x;
+    this.lasty = y;
+    
+    
+    // Other properties
     // TODO: https://www.w3schools.com/graphics/tryit.asp?filename=trygame_rotate_game
     //this.angle = 0; 
-    //this.angleSpeed = 0; 
+    //this.angleSpeed = 0;
     
     /**
     * image component
@@ -26,6 +30,7 @@ function component(x, y) {
         this.img.src = img;
         this.width = width;
         this.height = height;
+        return this;
     }
     
     /**
@@ -44,6 +49,7 @@ function component(x, y) {
         this.height = height;
         this.spritesX = spritesX;
         this.spritesY = spritesY;
+        return this;
     }
     
     /**
@@ -62,31 +68,97 @@ function component(x, y) {
         this.fillColor = fillColor;
         this.filled = filled;
         this.outlineColor = outlineColor;
-        this.outline = outline;        
+        this.outline = outline;
+        return this;
     }
     
-    this.update = function() {        
+    /**
+    * adds motion properties
+    * @param default moving speed
+    */
+    this.velocity = function(speed) {
+        this.speedX = 0;
+        this.speedY = 0;
+        this.speed = speed;
+        return this;
+    }
+    
+    /**
+    * add key control
+    * make component listen to key inputs
+    */
+    this.control = function(up, down, left, right) {        
+        // Key Control Properties
+        this.up = up;
+        this.down = down;
+        this.left = left;
+        this.right = right;
+        
+        this.disableControls = false;
+        
+        return this;
+    }
+    
+    /**
+    * add animations
+    */
+    this.animation = function(animationTime, idleUp, idleDown, idleLeft, idleRight, moveUp, moveDown, moveLeft, moveRight) {
+        this.animationTime = animationTime;
+        this.idleUp = idleUp;
+        this.idleDown = idleDown;
+        this.idleLeft = idleLeft;
+        this.idleRight = idleRight;
+        this.moveUp = moveUp;
+        this.moveDown = moveDown;
+        this.moveLeft = moveLeft;
+        this.moveRight = moveRight;
+        this.direction = DIR_S; // Default Direction
+        
+        return this;
+    }
+    
+    /**
+    * updates the component
+    * calculates position, update animation sequence, check key events
+    */
+    this.update = function() {
+        
+        this.keyEvent();
+        
         this.mapCollsion();
         
         // Update the direction the component is facing
         this.isFacing();
         
-        // Resolve Collision with the map
-        //mapCollsion();
-        
-        if (this.type == "sprite")
-            this.moveFinisher();
+        if (this.type == "sprite") {
+            // Sets Animations if defined based on moving and direction
+            this.isMoving();
+            this.updateAnimate();
+        }
         
         // Update Position
         this.x += this.speedX;
         this.y += this.speedY;        
         
-        // Sets Animations if defined based on moving and direction
-        this.isMoving();
-        this.updateAnimate();
+        // Reset Movement
+        this.speedX = 0;
+        this.speedY = 0;
         
-        // Render component
+        // Stop only on tiles: Needs some refinement!
+        this.moveFinisher();
+        
+        return this;
+    }
+    
+    /**
+    * Render component
+    * Draw it on the canvas
+    */
+    this.draw = function () {        
         ctx = myGameArea.context;
+        
+        if (debug && (this.rects != undefined))
+            this.showStandingOnTiles();
         
         // Image
         if (this.type == "image") {
@@ -107,11 +179,12 @@ function component(x, y) {
             if (this.outline) ctx.strokeRect(this.x, this.y, this.width, this.height);     
         }
         
-        // Reset Movement
-        this.speedX = 0;
-        this.speedY = 0;
+        return this;
     }
     
+    /**
+    * Tells if the component is clicked on
+    */
     this.clicked = function() {
         var myleft = this.x;
         var myright = this.x + (this.width);
@@ -124,48 +197,56 @@ function component(x, y) {
         }
         return clicked;
     }
-    
-    // Update the facing direction based on the speed
-    // For 4-direction movement (for 8-direction add more cases)
+    /**
+    * Update the facing direction based on the speed
+    * For 4-direction movement (for 8-direction add more cases)
+    */
     this.isFacing = function() {
-        if (this.speedY < 0) this.animation.direction = DIR_N;
-        if (this.speedY > 0) this.animation.direction = DIR_S;
-        if (this.speedX < 0) this.animation.direction = DIR_W;
-        if (this.speedX > 0) this.animation.direction = DIR_E;
+        if (this.speedY < 0) this.direction = DIR_N;
+        if (this.speedY > 0) this.direction = DIR_S;
+        if (this.speedX < 0) this.direction = DIR_W;
+        if (this.speedX > 0) this.direction = DIR_E;
     }
     
+    /**
+    * Tells if the component is moving
+    */
     this.isMoving = function() {
         if (this.speedX == 0 && this.speedY == 0)
             return false;        
         return true;
     }
     
-    // Updates the shown animation sequence based on the direction te component is facing
-    // For 4-direction movement (for 8-direction add more cases)
+    /**
+    * Updates the shown animation sequence based on the direction te component is facing
+    * For 4-direction movement (for 8-direction add more cases)
+    */
     this.updateAnimate = function() {
-        if (this.animation != undefined) {
-            // Moving
-            if (this.isMoving()){
-                if (this.animation.direction == DIR_N) this.sequence = this.animation.moveUp;
-                if (this.animation.direction == DIR_S) this.sequence = this.animation.moveDown;
-                if (this.animation.direction == DIR_W) this.sequence = this.animation.moveLeft;
-                if (this.animation.direction == DIR_E) this.sequence = this.animation.moveRight;         
-            }
-            // Idle (Animation or Still)
-            else {
-                if (this.animation.direction == DIR_N) this.sequence = this.animation.idleUp;
-                if (this.animation.direction == DIR_S) this.sequence = this.animation.idleDown;
-                if (this.animation.direction == DIR_W) this.sequence = this.animation.idleLeft;
-                if (this.animation.direction == DIR_E) this.sequence = this.animation.idleRight;                       
-            }
+        // Moving
+        if (this.isMoving()){
+            if (this.direction == DIR_N) this.sequence = this.moveUp;
+            if (this.direction == DIR_S) this.sequence = this.moveDown;
+            if (this.direction == DIR_W) this.sequence = this.moveLeft;
+            if (this.direction == DIR_E) this.sequence = this.moveRight; 
+        }
+        // Idle (Animation or Still)
+        else {
+            if (this.direction == DIR_N) this.sequence = this.idleUp;
+            if (this.direction == DIR_S) this.sequence = this.idleDown;
+            if (this.direction == DIR_W) this.sequence = this.idleLeft;
+            if (this.direction == DIR_E) this.sequence = this.idleRight;
         }
     }
     
+    /**
+    * Draw the sprite
+    * animated & still
+    */
     this.drawSprite = function() {
         if (this.sequence != undefined) {
-            // animation moving or idle
+            // Animation: Moving / Idle
             if (this.sequence.length != undefined) {
-                if (AnimationCounter[AnimationCounterIndex].animationDelay++ >= this.animation.animationTime) {
+                if (AnimationCounter[AnimationCounterIndex].animationDelay++ >= this.animationTime) {
                     AnimationCounter[AnimationCounterIndex].animationDelay = 0;
                     AnimationCounter[AnimationCounterIndex].animationIndexCounter++;
                     if (AnimationCounter[AnimationCounterIndex].animationIndexCounter >= this.sequence.length) {
@@ -177,7 +258,7 @@ function component(x, y) {
                 ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
                 AnimationCounterIndex++;
             }
-            // Standing still
+            // No Animation: Just sprite image
             else {
                 var res = i2xy(this.sequence, Math.max(this.spritesX, this.spritesY));
                 ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
@@ -185,10 +266,41 @@ function component(x, y) {
         }
     }
     
+    /**
+    * Key Events
+    * for moving component
+    * and for other events
+    */
+    this.keyEvent = function() {
+        // Key Events for moving the component
+        if (!this.disableControls) {
+            // Key Control: Else if for single-direction movement
+            if (myGameArea.keys) {
+                if (myGameArea.keys[this.up])
+                    this.speedY = -this.speed;
+                else if (myGameArea.keys[this.down])
+                    this.speedY = this.speed;
+                else if (myGameArea.keys[this.left])
+                    this.speedX = -this.speed;
+                else if (myGameArea.keys[this.right])
+                    this.speedX = this.speed;
+            }
+        }
+        // Other Key Events; i.E. press enter to start a dialog/event, selected a choice in a dialog sequence
+        // ...
+    }
+    
     // ########################
     // ## Collision handling ##
     // ########################
     
+    /**
+    * Adds Collision to the component
+    * @param x position relative to the sprite image
+    * @param y position relative to the sprite image
+    * @param width
+    * @param height
+    */
     this.collision = function(x, y, width, height) {
         // Collision Properties
         this.collidable = true;
@@ -197,14 +309,19 @@ function component(x, y) {
         this.offset_width = width;
         this.offset_height = height;
         
-        // Debugging Map Collision: Shows on which tiles the object is standing
-        this.rect1 = new component(); this.rect1.rectangle(16, 16, "black", false, "blue", true);
-        this.rect2 = new component(); this.rect2.rectangle(16, 16, "black", false, "blue", true);
-        this.rect3 = new component(); this.rect3.rectangle(16, 16, "black", false, "blue", true);
-        this.rect4 = new component(); this.rect4.rectangle(16, 16, "black", false, "blue", true);
+        if (debug) {
+            // Debugging Map Collision: Shows on which tiles the object is standing
+            this.rects = [];
+            for (i = 0; i < 4; i++) this.rects[i] = new component().rectangle(16, 16, "black", false, "blue", true);
+        }
+        
+        return this;
     }
     
-    // Only for width/height=16: => with tile-height/width=16 only max 4 tiles to stand on; "may TODO": Adept for all sizes
+    /**
+    * Only for width/height=16: => with tile-height/width=16 only max 4 tiles to stand on
+    * "may TODO": Adept for all sizes
+    */
     this.isMapWalkable = function() {
         if (this.walkthrough) return true;
         
@@ -217,29 +334,32 @@ function component(x, y) {
         if (Math.abs(x1-(this.x+this.offset_x+this.speedX)/16) < 0.1) x2 = x1;
         if (Math.abs(y1-(this.y+this.offset_y+this.speedY)/16) < 0.1) y2 = y1;
         
-        if (this.rect1 != undefined) {
-            this.rect1.x = x1*16-gameCamera.x; this.rect1.y = y1*16-gameCamera.y;
-            this.rect2.x = x1*16-gameCamera.x; this.rect2.y = y2*16-gameCamera.y;
-            this.rect3.x = x2*16-gameCamera.x; this.rect3.y = y1*16-gameCamera.y;
-            this.rect4.x = x2*16-gameCamera.x; this.rect4.y = y2*16-gameCamera.y;
+        if (this.rects != undefined) {
+            this.rects[0].x = x1*16-gameCamera.x; this.rects[0].y = y1*16-gameCamera.y;
+            this.rects[1].x = x1*16-gameCamera.x; this.rects[1].y = y2*16-gameCamera.y;
+            this.rects[2].x = x2*16-gameCamera.x; this.rects[2].y = y1*16-gameCamera.y;
+            this.rects[3].x = x2*16-gameCamera.x; this.rects[3].y = y2*16-gameCamera.y;
         }
         
         // Check map borders
         if (x1 < 0 || y1 < 0 || x2 > maps[mapID].mapWidth - 1 || y2 > maps[mapID].mapHeight - 1)
             return false;
         
-        if (this.rect1 != undefined) {
-            if (maps[mapID].layerC[xy2i(x1,y1,maps[mapID].mapWidth)]) this.rect1.outlineColor = "blue"; else this.rect1.outlineColor = "red";
-            if (maps[mapID].layerC[xy2i(x1,y2,maps[mapID].mapWidth)]) this.rect2.outlineColor = "blue"; else this.rect2.outlineColor = "red";
-            if (maps[mapID].layerC[xy2i(x2,y1,maps[mapID].mapWidth)]) this.rect3.outlineColor = "blue"; else this.rect3.outlineColor = "red";
-            if (maps[mapID].layerC[xy2i(x2,y2,maps[mapID].mapWidth)]) this.rect4.outlineColor = "blue"; else this.rect4.outlineColor = "red";
+        if (this.rects != undefined) {
+            if (maps[mapID].layerC[xy2i(x1,y1,maps[mapID].mapWidth)]) this.rects[0].outlineColor = "blue"; else this.rects[0].outlineColor = "red";
+            if (maps[mapID].layerC[xy2i(x1,y2,maps[mapID].mapWidth)]) this.rects[1].outlineColor = "blue"; else this.rects[1].outlineColor = "red";
+            if (maps[mapID].layerC[xy2i(x2,y1,maps[mapID].mapWidth)]) this.rects[2].outlineColor = "blue"; else this.rects[2].outlineColor = "red";
+            if (maps[mapID].layerC[xy2i(x2,y2,maps[mapID].mapWidth)]) this.rects[3].outlineColor = "blue"; else this.rects[3].outlineColor = "red";
         }
         
         return (maps[mapID].layerC[xy2i(x1,y1,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x1,y2,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x2,y1,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x2,y2,maps[mapID].mapWidth)]);
     }
     
-    // Map Collision Resolver
-    // [TODO: Check if there is no collision between the old and the new position (only happens if moving really fast!)]
+    /**
+    * Map Collision Resolver
+    * [TODO: Check if there is no collision between the old and the new position
+    * (only happens if moving really fast!)]
+    */
     this.mapCollsion = function() {
         // Half the move distance and check again
         if(!this.isMapWalkable()) {
@@ -256,8 +376,10 @@ function component(x, y) {
         else this.collided = false;
     }
     
-    // Object Collision Resolver
-    // Use maps tile width & height for collision
+    /**
+    * Object Collision Resolver
+    * Use maps tile width & height for collision
+    */
     this.crashWith = function(otherobj, x2, y2) {
         if (this.walkthrough) return false;
         if (otherobj.walkthrough) return false;
@@ -280,33 +402,57 @@ function component(x, y) {
         }
         return crash;
     }
-    
-    // For debug
+    /**
+    * For debug: Shows the tiles the component is standing (blue rectangles)
+    */
     this.showStandingOnTiles = function() {
-        this.rect1.update();
-        this.rect2.update();
-        this.rect3.update();
-        this.rect4.update();
+        for (i = 0; i < this.rects.length; i++)
+        this.rects[i].draw();
     }
     
-    // Always stop on a whole tile
+    /**
+    * Always stop on a whole tile
+    */
     this.moveFinisher = function() {
+        /*
         // Finish moving in x-direction
         if (this.speedX == 0) {
             var x1 = Math.floor((this.x+this.offset_x)/16);
             if (Math.abs(x1-(this.x+this.offset_x)/16) >= 0.1) {
-                if (this.animation.direction == DIR_W) this.speedX = -this.speed;
-                else if (this.animation.direction == DIR_E) this.speedX = this.speed;
+                this.disableControls = true;
+                if (this.direction == DIR_W) this.speedX = -this.speed;
+                else if (this.direction == DIR_E) this.speedX = this.speed;
             }
+            else this.disableControls = false;
         }
         // Finish moving in y-direction
         if (this.speedY == 0) {
             var y1 = Math.floor((this.y+this.offset_y)/16);
             if (Math.abs(y1-(this.y+this.offset_y)/16) >= 0.1) {
-                if (this.animation.direction == DIR_N) this.speedY = -this.speed;
-                else if (this.animation.direction == DIR_S) this.speedY = this.speed;
+                this.disableControls = true;
+                if (this.direction == DIR_N) this.speedY = -this.speed;
+                else if (this.direction == DIR_S) this.speedY = this.speed;
             }
+            else this.disableControls = false;
         }
+        */
+        var x1 = Math.floor((this.x+this.offset_x)/16);
+        var y1 = Math.floor((this.y+this.offset_y)/16);
+        var xFin = (Math.abs(x1-(this.x+this.offset_x)/16) >= 0.1);
+        var yFin = (Math.abs(y1-(this.y+this.offset_y)/16) >= 0.1);
+        this.disableControls = true;
+        
+        if (xFin) {
+            if (this.direction == DIR_W) this.speedX = -this.speed;
+            else if (this.direction == DIR_E) this.speedX = this.speed;
+        }
+        if (yFin) {
+            if (this.direction == DIR_N) this.speedY = -this.speed;
+            else if (this.direction == DIR_S) this.speedY = this.speed;
+        }
+        if (!xFin && !yFin)
+            this.disableControls = false;
+        
     }
 }
     

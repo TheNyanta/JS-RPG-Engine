@@ -7,25 +7,15 @@ var Animate = function(animationDelay, animationIndexCounter, animationCurrentFr
 var AnimationCounterIndex = 0;
 var AnimationCounter = new Array();
 
+/**
+* Max number of animated sprites
+*/
 function InitalizeAnimationCounters() {
-    for (var i = 0; i < 1000; i++) {
+    for (var i = 0; i < 50; i++) {
         AnimationCounter[i] = new Animate(0, 0, 0);
     }
 }
 
 function ResetAnimationCounter() {
     AnimationCounterIndex = 0;
-}
-
-function addAnimation(animationTime, idleUp, idleDown, idleLeft, idleRight, moveUp, moveDown, moveLeft, moveRight) {
-    this.animationTime = animationTime;
-    this.idleUp = idleUp;
-    this.idleDown = idleDown;
-    this.idleLeft = idleLeft;
-    this.idleRight = idleRight;
-    this.moveUp = moveUp;
-    this.moveDown = moveDown;
-    this.moveLeft = moveLeft;
-    this.moveRight = moveRight;
-    this.direction = DIR_S; // Default Direction
 }

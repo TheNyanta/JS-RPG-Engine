@@ -1,39 +1,40 @@
+var debug = false; // Global Variable for debugging
+
+var offset_x = 0;
+var offset_y = 0;
 var maps_objects = [];
 
 // Setup Character
-var character = new component(112, 176);
-character.sprite("Assets/Image/character.png", 24, 32, 8, 12);
-character.animation = new addAnimation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14]);
-character.collision(4,16,16,16);
+var character = new component(108, 176)
+.sprite("Assets/Image/character.png", 24, 32, 8, 12)
+.velocity(2)
+.control(KEY_W, KEY_S, KEY_A, KEY_D)
+.animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
+.collision(4,16,16,16);
 
 // Setup Cat
-var cat = new component(160, 160);
-cat.sprite("Assets/Image/cat.png", 24, 32, 8, 12);
-cat.animation = new addAnimation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14]);
-cat.collision(4, 16, 16, 16);
+var cat = new component(156, 160)
+.velocity(2)
+.sprite("Assets/Image/cat.png", 24, 32, 8, 12)
+.animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
+.collision(4, 16, 16, 16);
 
 // Camera
-var gameCamera = new camera(0, 0);
-gameCamera.target = character;
+var gameCamera = new camera(0, 0).setTarget(character);
 
 // Control
-var control1 = new control(character, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
-//control1.goto = true;
-control1.swipMove = true;
-
-var control2 = new control(character, KEY_W, KEY_S, KEY_A, KEY_D);
+var clickControl = new control(character);
+clickControl.goto = true;
+//control1.swipMove = true;
 
 // Chase character
-var control3 = new control(cat, 0, 0, 0, 0, character);
+var control2 = new control(cat).setTarget(character);
 
-var char_standing = new component();
-char_standing.rectangle(16, 16, "black", false, "black", true);
+var char_standing = new component().rectangle(16, 16, "black", false, "black", true);
 
-var char_front = new component();
-char_front.rectangle(16, 16, "black", false, "red", true);
+var char_front = new component().rectangle(16, 16, "black", false, "red", true);
 
-var tile_selected = new component();
-tile_selected.rectangle(16, 16, "black", false, "black", true);
+var tile_selected = new component().rectangle(16, 16, "black", false, "black", true);
 
 maps_objects.push(character, cat);
 
