@@ -9,8 +9,8 @@ function component(x, y) {
     this.x = x;
     this.y = y;
     
-    this.lastx = x;
-    this.lasty = y;
+    //this.lastx = x;
+    //this.lasty = y;
     
     
     // Other properties
@@ -162,7 +162,7 @@ function component(x, y) {
         
         // Image
         if (this.type == "image") {
-            ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+            ctx.drawImage(this.img, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
         }
         
         // Sprite
@@ -174,9 +174,9 @@ function component(x, y) {
         else if (this.type == "rectangle"){
             ctx.fillStyle = this.fillColor;
             ctx.strokeStyle = this.outlineColor;
-            if (this.filled) ctx.fillRect(this.x, this.y, this.width, this.height);
+            if (this.filled) ctx.fillRect(this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
             else if (this.filled == undefined) ctx.fillRect(this.x, this.y, this.width, this.height);
-            if (this.outline) ctx.strokeRect(this.x, this.y, this.width, this.height);     
+            if (this.outline) ctx.strokeRect(this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);     
         }
         
         return this;
@@ -273,7 +273,7 @@ function component(x, y) {
     */
     this.keyEvent = function() {
         // Key Events for moving the component
-        if (!this.disableControls) {
+        if (!this.disableControls && !this.finishMove) {
             // Key Control: Else if for single-direction movement
             if (myGameArea.keys) {
                 if (myGameArea.keys[this.up])
@@ -284,6 +284,20 @@ function component(x, y) {
                     this.speedX = -this.speed;
                 else if (myGameArea.keys[this.right])
                     this.speedX = this.speed;
+            }
+        }
+        else {
+            if (chatSequence) {
+                if (myGameArea.keys) {
+                    if (myGameArea.keys[this.up])
+                        currentDialog.selected = 0
+                    else if (myGameArea.keys[this.down])
+                        currentDialog.selected = 1;
+                    else if (myGameArea.keys[this.left])
+                        currentDialog.selected = 2;
+                    else if (myGameArea.keys[this.right])
+                        currentDialog.selected = 3;
+                }
             }
         }
         // Other Key Events; i.E. press enter to start a dialog/event, selected a choice in a dialog sequence
@@ -309,12 +323,6 @@ function component(x, y) {
         this.offset_width = width;
         this.offset_height = height;
         
-        if (debug) {
-            // Debugging Map Collision: Shows on which tiles the object is standing
-            this.rects = [];
-            for (i = 0; i < 4; i++) this.rects[i] = new component().rectangle(16, 16, "black", false, "blue", true);
-        }
-        
         return this;
     }
     
@@ -324,6 +332,12 @@ function component(x, y) {
     */
     this.isMapWalkable = function() {
         if (this.walkthrough) return true;
+        
+        if (debug) {
+            // Debugging Map Collision: Shows on which tiles the object is standing
+            this.rects = [];
+            for (i = 0; i < 4; i++) this.rects[i] = new component().rectangle(16, 16, "black", false, "blue", true);
+        }
         
         var x1 = Math.floor((this.x+this.offset_x+this.speedX)/16);
         var y1 = Math.floor((this.y+this.offset_y+this.speedY)/16);
@@ -335,10 +349,10 @@ function component(x, y) {
         if (Math.abs(y1-(this.y+this.offset_y+this.speedY)/16) < 0.1) y2 = y1;
         
         if (this.rects != undefined) {
-            this.rects[0].x = x1*16-gameCamera.x; this.rects[0].y = y1*16-gameCamera.y;
-            this.rects[1].x = x1*16-gameCamera.x; this.rects[1].y = y2*16-gameCamera.y;
-            this.rects[2].x = x2*16-gameCamera.x; this.rects[2].y = y1*16-gameCamera.y;
-            this.rects[3].x = x2*16-gameCamera.x; this.rects[3].y = y2*16-gameCamera.y;
+            this.rects[0].x = x1*16; this.rects[0].y = y1*16;
+            this.rects[1].x = x1*16; this.rects[1].y = y2*16;
+            this.rects[2].x = x2*16; this.rects[2].y = y1*16;
+            this.rects[3].x = x2*16; this.rects[3].y = y2*16;
         }
         
         // Check map borders
@@ -392,7 +406,6 @@ function component(x, y) {
         var otherright = otherobj.x + otherobj.offset_x + otherobj.offset_width;
         var othertop = otherobj.y + otherobj.offset_y;
         var otherbottom = otherobj.y + otherobj.offset_y + otherobj.offset_height;
-        
         var crash = true;
         if ((mybottom <= othertop) ||
                (mytop >= otherbottom) ||
@@ -414,44 +427,23 @@ function component(x, y) {
     * Always stop on a whole tile
     */
     this.moveFinisher = function() {
-        /*
-        // Finish moving in x-direction
-        if (this.speedX == 0) {
-            var x1 = Math.floor((this.x+this.offset_x)/16);
-            if (Math.abs(x1-(this.x+this.offset_x)/16) >= 0.1) {
-                this.disableControls = true;
-                if (this.direction == DIR_W) this.speedX = -this.speed;
-                else if (this.direction == DIR_E) this.speedX = this.speed;
-            }
-            else this.disableControls = false;
-        }
-        // Finish moving in y-direction
-        if (this.speedY == 0) {
-            var y1 = Math.floor((this.y+this.offset_y)/16);
-            if (Math.abs(y1-(this.y+this.offset_y)/16) >= 0.1) {
-                this.disableControls = true;
-                if (this.direction == DIR_N) this.speedY = -this.speed;
-                else if (this.direction == DIR_S) this.speedY = this.speed;
-            }
-            else this.disableControls = false;
-        }
-        */
         var x1 = Math.floor((this.x+this.offset_x)/16);
         var y1 = Math.floor((this.y+this.offset_y)/16);
         var xFin = (Math.abs(x1-(this.x+this.offset_x)/16) >= 0.1);
         var yFin = (Math.abs(y1-(this.y+this.offset_y)/16) >= 0.1);
-        this.disableControls = true;
-        
+        this.finishMove = true;
+        // Finish moving in x-direction
         if (xFin) {
             if (this.direction == DIR_W) this.speedX = -this.speed;
             else if (this.direction == DIR_E) this.speedX = this.speed;
         }
+        // Finish moving in y-direction
         if (yFin) {
             if (this.direction == DIR_N) this.speedY = -this.speed;
             else if (this.direction == DIR_S) this.speedY = this.speed;
         }
         if (!xFin && !yFin)
-            this.disableControls = false;
+            this.finishMove = false;
         
     }
 }

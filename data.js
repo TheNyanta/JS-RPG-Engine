@@ -3,6 +3,8 @@ var debug = false; // Global Variable for debugging
 var offset_x = 0;
 var offset_y = 0;
 var maps_objects = [];
+var map0_obj = [];
+var map1_obj = [];
 
 // Setup Character
 var character = new component(108, 176)
@@ -12,12 +14,26 @@ var character = new component(108, 176)
 .animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
 .collision(4,16,16,16);
 
+// Setup Character2
+var char2 = new component(204, 176)
+.sprite("Assets/Image/char2.png", 24, 32, 8, 12)
+.velocity(2)
+.control(KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT)
+.animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
+.collision(4,16,16,16);
+
 // Setup Cat
 var cat = new component(156, 160)
-.velocity(2)
+.velocity(1)
 .sprite("Assets/Image/cat.png", 24, 32, 8, 12)
 .animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
 .collision(4, 16, 16, 16);
+
+// Setup Jukebox
+var jukebox = new component(380, 112)
+.sprite("Assets/Image/snow_jukebox.png", 24, 32, 8, 12)
+.collision(4, 16, 16, 16);
+jukebox.sequence = 0;
 
 // Camera
 var gameCamera = new camera(0, 0).setTarget(character);
@@ -30,13 +46,13 @@ clickControl.goto = true;
 // Chase character
 var control2 = new control(cat).setTarget(character);
 
-var char_standing = new component().rectangle(16, 16, "black", false, "black", true);
-
-var char_front = new component().rectangle(16, 16, "black", false, "red", true);
+var char_front = new component().rectangle(16, 16, "black", false, "cyan", true).collision(0, 0, 16, 16);
 
 var tile_selected = new component().rectangle(16, 16, "black", false, "black", true);
 
-maps_objects.push(character, cat);
+map0_obj.push(character, char2, cat);
+map1_obj.push(character, char2, jukebox);
+maps_objects.push(map0_obj, map1_obj);
 
 // Music
 var audio1 = new Audio('Assets/Audio/banana-phone.m4a');
@@ -48,7 +64,24 @@ audio1.volume = 0.2;
 catsound.volume = 0.2;
 
 // Dialog [Test]
-var testdialog = new Dialog(["Hello World!","How are you?"]);
+var testdialog = new Dialog();
+var musicdialog = new Dialog();
+musicdialog.setDialog(["This is jukebox!","Wanna here some music?", "#choice", "#entered"], null, ["Yes", "No"]);
+musicdialog.event = function(choice) {
+    if (choice == 0)
+        audio1.play();
+    if (choice == 1)
+        audio1.pause();
+} 
+var catdialog = new Dialog();
+catdialog.setDialog(["Meow!", "Want meow to follow yeow?", "#choice", "#entered"], null, ["Yes", "No"]);
+catdialog.event = function(choice) {
+    if (choice == 0)
+        control2.doFollow = true;
+    if (choice == 1)
+        control2.doFollow = false;
+    catsound.play();
+}
 
 // Maps
 

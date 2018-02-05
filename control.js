@@ -130,7 +130,7 @@ function control(obj) {
                 // To show the Path
                 if (debug) {
                     this.rects = [];
-                    for (i = 0; i < this.route.length; i++) this.rects[i] = new component(this.route[i].x * 16 - gameCamera.x, this.route[i].y * 16 - gameCamera.y).rectangle(16, 16, "black", false, "yellow", true);
+                    for (i = 0; i < this.route.length; i++) this.rects[i] = new component(this.route[i].x * 16, this.route[i].y * 16).rectangle(16, 16, "black", false, "yellow", true);
                 }
                 
                 
@@ -147,6 +147,7 @@ function control(obj) {
                         //console.log("Reached");
                         this.route = undefined;
                         this.rects = undefined;
+                        obj.disableControls = false;
                         this.finished = true;
                     }
                 }

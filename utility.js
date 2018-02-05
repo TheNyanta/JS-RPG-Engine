@@ -11,6 +11,23 @@ function i2xy(index, width) {
     return [x,y];
 }
 
+//convert listmap to a grid
+function getGrid(maplayer, width, height) {
+    
+    arr=[];
+    k=0;
+    for (i=0; i<height;i++){
+        tmp=[];
+        for (j=0;j<width;j++) {
+            tmp[j]=maplayer[k];
+            k++;
+        }
+        arr[i]=tmp;
+    }
+    
+    return arr;
+}
+
 //convert mapCL to a graph
 function getGraph() {
     var mapCL = maps[mapID].layerC;
@@ -104,6 +121,11 @@ function getCookie(cname) {
         }
     }
     return "";
+}
+
+function toggle(boolean) {
+    if (boolean) return false;
+    return true;
 }
 
 // Init FPS and time

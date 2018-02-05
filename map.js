@@ -67,8 +67,8 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
         var res, tile_w, tile_h;
         for (var h = 0; h < this.mapHeight; h++) {
             for (var w = 0; w < this.mapWidth; w++, mapIndex++) {
-                tile_w = w * this.tileWidth - gameCamera.x;
-                tile_h = h * this.tileHeight - gameCamera.y;
+                tile_w = w * this.tileWidth;// - gameCamera.x;
+                tile_h = h * this.tileHeight;// - gameCamera.y;
                 res = i2xy(this.layer1[mapIndex]-1, Math.max(this.tilesX, this.tilesY));
                 this.cgx2.drawImage(this.tileset, res[0]*this.tileWidth, res[1]*this.tileHeight, this.tileWidth, this.tileHeight, tile_w, tile_h, this.tileWidth, this.tileHeight);
                 res = i2xy(this.layer2[mapIndex]-1, Math.max(this.tilesX, this.tilesY));
@@ -81,8 +81,8 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
         var res, tile_w, tile_h;
         for (var h = 0; h < this.mapHeight; h++) {
             for (var w = 0; w < this.mapWidth; w++, mapIndex++) {
-                tile_w = w * this.tileWidth - gameCamera.x;
-                tile_h = h * this.tileHeight - gameCamera.y;
+                tile_w = w * this.tileWidth;// - gameCamera.x;
+                tile_h = h * this.tileHeight;// - gameCamera.y;
                 res = i2xy(this.layer3[mapIndex]-1, Math.max(this.tilesX, this.tilesY));
                 this.cgx3.drawImage(this.tileset, res[0]*this.tileWidth, res[1]*this.tileHeight, this.tileWidth, this.tileHeight, tile_w, tile_h, this.tileWidth, this.tileHeight);                
             }
