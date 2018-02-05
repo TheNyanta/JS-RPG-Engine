@@ -67,19 +67,19 @@ function control(obj) {
     this.follow = function() {
         
         // No collision: Take direct route
-        if (this.obj.walkthrough) {
+        if (!this.obj.collidable) {
             this.directPath();
         }
         
         // Map collision: Take astar route
         else {
-            // Create / Update route
-            // Update only if the first route finished / canceled: "Easier opponent"; update route every time for higher difficulty
-            if (this.route == undefined)
-                this.createRoute(this.destX, this.destY); 
-            
-            // Follow the route
-            this.followRoute();               
+            if (!this.obj.componentCollision(this.target)) {
+                // Create / Update route
+                this.createRoute(this.destX, this.destY);
+                
+                // Follow the route
+                this.followRoute();
+            }                         
         }
     }
     
@@ -117,15 +117,16 @@ function control(obj) {
     this.followRoute = function() {
         if (this.route != undefined) {
             if (this.route.length != 0) {
-                
+               
+                // else-if to prevent diagonal movement
                 if (Math.floor((this.obj.x+this.obj.offset_x)/16) < this.route[this.routeIndex].x)
                     this.obj.speedX = this.obj.speed;
-                if (Math.floor((this.obj.x+this.obj.offset_x)/16) > this.route[this.routeIndex].x)
+                else if (Math.floor((this.obj.x+this.obj.offset_x)/16) > this.route[this.routeIndex].x)
                     this.obj.speedX -= this.obj.speed;
-                if (Math.floor((this.obj.y+this.obj.offset_y)/16) < this.route[this.routeIndex].y)
+                else if (Math.floor((this.obj.y+this.obj.offset_y)/16) < this.route[this.routeIndex].y)
                     this.obj.speedY = this.obj.speed;
-                if (Math.floor((this.obj.y+this.obj.offset_y)/16) > this.route[this.routeIndex].y)
-                    this.obj.speedY = -this.obj.speed;
+                else if (Math.floor((this.obj.y+this.obj.offset_y)/16) > this.route[this.routeIndex].y)
+                    this.obj.speedY = -this.obj.speed;    
                 
                 // To show the Path
                 if (debug) {
@@ -133,11 +134,8 @@ function control(obj) {
                     for (i = 0; i < this.route.length; i++) this.rects[i] = new component(this.route[i].x * 16, this.route[i].y * 16).rectangle(16, 16, "black", false, "yellow", true);
                 }
                 
-                
-                //if (Math.floor((this.obj.x+this.obj.offset_x)/16) == this.route[this.routeIndex].x && Math.floor((this.obj.y+this.obj.offset_y)/16) == this.route[this.routeIndex].y) {
-                
                 // Increase routeIndex to follow the given path until the destination is reached    
-                if ((Math.abs(this.route[this.routeIndex].x-((this.obj.x+this.obj.offset_x)/16)) < 0.1) && (Math.abs(this.route[this.routeIndex].y-((this.obj.y+this.obj.offset_y)/16)) < 0.1)) {
+                if ((Math.abs(this.route[this.routeIndex].x-((this.obj.x+this.obj.offset_x)/16)) < 1.0) && (Math.abs(this.route[this.routeIndex].y-((this.obj.y+this.obj.offset_y)/16)) < 1.0)) {
                     // Target not reached
                     if (this.route.length - 1 > this.routeIndex) {
                         this.routeIndex++;
@@ -147,7 +145,7 @@ function control(obj) {
                         //console.log("Reached");
                         this.route = undefined;
                         this.rects = undefined;
-                        obj.disableControls = false;
+                        this.obj.disableControls = false;
                         this.finished = true;
                     }
                 }
@@ -157,17 +155,17 @@ function control(obj) {
                 //console.log("Not reachable!")
                 this.route = undefined;
                 this.rects = undefined;
-                obj.disableControls = false;
+                this.obj.disableControls = false;
                 this.finished = true;
             }
             if (this.obj.collided) {
                 //console.log("Collided");
                 this.route = undefined;
-                obj.disableControls = false;
+                this.obj.disableControls = false;
                 this.rects = undefined;
                 this.finished = true;
             }
-        }      
+        }
     }
     
     // ###############################################

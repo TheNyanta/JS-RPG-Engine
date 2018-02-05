@@ -12,7 +12,8 @@ var character = new component(108, 176)
 .velocity(2)
 .control(KEY_W, KEY_S, KEY_A, KEY_D)
 .animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
-.collision(4,16,16,16);
+.collision(4,16,16,16)
+.interactive();
 
 // Setup Character2
 var char2 = new component(204, 176)
@@ -32,21 +33,11 @@ var cat = new component(156, 160)
 // Setup Jukebox
 var jukebox = new component(380, 112)
 .sprite("Assets/Image/snow_jukebox.png", 24, 32, 8, 12)
-.collision(4, 16, 16, 16);
+.collision(0, 16, 24, 16);
 jukebox.sequence = 0;
 
 // Camera
 var gameCamera = new camera(0, 0).setTarget(character);
-
-// Control
-var clickControl = new control(character);
-clickControl.goto = true;
-//control1.swipMove = true;
-
-// Chase character
-var control2 = new control(cat).setTarget(character);
-
-var char_front = new component().rectangle(16, 16, "black", false, "cyan", true).collision(0, 0, 16, 16);
 
 var tile_selected = new component().rectangle(16, 16, "black", false, "black", true);
 
@@ -74,13 +65,11 @@ musicdialog.event = function(choice) {
         audio1.pause();
 } 
 var catdialog = new Dialog();
-catdialog.setDialog(["Meow!", "Want meow to follow yeow?", "#choice", "#entered"], null, ["Yes", "No"]);
+catdialog.setDialog(["Meow!", "Want meow to meow?", "#choice", "#entered"], null, ["Yes", "No"]);
 catdialog.event = function(choice) {
     if (choice == 0)
-        control2.doFollow = true;
-    if (choice == 1)
-        control2.doFollow = false;
-    catsound.play();
+        catsound.play();
+    if (choice == 1) {}    
 }
 
 // Maps

@@ -25,18 +25,13 @@ var myGameArea = {
             '<button onclick="enterFullscreen()" unselectable="on">Fullscreen</button>' +
             '<button onclick="EnableScrollbar()" unselectable="on">Scrollbar On</button>' +
             '<button onclick="DisableScrollbar()" unselectable="on">Scrollbar Off</button>' +
-            '<br>' +
-            '<button onclick="clickEnabled=true" unselectable="on">MoveOnClick On</button>' +
-            '<button onclick="clickEnabled=false" unselectable="on">MoveOnClick Off</button>' +
             '<button onclick="debug=toggle(debug)", unselectable="on">Debug On/Off</button>' +
             '<br>' +
             '<button onclick="gameCamera.setTarget(character)">Camera on Character</button>' +
             '<button onclick="gameCamera.setTarget(cat)">Camera on Cat</button>' +
             '<button onclick="gameCamera.setTarget(char2)">Camera on Girl</button>' +
             '<br>' +
-            '<button onclick="control2.doFollow=true">Cat follow</button>' +
-            '<button onclick="control2.doFollow=false">Cat stay</button>' +
-            '<p>Talk to the girl or the cat by pressing enter in front of them.</p>';
+            '<a>Talk to the girl or the cat by pressing enter in front of them.</a>';
                 
         document.getElementById("startGame").insertAdjacentHTML('afterend',myGameButtons);
         
@@ -107,9 +102,6 @@ var myGameArea = {
     },
     
     start : function() {
-        
-        // Old gameLoop
-        //this.interval = setInterval(function() { ResetAnimationCounter(); updateGameArea();} , 16);
 
         // New gameLoop
         function gameLoop() {
@@ -138,7 +130,6 @@ function everyinterval(n) {
 }
 
 var enterPressed = false; // For dialog
-var clickEnabled = false; // Enables click move
 
 // Update Canvas
 function updateGameArea() {
@@ -146,17 +137,16 @@ function updateGameArea() {
     
     maps[mapID].drawBackground();
     
-    if (clickEnabled)
-        clickControl.update();
-    else myGameArea.clicked = false;
+    // Update maps_objects: Control update
+    for (i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateControl();
     
-    if (!cat.disableControls)
-        control2.update();
+    // Check for component-component-collision
+    for (i = 0; i < maps_objects[mapID].length; i++)
+        for (j = i + 1; j < maps_objects[mapID].length; j++)
+            maps_objects[mapID][i].componentCollision(maps_objects[mapID][j]);
     
-    if (debug) {
-        clickControl.drawRoute();
-        control2.drawRoute();
-    }
+    // Update maps_objects: Control position
+    for (i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updatePosition();
     
     /*
     if ((character.speedX != 0 || character.speedY != 0) && (char2.speedX != 0 || char2.speedY != 0)) {
@@ -165,42 +155,18 @@ function updateGameArea() {
     else 
     {
         if (character.speedX != 0 || character.speedY != 0) {
-            if (character.crashWith(char2, character.speedX, character.speedY)) {
+            if (character.collisionOverlap(char2)) {
                 char2.speedX = character.speedX;
                 char2.speedY = character.speedY;
             }
         }
         if (char2.speedX != 0 || char2.speedY != 0) {
-            if (char2.crashWith(character, char2.speedX, char2.speedY)) {
+            if (char2.collisionOverlap(character)) {
                 character.speedX = char2.speedX;
                 character.speedY = char2.speedY;
             }
         }
-    }
-    */
-    
-    
-    if (character.direction == DIR_N) {
-        char_front.x = Math.floor((character.x+ 4)/16)*16;
-        char_front.y = Math.floor((character.y+16-16)/16)*16;
-    }
-    if (character.direction == DIR_S) {
-        char_front.x = Math.floor((character.x+ 4)/16)*16;
-        char_front.y = Math.floor((character.y+16+16)/16)*16;
-    }
-    if (character.direction == DIR_W) {
-        char_front.x = Math.floor((character.x+ 4-16)/16)*16;
-        char_front.y = Math.floor((character.y+16)/16)*16;
-    }
-    if (character.direction == DIR_E) {
-        char_front.x = Math.floor((character.x+ 4+16)/16)*16;
-        char_front.y = Math.floor((character.y+16)/16)*16;
-    }
-    if (debug)
-        char_front.draw();
-    
-    // Update maps_objects
-    for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].update();
+    }*/
     
     // TODO: Draw bigger y values later!
     // Draw Objects of the current map
@@ -261,12 +227,12 @@ function updateGameArea() {
     
     maps[mapID].drawForeground();
     
-    //control3.drawSwip();
-    
     gameCamera.update();
     
+    // ### START HARDCODED DIALOG EVENT ###
+    
     // Enter KEY
-    if (char_front.crashWith(char2, 0, 0)) {
+    if (character.front.collisionOverlap(char2)) {
         currentDialog = testdialog;
         if (myGameArea.keys)
             if (myGameArea.keys[KEY_ENTER]) {
@@ -274,6 +240,7 @@ function updateGameArea() {
                     //console.log("Enter Pressed");
                     currentDialog.chatCounter++;
                     chatSequence = true;
+                    character.interacting = true;
                     character.disableControls = true;
                     char2.disableControls = true;
                     // Turn char2 to face character
@@ -296,9 +263,10 @@ function updateGameArea() {
         else {
             character.disableControls = false;
             char2.disableControls = false;
+            character.interacting = false;
         }
     }
-    else if (char_front.crashWith(jukebox, 0, 0)) {
+    else if (character.front.collisionOverlap(jukebox)) {
         currentDialog = musicdialog;
         if (myGameArea.keys)
             if (myGameArea.keys[KEY_ENTER]) {
@@ -306,6 +274,7 @@ function updateGameArea() {
                     //console.log("Enter Pressed");
                     currentDialog.chatCounter++;
                     chatSequence = true;
+                    character.interacting = true;
                     character.disableControls = true;
                 }
                 enterPressed = true;
@@ -321,9 +290,10 @@ function updateGameArea() {
             currentDialog.update();
         else {
             character.disableControls = false;
+            character.interacting = false;
         }
     }
-    else if (char_front.crashWith(cat, 0, 0)) {
+    else if (character.front.collisionOverlap(cat)) {
         currentDialog = catdialog;
         if (myGameArea.keys)
             if (myGameArea.keys[KEY_ENTER]) {
@@ -331,6 +301,7 @@ function updateGameArea() {
                     //console.log("Enter Pressed");
                     currentDialog.chatCounter++;
                     chatSequence = true;
+                    character.interacting = true;
                     character.disableControls = true;
                     cat.disableControls = true;
                     // Turn cat to face character
@@ -353,6 +324,7 @@ function updateGameArea() {
         else {
             character.disableControls = false;
             cat.disableControls = false;
+            character.interacting = false;
         }
     }
     else {
@@ -360,6 +332,7 @@ function updateGameArea() {
         char2.disableControls = false;
         cat.disableControls = false;
         chatSequence = false;
+        character.interacting = false;
         if (currentDialog != undefined)
             currentDialog.chatCounter =-1;
     }
@@ -384,5 +357,7 @@ function updateGameArea() {
                 mapID = 0;
         }
     }
+    
+    // ### END ###
 
 }
