@@ -44,6 +44,7 @@ var tile_selected = new component().rectangle(16, 16, "black", false, "black", t
 map0_obj.push(character, char2, cat);
 map1_obj.push(character, char2, jukebox);
 maps_objects.push(map0_obj, map1_obj);
+maps_objects[0].sort(this.y);
 
 // Music
 var audio1 = new Audio('Assets/Audio/banana-phone.m4a');

@@ -504,10 +504,29 @@ function component(x, y) {
             return false
         }
         else {
-            this.speedX = 0;
-            this.speedY = 0;
-            otherobj.speedX = 0;
-            otherobj.speedY = 0;
+            if (!otherobj.moveable) {
+                this.speedX = 0;
+                this.speedY = 0;
+                otherobj.speedX = 0;
+                otherobj.speedY = 0;
+            }
+            /*else {
+                otherobj.speedX = this.speedX;
+                otherobj.speedY = this.speedY;
+                // TODO: Prevent moving into other components
+                
+                for (i = 0; i < maps_objects[mapID].length; i++) {
+                    if (maps_objects[mapID][i] != this && maps_objects[mapID][i] != otherobj) {
+                        if ()
+                    }
+                }
+                if (!otherobj.isMapWalkable()) {
+                    this.speedX = 0;
+                    this.speedY = 0;
+                    otherobj.speedX = 0;
+                    otherobj.speedY = 0;
+                }                
+            }*/
             return true;
         }
     }

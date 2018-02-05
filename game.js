@@ -140,7 +140,7 @@ function updateGameArea() {
     // Update maps_objects: Control update
     for (i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateControl();
     
-    // Check for component-component-collision
+    // Check each combination of maps_objects elements for component-component-collision
     for (i = 0; i < maps_objects[mapID].length; i++)
         for (j = i + 1; j < maps_objects[mapID].length; j++)
             maps_objects[mapID][i].componentCollision(maps_objects[mapID][j]);
@@ -148,88 +148,19 @@ function updateGameArea() {
     // Update maps_objects: Control position
     for (i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updatePosition();
     
-    /*
-    if ((character.speedX != 0 || character.speedY != 0) && (char2.speedX != 0 || char2.speedY != 0)) {
-        
-    }
-    else 
-    {
-        if (character.speedX != 0 || character.speedY != 0) {
-            if (character.collisionOverlap(char2)) {
-                char2.speedX = character.speedX;
-                char2.speedY = character.speedY;
-            }
-        }
-        if (char2.speedX != 0 || char2.speedY != 0) {
-            if (char2.collisionOverlap(character)) {
-                character.speedX = char2.speedX;
-                character.speedY = char2.speedY;
-            }
-        }
-    }*/
-    
-    // TODO: Draw bigger y values later!
+    // Sorts the array after it's y value so that components with bigger y are drawn later
+    maps_objects[mapID].sort(function(a,b) {return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0); } );
     // Draw Objects of the current map
-    //for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].draw();
-    if (mapID == 0) {
-    if (cat.y < char2.y) {
-        if(char2.y < character.y) {
-            // cat < char2 < character
-            cat.draw();
-            char2.draw();
-            character.draw();
-        }
-        else if (cat.y < character.y) {
-            // cat < character < char2
-            cat.draw();
-            character.draw();
-            char2.draw();
-        }
-        else {
-            // character < cat < char2
-            character.draw();
-            cat.draw();
-            char2.draw();
-        }
-    }
-    else {
-        if(char2.y > character.y) {
-            // character < char2 < cat
-            character.draw();
-            char2.draw();
-            cat.draw();           
-        }
-        else if (cat.y < character.y) {
-            // char2 < cat < character
-            char2.draw();
-            cat.draw();
-            character.draw();
-        }
-        else {
-            // char2 < character < cat
-            char2.draw();
-            character.draw();
-            cat.draw();
-        }
-    }
-    }
-    else {
-        jukebox.draw();
-        if (char2.y < character.y) {
-            char2.draw();
-            character.draw();
-        }
-        else {
-            character.draw();
-            char2.draw();
-        }        
-    }
+    for (i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].draw();
     
     maps[mapID].drawForeground();
     
     gameCamera.update();
     
-    // ### START HARDCODED DIALOG EVENT ###
+    
+    
+    
+    // ### HARDCODED DIALOG EVENT ###
     
     // Enter KEY
     if (character.front.collisionOverlap(char2)) {
@@ -337,12 +268,6 @@ function updateGameArea() {
             currentDialog.chatCounter =-1;
     }
     
-    updateFPS();
-    showFPS();
-    
-    showTime();
-    showPosition(character);
-    
     if (mapID==0) {
         testdialog.setDialog(["Hello!","Do you want to visit the snow map?", "#choice", "#entered"], null, ["Yes", "No"]);
         testdialog.event = function(choice) {
@@ -358,6 +283,12 @@ function updateGameArea() {
         }
     }
     
-    // ### END ###
+    // ### HARDCODE END ###
+    
+    updateFPS();
+    showFPS();
+    
+    showTime();
+    showPosition(character);
 
 }
