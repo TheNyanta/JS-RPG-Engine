@@ -39,12 +39,9 @@ jukebox.sequence = 0;
 // Camera
 var gameCamera = new camera(0, 0).setTarget(character);
 
-var tile_selected = new component().rectangle(16, 16, "black", false, "black", true);
-
 map0_obj.push(character, char2, cat);
 map1_obj.push(character, char2, jukebox);
 maps_objects.push(map0_obj, map1_obj);
-maps_objects[0].sort(this.y);
 
 // Music
 var audio1 = new Audio('Assets/Audio/banana-phone.m4a');
@@ -55,7 +52,7 @@ var catsound = new Audio('Assets/Audio/cat.m4a');
 audio1.volume = 0.2;
 catsound.volume = 0.2;
 
-// Dialog [Test]
+// Dialog [Test] #
 var testdialog = new Dialog();
 var musicdialog = new Dialog();
 musicdialog.setDialog(["This is jukebox!","Wanna here some music?", "#choice", "#entered"], null, ["Yes", "No"]);
@@ -72,8 +69,9 @@ catdialog.event = function(choice) {
         catsound.play();
     if (choice == 1) {}    
 }
+//###
 
-// Maps
+// Maps (TODO: Seperate files for maps?)
 
 //################
 //### Grassmap ###
