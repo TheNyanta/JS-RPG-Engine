@@ -5,7 +5,7 @@
 // TODO: Maybe fuse into component.js
 
 /**
-* attach it to a component to add control: Keyboard Control, Following, Mouse Control
+* attach it to a component to add control: Following, Mouse Control -> goto click
 * @param obj
 */
 function control(obj) {
