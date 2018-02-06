@@ -201,7 +201,7 @@ function updateGameArea() {
         else
             character.interacting = false;
     }    
-    else if (character.front.collisionOverlap(cat)) {
+    else if (character.front.collisionOverlap(cat) && mapID==0) {
         currentDialog = catdialog;
         if (enter_down) {
             if (!currentDialog.next) {
@@ -225,7 +225,7 @@ function updateGameArea() {
         else
             character.interacting = false;
     }
-    else if (character.front.collisionOverlap(jukebox)) {
+    else if (character.front.collisionOverlap(jukebox) && mapID==1) {
         currentDialog = musicdialog;
         if (enter_down) {
             if (!currentDialog.next) {
