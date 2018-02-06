@@ -60,9 +60,11 @@ var myGameArea = {
         window.addEventListener('keydown', function (e) {
             myGameArea.keys = (myGameArea.keys || []);
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
+            if (e.keyCode == KEY_ENTER) enter_down = true;
         })
         window.addEventListener('keyup', function (e) {
-            myGameArea.keys[e.keyCode] = (e.type == "keydown");            
+            myGameArea.keys[e.keyCode] = (e.type == "keydown");
+            if (e.keyCode == KEY_ENTER) enter_down = false;
         })
         window.addEventListener('mousedown', function (e) {
             myGameArea.mousedown = true;
@@ -129,7 +131,8 @@ function everyinterval(n) {
     return false;
 }
 
-var enterPressed = false; // For dialog
+var enter_down = false; // For dialog
+var turn = false; // For cat turn
 
 // Update Canvas
 function updateGameArea() {
@@ -137,136 +140,112 @@ function updateGameArea() {
     
     maps[mapID].drawBackground();
     
-    // Update maps_objects: Control update
-    for (i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateControl();
+    // ## Cat walk ##
+    if (!chatSequence) {
+        if (turn) cat.speedY = -cat.speed;
+        else cat.speedY = cat.speed;
+        
+        if (cat.y > 188) turn = true;
+        if (cat.y < 100) turn = false;
+    }
+    // #############
     
-    // Check each combination of maps_objects elements for component-component-collision
-    for (i = 0; i < maps_objects[mapID].length; i++)
-        for (j = i + 1; j < maps_objects[mapID].length; j++)
-            maps_objects[mapID][i].componentCollision(maps_objects[mapID][j]);
-    
-    // Update maps_objects: Control position
-    for (i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updatePosition();
+    // # Reminder: Add x/y collision => while x-collision allow movement in y direction vice versa
+    if (!chatSequence) {
+        // Update the movement of all components in maps_objects[mapID] (incl. mapCollsion resolving)
+        for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateControl();
+        // Check each combination of components in maps_objects[mapID] for component-component-collision
+        for (var i = 0; i < maps_objects[mapID].length; i++)
+            for (var j = i + 1; j < maps_objects[mapID].length; j++)
+                maps_objects[mapID][i].componentCollision(maps_objects[mapID][j]);
+        // Update the position of all components in maps_objects[mapID]
+        for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updatePosition();
+    }
+    // Interacting character: select choice in dialog
+    character.keyEvent();
     
     // Sorts the array after it's y value so that components with bigger y are drawn later
-    maps_objects[mapID].sort(function(a,b) {return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0); } );
+    maps_objects[mapID].sort(function(a,b) {return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0); });
     // Draw Objects of the current map
-    for (i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].draw();
+    for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].draw();
     
     maps[mapID].drawForeground();
     
     gameCamera.update();
     
     
-    
-    
-    // ### HARDCODED DIALOG EVENT ###
+    // ### HARDCODED DIALOG EVENT ### same pattern for each obj
     
     // Enter KEY
     if (character.front.collisionOverlap(char2)) {
         currentDialog = testdialog;
-        if (myGameArea.keys)
-            if (myGameArea.keys[KEY_ENTER]) {
-                if (!enterPressed) {
-                    //console.log("Enter Pressed");
-                    currentDialog.chatCounter++;
-                    chatSequence = true;
-                    character.interacting = true;
-                    character.disableControls = true;
-                    char2.disableControls = true;
-                    // Turn char2 to face character
-                    if (character.direction == DIR_N) char2.direction = DIR_S;
-                    if (character.direction == DIR_S) char2.direction = DIR_N;
-                    if (character.direction == DIR_E) char2.direction = DIR_W;
-                    if (character.direction == DIR_W) char2.direction = DIR_E;
-                }
-                enterPressed = true;
+        if (enter_down) {
+            if (!currentDialog.next) {
+                currentDialog.chatCounter++;
+                chatSequence = true;
+                character.interacting = true;
+                // Turn char2 to face character
+                if (character.direction == DIR_N) char2.direction = DIR_S;
+                if (character.direction == DIR_S) char2.direction = DIR_N;
+                if (character.direction == DIR_E) char2.direction = DIR_W;
+                if (character.direction == DIR_W) char2.direction = DIR_E;
             }
-            else {
-                if (enterPressed) {
-                    //console.log("Enter Released");
-                    enterPressed = false;
-                }
-            }  
-        
+            currentDialog.next = true;
+        }
+        else {
+            if (currentDialog.next)
+            currentDialog.next = false;
+        }        
         if (chatSequence)
             currentDialog.update();
-        else {
-            character.disableControls = false;
-            char2.disableControls = false;
+        else
             character.interacting = false;
+    }    
+    else if (character.front.collisionOverlap(cat)) {
+        currentDialog = catdialog;
+        if (enter_down) {
+            if (!currentDialog.next) {
+                currentDialog.chatCounter++;
+                chatSequence = true;
+                character.interacting = true;
+                // Turn cat to face character
+                if (character.direction == DIR_N) cat.direction = DIR_S;
+                if (character.direction == DIR_S) cat.direction = DIR_N;
+                if (character.direction == DIR_E) cat.direction = DIR_W;
+                if (character.direction == DIR_W) cat.direction = DIR_E;
+            }
+            currentDialog.next = true;
         }
+        else {
+            if (currentDialog.next)
+            currentDialog.next = false;
+        }        
+        if (chatSequence)
+            currentDialog.update();
+        else
+            character.interacting = false;
     }
     else if (character.front.collisionOverlap(jukebox)) {
         currentDialog = musicdialog;
-        if (myGameArea.keys)
-            if (myGameArea.keys[KEY_ENTER]) {
-                if (!enterPressed) {
-                    //console.log("Enter Pressed");
-                    currentDialog.chatCounter++;
-                    chatSequence = true;
-                    character.interacting = true;
-                    character.disableControls = true;
-                }
-                enterPressed = true;
+        if (enter_down) {
+            if (!currentDialog.next) {
+                currentDialog.chatCounter++;
+                chatSequence = true;
+                character.interacting = true;
             }
-            else {
-                if (enterPressed) {
-                    //console.log("Enter Released");
-                    enterPressed = false;
-                }
-            }  
-        
+            currentDialog.next = true;
+        }
+        else {
+            if (currentDialog.next)
+            currentDialog.next = false;
+        }        
         if (chatSequence)
             currentDialog.update();
-        else {
-            character.disableControls = false;
+        else
             character.interacting = false;
-        }
     }
-    else if (character.front.collisionOverlap(cat)) {
-        currentDialog = catdialog;
-        if (myGameArea.keys)
-            if (myGameArea.keys[KEY_ENTER]) {
-                if (!enterPressed) {
-                    //console.log("Enter Pressed");
-                    currentDialog.chatCounter++;
-                    chatSequence = true;
-                    character.interacting = true;
-                    character.disableControls = true;
-                    cat.disableControls = true;
-                    // Turn cat to face character
-                    if (character.direction == DIR_N) cat.direction = DIR_S;
-                    if (character.direction == DIR_S) cat.direction = DIR_N;
-                    if (character.direction == DIR_E) cat.direction = DIR_W;
-                    if (character.direction == DIR_W) cat.direction = DIR_E;
-                }
-                enterPressed = true;
-            }
-            else {
-                if (enterPressed) {
-                    //console.log("Enter Released");
-                    enterPressed = false;
-                }
-            }  
-        
-        if (chatSequence)
-            currentDialog.update();
-        else {
-            character.disableControls = false;
-            cat.disableControls = false;
-            character.interacting = false;
-        }
-    }
-    else {
-        character.disableControls = false;
-        char2.disableControls = false;
-        cat.disableControls = false;
-        chatSequence = false;
-        character.interacting = false;
-        if (currentDialog != undefined)
-            currentDialog.chatCounter =-1;
-    }
+    
+    // Changing text
     
     if (mapID==0) {
         testdialog.setDialog(["Hello!","Do you want to visit the snow map?", "#choice", "#entered"], null, ["Yes", "No"]);

@@ -166,9 +166,6 @@ function component(x, y) {
         // A component is moved by setting it's speedX/Y and adding it to it's x/y position after checking for collisions
         this.keyControl();
         
-        // Interactions: Dialog(Select Choice):Sstop all movement? Probably yes, (for automatic texts: maybe make it chooseable), Switches, ...
-        this.keyEvent();
-        
         // After the speedX/Y is set the direction the component is facing can be updated
         this.updateDirection();
         
@@ -200,46 +197,6 @@ function component(x, y) {
         
         // Stop only on tiles: Causes problems with component-component-collision if both step on the same tile!
         //this.moveFinisher();
-        
-        return this;
-    }
-    
-    /**
-    * updates the component
-    * calculates position, update animation sequence, check key events
-    */
-    this.update = function() {
-        
-        // A component is moved by setting it's speedX/Y and adding it to it's x/y position after checking for collisions
-        this.keyControl();
-        
-        // Interactions: Dialog(Select Choice): Stop all movement? Probably yes, (for automatic texts: maybe make it chooseable), Switches, ...
-        this.keyEvent();
-        
-        // After the speedX/Y is set the direction the component is facing can be updated
-        this.updateDirection();
-        
-        // Checks if there is a collision with the map
-        this.mapCollsion();
-        
-        // Sets Animations if defined based on moving and direction
-        if (this.type == "sprite")
-            this.updateAnimation();
-        
-        // Update Position
-        this.x += this.speedX;
-        this.y += this.speedY;
-        
-        // Update Front
-        if (this.front != undefined)
-            this.updateFront();
-        
-        // Reset Movement
-        this.speedX = 0;
-        this.speedY = 0;
-        
-        // Stop only on tiles: Causes problems with component-component-collision if both step on the same tile!
-        this.moveFinisher();
         
         return this;
     }
@@ -327,21 +284,21 @@ function component(x, y) {
     
     this.updateFront = function() {
         if (this.direction == DIR_N) {
-                this.front.x = Math.floor((this.x + this.offset_x)/16)*16;
-                this.front.y = Math.floor((this.y + this.offset_y - 16)/16)*16;
-            }
-            if (this.direction == DIR_S) {
-                this.front.x = Math.floor((this.x + this.offset_x)/16)*16;
-                this.front.y = Math.floor((this.y + this.offset_y + 16)/16)*16;
-            }
-            if (this.direction == DIR_W) {
-                this.front.x = Math.floor((this.x + this.offset_x - 16)/16)*16;
-                this.front.y = Math.floor((this.y + this.offset_y)/16)*16;
-            }
-            if (this.direction == DIR_E) {
-                this.front.x = Math.floor((this.x + this.offset_x + 16)/16)*16;
-                this.front.y = Math.floor((this.y + this.offset_y)/16)*16;
-            }
+            this.front.x = this.x + this.offset_x;
+            this.front.y = this.y + this.offset_y - 16;
+        }
+        if (this.direction == DIR_S) {
+            this.front.x = this.x + this.offset_x
+            this.front.y = this.y + this.offset_y + 16;
+        }
+        if (this.direction == DIR_W) {
+            this.front.x = this.x + this.offset_x - 16;
+            this.front.y = this.y + this.offset_y;
+        }
+        if (this.direction == DIR_E) {
+            this.front.x = this.x + this.offset_x + 16;
+            this.front.y = this.y + this.offset_y;
+        }
     }
     
     /**
@@ -378,7 +335,7 @@ function component(x, y) {
     */
     this.keyControl = function() {
         // Check if it key control is allowed
-        if (!this.disableControls && !this.finishMove) {
+        if (!this.disableControls /*&& !this.finishMove*/) {
             // Listen to keys: "Else if" to limit movement in only one direction at the same time (no diagonal moving)
             if (myGameArea.keys) {
                 if (myGameArea.keys[this.up])
@@ -395,7 +352,7 @@ function component(x, y) {
     
     /**
     * Key Events
-    * Interaction
+    * Interaction ??? Extra class might be better
     */
     this.keyEvent = function() {
         // Key Events for moving the component

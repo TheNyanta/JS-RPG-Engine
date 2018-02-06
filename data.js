@@ -1,4 +1,4 @@
-var debug = false; // Global Variable for debugging
+var debug = true; // Global Variable for debugging
 
 var offset_x = 0;
 var offset_y = 0;
@@ -71,7 +71,7 @@ catdialog.event = function(choice) {
 }
 //###
 
-// Maps (TODO: Seperate files for maps?)
+// Maps (TODO: Seperate files for maps???)
 
 //################
 //### Grassmap ###

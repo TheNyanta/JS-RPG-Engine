@@ -3,10 +3,13 @@ var currentDialog;
 
 function Dialog(text, img, choices) {
      
-    this.chatCounter = -1;
+    this.chatCounter = 0;
     this.choices = choices
     this.selected = 0;
     this.text = text;
+    
+    this.started = false;
+    this.next = false;
     
     this.setDialog = function(text, img, choices) {
         this.text = text;
@@ -24,7 +27,8 @@ function Dialog(text, img, choices) {
     this.update = function() {
         if (this.chatCounter >= this.text.length) {
             chatSequence = false;
-            this.chatCounter = -1;
+            this.started = false;
+            this.chatCounter = 0;
         }
         else {             
             ctx = myGameArea.context;
