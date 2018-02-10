@@ -149,25 +149,10 @@ function everyinterval(n) {
     return false;
 }
 
-var enter_down = false; // For dialog
-var turn = false; // For cat turn
-
-// Update Canvas
-function updateGameArea() {
-    myGameArea.frameNo += 1;
-    
-    maps[mapID].drawBackground();
-    
-    // ## Cat walk HARDCODE ##
-    if (!chatSequence) {
-        if (turn) cat.speedY = -cat.speed;
-        else cat.speedY = cat.speed;
-        
-        if (cat.y > 188) turn = true;
-        if (cat.y < 100) turn = false;
-    }
-    // #############
-    
+/**
+* Updates the current map with all it's components
+*/
+function updateComponents() {
     // # Reminder: Add x/y collision => while x-collision allow movement in y direction and vice versa
     if (!chatSequence/*maybe change it to gameSequence, hm?*/) {
         // Update the movement of all components in maps_objects[mapID] (incl. mapCollsion resolving)
@@ -182,6 +167,14 @@ function updateGameArea() {
     
     // Interacting character: select choice in dialog
     character.keyEvent();
+    gameCamera.update();
+}
+
+/**
+* Draws the current map with all it's components
+*/
+function drawComponents() {
+    maps[mapID].drawBackground();
     
     // Sorts the array after it's y value so that components with bigger y are drawn later
     maps_objects[mapID].sort(function(a,b) {return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0); });
@@ -190,11 +183,50 @@ function updateGameArea() {
     
     maps[mapID].drawForeground();
     
-    gameCamera.update();
+    // Extras
+    updateFPS();
+    showFPS();
     
+    showTime();
+    showPosition(character);
+}
+
+/**
+* Update Canvas
+* This is the core function of the game
+*/
+function updateGameArea() {
+    myGameArea.frameNo += 1;
     
-    // ### HARDCODED DIALOG EVENT ### same pattern for each obj
+    walking_cat();
     
+    // "gameEvent();" //TODO: Put all events in here   
+    updateComponents();  
+    drawComponents(); 
+    
+    dialogTesting();
+}
+
+// ####################################
+// ## HARDCODE FUNCTIONS FOR TESTING ##
+// ####################################
+
+// ## Cat walk  ##
+var turn = false; // For cat turn
+function walking_cat() {
+    
+    if (!chatSequence) {
+        if (turn) cat.speedY = -cat.speed;
+        else cat.speedY = cat.speed;
+        
+        if (cat.y > 188) turn = true;
+        if (cat.y < 100) turn = false;
+    }
+}
+
+//DIALOG EVENT: same pattern for each obj
+var enter_down = false; // For dialog
+function dialogTesting() { 
     // Enter KEY
     if (character.front.collisionOverlap(char2)) {
         currentDialog = testdialog;
@@ -294,13 +326,4 @@ function updateGameArea() {
             }
         }
     }
-    
-    // ### HARDCODE END ###
-    
-    updateFPS();
-    showFPS();
-    
-    showTime();
-    showPosition(character);
-
 }
