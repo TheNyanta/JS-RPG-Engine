@@ -16,6 +16,11 @@ var myGameArea = {
         $(window).focus(function() {document.active = true;});
         $(window).blur(function() {document.active = false;});
         
+        this.frameNo = 0;
+        
+        // Animation Counter
+        InitalizeAnimationCounters();
+        
         //this.canvas.style.cursor = "none"; //hide the original cursor
         this.context = this.canvas.getContext("2d");
         
@@ -31,6 +36,14 @@ var myGameArea = {
         
         this.panorama.width = myGameArea.canvas.width;
         this.panorama.height = myGameArea.canvas.height;
+        
+        // Initalize Maps
+        for (i=0; i<maps.length; i++) {
+            maps[i].init();
+            maps[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);         
+        }
+        // Draw the first or current map onto the cached canvas'
+        maps[mapID].drawCache();
         
         // Add buttons
         var myGameButtons =
@@ -50,19 +63,6 @@ var myGameArea = {
         
         // Replace Start Button with Canvas
         document.getElementById("startGame").parentElement.replaceChild(this.canvas, document.getElementById("startGame"));
-        
-        this.frameNo = 0;
-        
-        // Animation Counter
-        InitalizeAnimationCounters();
-        
-        // Initalize Maps
-        for (i=0; i<maps.length; i++) {
-            maps[i].init();
-            maps[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);         
-        }
-        // Draw the first or current map onto the cached canvas'
-        maps[mapID].drawCache();
         
         window.requestAnimationFrame = window.requestAnimationFrame
         || window.mozRequestAnimationFrame

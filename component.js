@@ -441,7 +441,7 @@ function component(x, y) {
         if (this.onClickEvent != undefined) this.updateClick();
         
         // After the speedX/Y is set the direction the component is facing can be updated
-        this.updateDirection();
+        if (this.direction != undefined) this.updateDirection();
         
         // Checks if there is a collision with the map
         this.mapCollsion();

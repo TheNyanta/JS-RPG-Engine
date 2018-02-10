@@ -98,9 +98,10 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
         }
     }
     
-    // Drawing Functions on the actual game canvas
-        
-        
+    // ####################################
+    //  Draw functions for the game canvas
+    // ####################################
+           
     /**
     * Draws the Panorama & the background of the map
     */
