@@ -27,33 +27,20 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
     this.layers = [[],[],[]];
     this.layerC = [];
     
-    // "Cache" Map on an hidden canvas
-    this.panorama = document.createElement('canvas');
-    this.cgx1 = this.panorama.getContext("2d");
-    
-    this.background = document.createElement('canvas');
-    this.cgx2 = this.background.getContext("2d");
-    
-    this.foreground = document.createElement('canvas');
-    this.cgx3 = this.foreground.getContext("2d");
-    
-    this.background.width = this.mapWidth * this.tileWidth;
-    this.background.height = this.mapHeight * this.tileHeight;
-    
-    this.foreground.width = this.mapWidth * this.tileWidth;
-    this.foreground.height = this.mapHeight * this.tileHeight;
-    
     /**
-    * Draws Panorama, Background and Foreground only 'one single time' on extra canvas
-    * TODO: Maybe troublesome if all maps are initalized at the beginning instead init-on-demand?
+    * Initalizes Panorama, Background and Foreground
+    * After changing a map call drawCache() to draw the map on the cached canvas
     */
     this.init = function() {
+        myGameArea.background.width = this.mapWidth * this.tileWidth;
+        myGameArea.background.height = this.mapHeight * this.tileHeight;
+    
+        myGameArea.foreground.width = this.mapWidth * this.tileWidth;
+        myGameArea.foreground.height = this.mapHeight * this.tileHeight;
+        
         // Panorama
-        if (this.image != undefined) {
-            this.panorama.width = myGameArea.canvas.width;
-            this.panorama.height = myGameArea.canvas.height;
-            
-            this.cgx1.drawImage(this.image, this.x, this.y, this.panorama.width, this.panorama.height);
+        if (this.image != undefined) {  
+            myGameArea.cgx1.drawImage(this.image, this.x, this.y, myGameArea.panorama.width, myGameArea.panorama.height);
             // TODO: Moving background image, see https://www.w3schools.com/graphics/game_images.asp
             //ctx.drawImage(this.image, this.x + myGameArea.canvas.width, this.y, myGameArea.canvas.width, myGameArea.canvas.height);
         }
@@ -72,9 +59,6 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
                 }
             }
         }
-        
-        // Draw the tiles on the cached canvas'
-        this.drawCache();
     }
     
     /**
@@ -98,32 +82,32 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
         }
         // Collision Layer
         this.layerC = lc;
-        
-        // Draw the tiles on the cached canvas'
-        this.drawCache();
     }
     
     /**
     * If the cached images need to be updated
     */
     this.drawCache = function() {
-        this.cgx2.clearRect(0, 0, this.background.width, this.background.height);
-        this.cgx3.clearRect(0, 0, this.foreground.width, this.foreground.height);
+        myGameArea.cgx2.clearRect(0, 0, myGameArea.background.width, myGameArea.background.height);
+        myGameArea.cgx3.clearRect(0, 0, myGameArea.foreground.width, myGameArea.foreground.height);
         // Assume all layers have the same size!
         for (var i = 0; i < this.layers[0].length; i++) {
-            this.layers[0][i].draw(this.cgx2);
-            this.layers[1][i].draw(this.cgx2);
-            this.layers[2][i].draw(this.cgx3);
+            this.layers[0][i].draw(myGameArea.cgx2);
+            this.layers[1][i].draw(myGameArea.cgx2);
+            this.layers[2][i].draw(myGameArea.cgx3);
         }
     }
     
+    // Drawing Functions on the actual game canvas
+        
+        
     /**
     * Draws the Panorama & the background of the map
     */
     this.drawBackground = function() {
         ctx = myGameArea.context;
-        ctx.drawImage(this.panorama, 0, 0);
-        ctx.drawImage(this.background, -gameCamera.x, -gameCamera.y);
+        ctx.drawImage(myGameArea.panorama, 0, 0);
+        ctx.drawImage(myGameArea.background, -gameCamera.x, -gameCamera.y);
         /*
         // To Draw animated tiles: sequence has to be an array and you have to set the components animationTime (i.e = 20)
         for (var i = 0; i < this.layer1.length; i++) {
@@ -140,6 +124,6 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
     */
     this.drawForeground = function() {
         ctx = myGameArea.context;
-        ctx.drawImage(this.foreground, -gameCamera.x, -gameCamera.y);
+        ctx.drawImage(myGameArea.foreground, -gameCamera.x, -gameCamera.y);
     }      
 }

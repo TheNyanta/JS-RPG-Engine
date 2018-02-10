@@ -19,6 +19,19 @@ var myGameArea = {
         //this.canvas.style.cursor = "none"; //hide the original cursor
         this.context = this.canvas.getContext("2d");
         
+        // "Cache" Map on an hidden canvas
+        this.panorama = document.createElement('canvas');
+        this.cgx1 = this.panorama.getContext("2d");
+    
+        this.background = document.createElement('canvas');
+        this.cgx2 = this.background.getContext("2d");
+    
+        this.foreground = document.createElement('canvas');
+        this.cgx3 = this.foreground.getContext("2d");
+        
+        this.panorama.width = myGameArea.canvas.width;
+        this.panorama.height = myGameArea.canvas.height;
+        
         // Add buttons
         var myGameButtons =
             '<br>' +
@@ -48,6 +61,8 @@ var myGameArea = {
             maps[i].init();
             maps[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);         
         }
+        // Draw the first or current map onto the cached canvas'
+        maps[mapID].drawCache();
         
         window.requestAnimationFrame = window.requestAnimationFrame
         || window.mozRequestAnimationFrame
@@ -262,15 +277,21 @@ function updateGameArea() {
     if (mapID==0) {
         testdialog.setDialog(["Hello!","Do you want to visit the snow map?", "#choice", "#entered"], null, ["Yes", "No"]);
         testdialog.event = function(choice) {
-            if (choice == 0)
+            if (choice == 0) {
                 mapID = 1;
+                // Redraw Cache on map switch!
+                maps[mapID].drawCache();
+            }
         }       
     }
     if (mapID==1) {
         testdialog.setDialog(["Hi Again!","Do you want to visit the grass map?", "#choice", "#entered"], null, ["Yes", "No"]);
         testdialog.event = function(choice) {
-            if (choice == 0)
+            if (choice == 0) {
                 mapID = 0;
+                // Redraw Cache on map switch!s
+                maps[mapID].drawCache();
+            }
         }
     }
     
