@@ -49,6 +49,74 @@ function component(x, y) {
         this.height = height;
         this.spritesX = spritesX;
         this.spritesY = spritesY;
+        
+        // ######################
+        // ## Sprite functions ##
+        // ######################
+        
+        /**
+        * Draw the sprite
+        * animated & still
+        */
+        this.drawSprite = function(ctx) {
+            if (this.sequence != undefined) {
+                // Animation: Moving / Idle
+                if (this.sequence.length != undefined) {
+                    if (AnimationCounter[AnimationCounterIndex].animationDelay++ >= this.animationTime) {
+                        AnimationCounter[AnimationCounterIndex].animationDelay = 0;
+                        AnimationCounter[AnimationCounterIndex].animationIndexCounter++;
+                        if (AnimationCounter[AnimationCounterIndex].animationIndexCounter >= this.sequence.length) {
+                            AnimationCounter[AnimationCounterIndex].animationIndexCounter = 0;
+                        }
+                        AnimationCounter[AnimationCounterIndex].animationCurrentFrame = this.sequence[AnimationCounter[AnimationCounterIndex].animationIndexCounter];
+                    }
+                    var res = i2xy(AnimationCounter[AnimationCounterIndex].animationCurrentFrame, Math.max(this.spritesX, this.spritesY));
+                    ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
+                    AnimationCounterIndex++;
+                }
+                // No Animation: Just sprite image
+                else {
+                    var res = i2xy(this.sequence, Math.max(this.spritesX, this.spritesY));
+                    // For cached tiles
+                    if (this.static) ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x, this.y, this.width, this.height);
+                    // For moving objects
+                    else ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
+                }
+            }
+        }
+    
+        /**
+        * Update the facing direction based on the speed
+        * For 4-direction movement (for 8-direction add more cases)
+        */
+        this.updateDirection = function() {
+            if (this.speedY < 0) this.direction = DIR_N;
+            if (this.speedY > 0) this.direction = DIR_S;
+            if (this.speedX < 0) this.direction = DIR_W;
+            if (this.speedX > 0) this.direction = DIR_E;
+        }
+    
+        /**
+        * Updates the shown animation sequence based on the direction te component is facing
+        * For 4-direction movement (for 8-direction add more cases)
+        */
+        this.updateAnimation = function() {
+            // Idle (Animation or Still)
+            if (this.speedX == 0 && this.speedY == 0){
+                if (this.direction == DIR_N) this.sequence = this.idleUp;
+                if (this.direction == DIR_S) this.sequence = this.idleDown;
+                if (this.direction == DIR_W) this.sequence = this.idleLeft;
+                if (this.direction == DIR_E) this.sequence = this.idleRight; 
+            }
+            // Moving
+            else {
+                if (this.direction == DIR_N) this.sequence = this.moveUp;
+                if (this.direction == DIR_S) this.sequence = this.moveDown;
+                if (this.direction == DIR_W) this.sequence = this.moveLeft;
+                if (this.direction == DIR_E) this.sequence = this.moveRight;
+            }
+        }        
+        
         return this;
     }
     
@@ -134,6 +202,132 @@ function component(x, y) {
         this.offset_width = width;
         this.offset_height = height;
         
+        // #########################
+        // ## Collision functions ##
+        // #########################
+        
+        /**
+        * Prevents map collision
+        * [TODO: Check if there is no collision between the old and the new position
+        * (only happens if moving really fast!)]
+        */
+        this.mapCollsion = function() {
+            if (!this.isMapWalkable()) {
+                this.updateDirection();
+                this.speedX = 0;
+                this.speedY = 0;
+                this.collided = true;
+            }
+            else this.collided = false;
+        }   
+        
+        /**
+        * Calculates the new position and checks if it's walkable by using the maps collision layer
+        * Only for width/height=16: => with tile-height/width=16 only max 4 tiles to stand on
+        * "may TODO": Adept for all sizes
+        */
+        this.isMapWalkable = function() {
+            if (!this.collidable) return true;
+            
+            // Converts the cartesian to grid coordiantes
+            var x1 = Math.floor((this.x+this.offset_x+this.speedX)/16);
+            var y1 = Math.floor((this.y+this.offset_y+this.speedY)/16);
+            var x2 = x1 + 1;
+            var y2 = y1 + 1;
+        
+            // Check if standing exactly on a tile-axis; tolarance=0.1
+            if (Math.abs(x1-(this.x+this.offset_x+this.speedX)/16) < 0.1) x2 = x1;
+            if (Math.abs(y1-(this.y+this.offset_y+this.speedY)/16) < 0.1) y2 = y1;
+        
+            // Debugging Map Collision: Shows on which tiles the object is standing and map collisions
+            if (debug) {
+                this.rects = [];
+                for (i = 0; i < 4; i++) this.rects[i] = new component().rectangle(16, 16, "black", false, "blue", true);    
+                
+                this.rects[0].x = x1*16; this.rects[0].y = y1*16;
+                this.rects[1].x = x1*16; this.rects[1].y = y2*16;
+                this.rects[2].x = x2*16; this.rects[2].y = y1*16;
+                this.rects[3].x = x2*16; this.rects[3].y = y2*16;
+            
+                if (maps[mapID].layerC[xy2i(x1,y1,maps[mapID].mapWidth)]) this.rects[0].outlineColor = "blue"; else this.rects[0].outlineColor = "red";
+                if (maps[mapID].layerC[xy2i(x1,y2,maps[mapID].mapWidth)]) this.rects[1].outlineColor = "blue"; else this.rects[1].outlineColor = "red";
+                if (maps[mapID].layerC[xy2i(x2,y1,maps[mapID].mapWidth)]) this.rects[2].outlineColor = "blue"; else this.rects[2].outlineColor = "red";
+                if (maps[mapID].layerC[xy2i(x2,y2,maps[mapID].mapWidth)]) this.rects[3].outlineColor = "blue"; else this.rects[3].outlineColor = "red";
+            }
+        
+            // Check map borders
+            if (x1 < 0 || y1 < 0 || x2 > maps[mapID].mapWidth - 1 || y2 > maps[mapID].mapHeight - 1)
+                return false;
+          
+            // Use collision layer of the map and check if all 4 tiles are walkable (=true)
+            return (maps[mapID].layerC[xy2i(x1,y1,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x1,y2,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x2,y1,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x2,y2,maps[mapID].mapWidth)]);
+        }
+    
+        /**
+        * Tell if the collision boxes of the two components are overlapping
+        */
+        this.collisionOverlap = function(otherobj) {
+            if (!this.collidable) return false;
+            if (!otherobj.collidable) return false;
+        
+            if ((this.y + this.offset_y + this.offset_height <= otherobj.y + otherobj.offset_y) ||
+                (this.y + this.offset_y >= otherobj.y + otherobj.offset_y + otherobj.offset_height) ||
+                (this.x + this.offset_x + this.offset_width <= otherobj.x + otherobj.offset_x) ||
+                (this.x + this.offset_x >= otherobj.x + otherobj.offset_x + otherobj.offset_width))
+                return false
+            
+            return true;
+        }
+        
+        /**
+        * Prevent collsion with other components
+        * Has to be called in the main loop for all combinations after the control updates of all components
+        */
+        this.componentCollision = function(otherobj) {
+            if (!this.collidable || !otherobj.collidable) return false;
+        
+            if ((this.y + this.offset_y + this.speedY + this.offset_height <= otherobj.y + otherobj.offset_y + otherobj.speedY) ||
+                (this.y + this.offset_y + this.speedY >= otherobj.y + otherobj.offset_y + otherobj.speedY + otherobj.offset_height) ||
+                (this.x + this.offset_x + this.speedX + this.offset_width <= otherobj.x + otherobj.offset_x + otherobj.speedX) ||
+                (this.x + this.offset_x + this.speedX >= otherobj.x + otherobj.offset_x + otherobj.speedX + otherobj.offset_width)) {
+                return false
+            }
+            else {
+                if (!otherobj.moveable) {
+                    this.speedX = 0;
+                    this.speedY = 0;
+                    otherobj.speedX = 0;
+                    otherobj.speedY = 0;
+                }
+                /*else {
+                otherobj.speedX = this.speedX;
+                otherobj.speedY = this.speedY;
+                // TODO: Prevent moving into other components
+                
+                for (i = 0; i < maps_objects[mapID].length; i++) {
+                if (maps_objects[mapID][i] != this && maps_objects[mapID][i] != otherobj) {
+                if ()
+                }
+                }
+                if (!otherobj.isMapWalkable()) {
+                this.speedX = 0;
+                this.speedY = 0;
+                otherobj.speedX = 0;
+                otherobj.speedY = 0;
+                }   
+                }*/
+                return true;
+            }
+        }
+        
+        /**
+        * For debug: Shows the tiles the component is standing (blue rectangles)
+        */
+        this.showStandingOnTiles = function() {
+            for (i = 0; i < this.rects.length; i++)
+                this.rects[i].draw(myGameArea.context);
+        }
+        
         return this;
     }
     
@@ -147,6 +341,83 @@ function component(x, y) {
         this.front = new component().rectangle(16, 16, "black", false, "white", true).collision(0, 0, 16, 16);
         // It's interacting state
         this.interacting = false;
+        
+        this.updateFront = function() {
+            if (this.direction == DIR_N) {
+                this.front.x = this.x + this.offset_x;
+                this.front.y = this.y + this.offset_y - 16;
+            }
+            if (this.direction == DIR_S) {
+                this.front.x = this.x + this.offset_x
+                this.front.y = this.y + this.offset_y + 16;
+            }
+            if (this.direction == DIR_W) {
+                this.front.x = this.x + this.offset_x - 16;
+                this.front.y = this.y + this.offset_y;
+            }
+            if (this.direction == DIR_E) {
+                this.front.x = this.x + this.offset_x + 16;
+                this.front.y = this.y + this.offset_y;
+            }
+        }
+        
+        return this;
+    }
+    
+    /**
+    * Adds Clicking
+    * A onclick-Event can be defined that will be fired on click
+    */
+    this.clickable = function() {
+        this.click = false;
+        this.clickEvent = true;
+        
+        /**
+        * Updates the click state of the component and fires one onclick-Event if defined
+        */
+        this.updateClick = function() {
+            this.click = false;
+            this.clicked();
+            
+            if (this.click)
+                if (this.clickEvent) {
+                    if (this.onClickEvent != undefined)
+                        this.onClickEvent();
+                    this.clickEvent = false;
+                }
+        }
+        
+        /**
+        * Tells if the component is clicked on
+        * If it's not clicked an on-click Event can be fired again
+        */
+        this.clicked = function() {
+            var myleft = this.x;
+            var myright = this.x + (this.width);
+            var mytop = this.y;
+            var mybottom = this.y + (this.height);
+        
+            // The game canvas by default
+            if (activeCanvas == undefined) {
+                var clickX = myGameArea.clickdownX + gameCamera.x;
+                var clickY = myGameArea.clickdownY + gameCamera.y;
+            }                
+            // The game canvas can move so you have to add the gameCameras x and y  
+            else if (activeCanvas == 0) {
+                var clickX = myGameArea.clickdownX + gameCamera.x;
+                var clickY = myGameArea.clickdownY + gameCamera.y;
+            }
+            // The tileset canvas will be always full drawn
+            else if (activeCanvas == 1) {
+                var clickX = myGameArea.clickdownX;
+                var clickY = myGameArea.clickdownY;
+            }       
+            
+            if (myGameArea.mousedown || myGameArea.touchdown) this.click = true;
+            else this.clickEvent = true; // Enable Click Event again
+        
+            if ((mybottom < clickY) || (mytop > clickY) || (myright < clickX) || (myleft > clickX)) this.click = false;
+        }
         
         return this;
     }
@@ -165,6 +436,9 @@ function component(x, y) {
     this.updateControl = function() {
         // A component is moved by setting it's speedX/Y and adding it to it's x/y position after checking for collisions
         this.keyControl();
+        
+        // If the component has an onClick Event this will check if it is clicked
+        if (this.onClickEvent != undefined) this.updateClick();
         
         // After the speedX/Y is set the direction the component is facing can be updated
         this.updateDirection();
@@ -205,13 +479,8 @@ function component(x, y) {
     * Render component
     * Draw it on the canvas
     */
-    this.draw = function () {        
-        ctx = myGameArea.context;
-        
-        if (debug) {
-            if (this.rects != undefined) this.showStandingOnTiles();
-            if (this.front != undefined) this.front.draw();
-        }            
+    this.draw = function (ctx) {        
+        //ctx = myGameArea.context;          
         
         // Image
         if (this.type == "image") {
@@ -220,7 +489,15 @@ function component(x, y) {
         
         // Sprite
         else if (this.type == "sprite") {
-            this.drawSprite();
+            if (debug) {
+                if (this.rects != undefined) this.showStandingOnTiles();
+                if (this.front != undefined) this.front.draw(myGameArea.context);
+                // Draw Collision Box
+                ctx.strokeStyle = "black";
+                ctx.strokeRect(this.x + this.offset_x - gameCamera.x, this.y + this.offset_y - gameCamera.y, this.offset_width , this.offset_height);
+            }
+            // Draw Sprite
+            this.drawSprite(ctx);                       
         }
         
         // Rectangle
@@ -233,100 +510,6 @@ function component(x, y) {
         }
         
         return this;
-    }
-    
-    /**
-    * Tells if the component is clicked on
-    */
-    this.clicked = function() {
-        var myleft = this.x;
-        var myright = this.x + (this.width);
-        var mytop = this.y;
-        var mybottom = this.y + (this.height);
-        var clicked;
-        if (myGameArea.x && myGameArea.y && (myGameArea.mousedown || myGameArea.touchdown)) { clicked = true; }
-        if ((mybottom < myGameArea.y) || (mytop > myGameArea.y) || (myright < myGameArea.x) || (myleft > myGameArea.x)) {
-            clicked = false;
-        }
-        return clicked;
-    }
-    /**
-    * Update the facing direction based on the speed
-    * For 4-direction movement (for 8-direction add more cases)
-    */
-    this.updateDirection = function() {
-        if (this.speedY < 0) this.direction = DIR_N;
-        if (this.speedY > 0) this.direction = DIR_S;
-        if (this.speedX < 0) this.direction = DIR_W;
-        if (this.speedX > 0) this.direction = DIR_E;
-    }
-    
-    /**
-    * Updates the shown animation sequence based on the direction te component is facing
-    * For 4-direction movement (for 8-direction add more cases)
-    */
-    this.updateAnimation = function() {
-        // Idle (Animation or Still)
-        if (this.speedX == 0 && this.speedY == 0){
-            if (this.direction == DIR_N) this.sequence = this.idleUp;
-            if (this.direction == DIR_S) this.sequence = this.idleDown;
-            if (this.direction == DIR_W) this.sequence = this.idleLeft;
-            if (this.direction == DIR_E) this.sequence = this.idleRight; 
-        }
-        // Moving
-        else {
-            if (this.direction == DIR_N) this.sequence = this.moveUp;
-            if (this.direction == DIR_S) this.sequence = this.moveDown;
-            if (this.direction == DIR_W) this.sequence = this.moveLeft;
-            if (this.direction == DIR_E) this.sequence = this.moveRight;
-        }
-    }
-    
-    this.updateFront = function() {
-        if (this.direction == DIR_N) {
-            this.front.x = this.x + this.offset_x;
-            this.front.y = this.y + this.offset_y - 16;
-        }
-        if (this.direction == DIR_S) {
-            this.front.x = this.x + this.offset_x
-            this.front.y = this.y + this.offset_y + 16;
-        }
-        if (this.direction == DIR_W) {
-            this.front.x = this.x + this.offset_x - 16;
-            this.front.y = this.y + this.offset_y;
-        }
-        if (this.direction == DIR_E) {
-            this.front.x = this.x + this.offset_x + 16;
-            this.front.y = this.y + this.offset_y;
-        }
-    }
-    
-    /**
-    * Draw the sprite
-    * animated & still
-    */
-    this.drawSprite = function() {
-        if (this.sequence != undefined) {
-            // Animation: Moving / Idle
-            if (this.sequence.length != undefined) {
-                if (AnimationCounter[AnimationCounterIndex].animationDelay++ >= this.animationTime) {
-                    AnimationCounter[AnimationCounterIndex].animationDelay = 0;
-                    AnimationCounter[AnimationCounterIndex].animationIndexCounter++;
-                    if (AnimationCounter[AnimationCounterIndex].animationIndexCounter >= this.sequence.length) {
-                        AnimationCounter[AnimationCounterIndex].animationIndexCounter = 0;
-                    }
-                    AnimationCounter[AnimationCounterIndex].animationCurrentFrame = this.sequence[AnimationCounter[AnimationCounterIndex].animationIndexCounter];
-                }
-                var res = i2xy(AnimationCounter[AnimationCounterIndex].animationCurrentFrame, Math.max(this.spritesX, this.spritesY));
-                ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
-                AnimationCounterIndex++;
-            }
-            // No Animation: Just sprite image
-            else {
-                var res = i2xy(this.sequence, Math.max(this.spritesX, this.spritesY));
-                ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
-            }
-        }
     }
     
     /**
@@ -370,135 +553,10 @@ function component(x, y) {
         }
     }    
     
-    // ########################
-    // ## Collision handling ##
-    // ########################
-    
-    /**
-    * Prevents map collision
-    * [TODO: Check if there is no collision between the old and the new position
-    * (only happens if moving really fast!)]
-    */
-    this.mapCollsion = function() {
-        if (!this.isMapWalkable()) {
-            this.updateDirection();
-            this.speedX = 0;
-            this.speedY = 0;
-            this.collided = true;
-        }
-        else this.collided = false;
-    }
-    
-    /**
-    * Calculates the new position and checks if it's walkable by using the maps collision layer
-    * Only for width/height=16: => with tile-height/width=16 only max 4 tiles to stand on
-    * "may TODO": Adept for all sizes
-    */
-    this.isMapWalkable = function() {
-        if (!this.collidable) return true;
-        
-        // Converts the cartesian to grid coordiantes
-        var x1 = Math.floor((this.x+this.offset_x+this.speedX)/16);
-        var y1 = Math.floor((this.y+this.offset_y+this.speedY)/16);
-        var x2 = x1 + 1;
-        var y2 = y1 + 1;
-        
-        // Check if standing exactly on a tile-axis; tolarance=0.1
-        if (Math.abs(x1-(this.x+this.offset_x+this.speedX)/16) < 0.1) x2 = x1;
-        if (Math.abs(y1-(this.y+this.offset_y+this.speedY)/16) < 0.1) y2 = y1;
-        
-        // Debugging Map Collision: Shows on which tiles the object is standing and map collisions
-        if (debug) {
-            this.rects = [];
-            for (i = 0; i < 4; i++) this.rects[i] = new component().rectangle(16, 16, "black", false, "blue", true);
-        
-            this.rects[0].x = x1*16; this.rects[0].y = y1*16;
-            this.rects[1].x = x1*16; this.rects[1].y = y2*16;
-            this.rects[2].x = x2*16; this.rects[2].y = y1*16;
-            this.rects[3].x = x2*16; this.rects[3].y = y2*16;
-            
-            if (maps[mapID].layerC[xy2i(x1,y1,maps[mapID].mapWidth)]) this.rects[0].outlineColor = "blue"; else this.rects[0].outlineColor = "red";
-            if (maps[mapID].layerC[xy2i(x1,y2,maps[mapID].mapWidth)]) this.rects[1].outlineColor = "blue"; else this.rects[1].outlineColor = "red";
-            if (maps[mapID].layerC[xy2i(x2,y1,maps[mapID].mapWidth)]) this.rects[2].outlineColor = "blue"; else this.rects[2].outlineColor = "red";
-            if (maps[mapID].layerC[xy2i(x2,y2,maps[mapID].mapWidth)]) this.rects[3].outlineColor = "blue"; else this.rects[3].outlineColor = "red";
-        }
-        
-        // Check map borders
-        if (x1 < 0 || y1 < 0 || x2 > maps[mapID].mapWidth - 1 || y2 > maps[mapID].mapHeight - 1)
-            return false;
-          
-        // Use collision layer of the map and check if all 4 tiles are walkable (=true)
-        return (maps[mapID].layerC[xy2i(x1,y1,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x1,y2,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x2,y1,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x2,y2,maps[mapID].mapWidth)]);
-    }
-    
-    /**
-    * Tell if the collision boxes of the two components are overlapping
-    */
-    this.collisionOverlap = function(otherobj) {
-        if (!this.collidable) return false;
-        if (!otherobj.collidable) return false;
-        
-        if ((this.y + this.offset_y + this.offset_height <= otherobj.y + otherobj.offset_y) ||
-            (this.y + this.offset_y >= otherobj.y + otherobj.offset_y + otherobj.offset_height) ||
-            (this.x + this.offset_x + this.offset_width <= otherobj.x + otherobj.offset_x) ||
-            (this.x + this.offset_x >= otherobj.x + otherobj.offset_x + otherobj.offset_width))
-            return false
-
-        return true;
-    }
-    
-    /**
-    * Prevent collsion with other components
-    * Has to be called in the main loop for all combinations after the control updates of all components
-    */
-    this.componentCollision = function(otherobj) {
-        if (!this.collidable || !otherobj.collidable) return false;
-        
-        if ((this.y + this.offset_y + this.speedY + this.offset_height <= otherobj.y + otherobj.offset_y + otherobj.speedY) ||
-            (this.y + this.offset_y + this.speedY >= otherobj.y + otherobj.offset_y + otherobj.speedY + otherobj.offset_height) ||
-            (this.x + this.offset_x + this.speedX + this.offset_width <= otherobj.x + otherobj.offset_x + otherobj.speedX) ||
-            (this.x + this.offset_x + this.speedX >= otherobj.x + otherobj.offset_x + otherobj.speedX + otherobj.offset_width)) {
-            return false
-        }
-        else {
-            if (!otherobj.moveable) {
-                this.speedX = 0;
-                this.speedY = 0;
-                otherobj.speedX = 0;
-                otherobj.speedY = 0;
-            }
-            /*else {
-                otherobj.speedX = this.speedX;
-                otherobj.speedY = this.speedY;
-                // TODO: Prevent moving into other components
-                
-                for (i = 0; i < maps_objects[mapID].length; i++) {
-                    if (maps_objects[mapID][i] != this && maps_objects[mapID][i] != otherobj) {
-                        if ()
-                    }
-                }
-                if (!otherobj.isMapWalkable()) {
-                    this.speedX = 0;
-                    this.speedY = 0;
-                    otherobj.speedX = 0;
-                    otherobj.speedY = 0;
-                }                
-            }*/
-            return true;
-        }
-    }
-    
-    /**
-    * For debug: Shows the tiles the component is standing (blue rectangles)
-    */
-    this.showStandingOnTiles = function() {
-        for (i = 0; i < this.rects.length; i++)
-        this.rects[i].draw();
-    }
-    
     /**
     * Always stop on a whole tile
     */
+    /*
     this.moveFinisher = function() {
         var x1 = Math.floor((this.x+this.offset_x)/16);
         var y1 = Math.floor((this.y+this.offset_y)/16);
@@ -521,7 +579,6 @@ function component(x, y) {
         if (!xFin && !yFin) {
             console.log("end");
             this.finishMove = false;
-        }
-        
-    }    
+        }        
+    }*/    
 }

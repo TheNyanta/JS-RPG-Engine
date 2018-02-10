@@ -60,7 +60,7 @@ function control(obj) {
     
     this.drawRoute = function() {
         if (this.rects)
-            for (i = this.routeIndex; i < this.rects.length; i++) this.rects[i].draw();
+            for (i = this.routeIndex; i < this.rects.length; i++) this.rects[i].draw(myGameArea.context);
     }
     
     // Follow a given object

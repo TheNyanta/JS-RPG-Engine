@@ -44,7 +44,10 @@ var myGameArea = {
         InitalizeAnimationCounters();
         
         // Initalize Maps
-        for (i=0; i<maps.length; i++) maps[i].init();
+        for (i=0; i<maps.length; i++) {
+            maps[i].init();
+            maps[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);         
+        }
         
         window.requestAnimationFrame = window.requestAnimationFrame
         || window.mozRequestAnimationFrame
@@ -140,7 +143,7 @@ function updateGameArea() {
     
     maps[mapID].drawBackground();
     
-    // ## Cat walk ##
+    // ## Cat walk HARDCODE ##
     if (!chatSequence) {
         if (turn) cat.speedY = -cat.speed;
         else cat.speedY = cat.speed;
@@ -150,8 +153,8 @@ function updateGameArea() {
     }
     // #############
     
-    // # Reminder: Add x/y collision => while x-collision allow movement in y direction vice versa
-    if (!chatSequence) {
+    // # Reminder: Add x/y collision => while x-collision allow movement in y direction and vice versa
+    if (!chatSequence/*maybe change it to gameSequence, hm?*/) {
         // Update the movement of all components in maps_objects[mapID] (incl. mapCollsion resolving)
         for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateControl();
         // Check each combination of components in maps_objects[mapID] for component-component-collision
@@ -161,13 +164,14 @@ function updateGameArea() {
         // Update the position of all components in maps_objects[mapID]
         for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updatePosition();
     }
+    
     // Interacting character: select choice in dialog
     character.keyEvent();
     
     // Sorts the array after it's y value so that components with bigger y are drawn later
     maps_objects[mapID].sort(function(a,b) {return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0); });
     // Draw Objects of the current map
-    for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].draw();
+    for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].draw(myGameArea.context);
     
     maps[mapID].drawForeground();
     
@@ -189,6 +193,9 @@ function updateGameArea() {
                 if (character.direction == DIR_S) char2.direction = DIR_N;
                 if (character.direction == DIR_E) char2.direction = DIR_W;
                 if (character.direction == DIR_W) char2.direction = DIR_E;
+                char2.updateAnimation();
+                // Stop running animation if Enter is pressed while moving
+                character.updateAnimation();
             }
             currentDialog.next = true;
         }
@@ -213,6 +220,9 @@ function updateGameArea() {
                 if (character.direction == DIR_S) cat.direction = DIR_N;
                 if (character.direction == DIR_E) cat.direction = DIR_W;
                 if (character.direction == DIR_W) cat.direction = DIR_E;
+                cat.updateAnimation();
+                // Stop running animation if Enter is pressed while moving
+                character.updateAnimation();
             }
             currentDialog.next = true;
         }
@@ -232,6 +242,8 @@ function updateGameArea() {
                 currentDialog.chatCounter++;
                 chatSequence = true;
                 character.interacting = true;
+                // Stop running animation if Enter is pressed while moving
+                character.updateAnimation();
             }
             currentDialog.next = true;
         }
@@ -245,7 +257,7 @@ function updateGameArea() {
             character.interacting = false;
     }
     
-    // Changing text
+    // Changing dialog text based on mapID
     
     if (mapID==0) {
         testdialog.setDialog(["Hello!","Do you want to visit the snow map?", "#choice", "#entered"], null, ["Yes", "No"]);
