@@ -24,9 +24,16 @@ var char2 = new component(204, 176)
 .collision(4,16,16,16);
 
 // Setup Cat
-var cat = new component(164, 384)
+var cat = new component(160, 380)
 .velocity(1)
 .sprite("Assets/Image/cat.png", 24, 32, 8, 12)
+.animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
+.collision(4, 16, 16, 16);
+
+// Setup Dog
+var dog = new component(100, 100)
+.velocity(1)
+.sprite("Assets/Image/animal.png", 24, 32, 8, 12)
 .animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
 .collision(4, 16, 16, 16);
 
@@ -40,7 +47,7 @@ jukebox.sequence = 0;
 var gameCamera = new camera(0, 0).setTarget(character);
 
 map0_obj.push(character, char2, cat);
-map1_obj.push(character, char2, jukebox);
+map1_obj.push(character, char2, jukebox, dog);
 maps_objects.push(map0_obj, map1_obj);
 
 // Music
@@ -48,9 +55,11 @@ var audio1 = new Audio('Assets/Audio/banana-phone.m4a');
 
 // Sounds
 var catsound = new Audio('Assets/Audio/cat.m4a');
+var dogsound = new Audio('Assets/Audio/dog.m4a');
 
 audio1.volume = 0.2;
 catsound.volume = 0.2;
+dogsound.volume = 0.2;
 
 // Dialog [Test] #
 var testdialog = new dialog();
@@ -73,21 +82,55 @@ catdialog.event = function(choice) {
 // ## Cat walk  ##
 cat.route = [[160, 380], [160, 90], [450, 90], [450, 220], [540, 220], [540, 380]];
 cat.routeIndex = 0;
+cat.speed = 10;
+cat.routeForward = true;
 // You can use this.variable in the function because it will be called in the cat component
 cat.movementEvent = function() {
     if (!gameSequence) {
         if (this.routeIndex >= this.route.length) this.routeIndex = 0;
+        if (this.routeIndex < 0) this.routeIndex = this.route.length - 1;
         
         // First reach x
         if (this.x == this.route[this.routeIndex][0]) {
             // Than reach y
-            if (this.y == this.route[this.routeIndex][1]) this.routeIndex++;
+            if (this.y == this.route[this.routeIndex][1]) {
+                if (this.routeForward) this.routeIndex++;
+                else this.routeIndex--;
+            }
             else if (this.y < this.route[this.routeIndex][1]) this.speedY = this.speed;
             else this.speedY = -this.speed;
         }
         else if (this.x < this.route[this.routeIndex][0]) this.speedX = this.speed;
         else this.speedX = -this.speed;
     }
+}
+
+dog.movementEvent = function() {
+    if (!gameSequence) {
+        // x move
+        if (Math.abs(this.x + this.offset_x - character.front.x) > Math.abs(this.y + this.offset_y - character.front.y)) {
+            if (this.x + this.offset_x!= character.front.x) {
+                if (this.x + this.offset_x < character.front.x) this.speedX = this.speed;
+                else  this.speedX = -this.speed;
+            }            
+        }
+        // y move
+        else {
+            if (this.y + this.offset_y != character.front.y) {
+                if (this.y + this.offset_y < character.front.y) this.speedY = this.speed
+                else this.speedY = -this.speed;
+            }
+        }
+        
+        if (this.xCollisionMap) {
+            this.speedY = this.speed;
+            if (this.yCollisionMap) this.speedY = -this.speed;            
+        }
+        if (this.yCollisionMap) {
+            this.speedX = this.speed;
+            if (this.xCollisionMap) this.speedX = -this.speed;
+        }
+    }    
 }
 
 char2.faceOnInteraction = true;
@@ -100,6 +143,14 @@ cat.faceOnInteraction = true;
 cat.onEnterEvent = function() {
     currentDialog = catdialog;
     gameSequence = true;
+    if (cat.routeForward) cat.routeIndex--;
+    else cat.routeIndex++;
+    cat.routeForward = toggle(cat.routeForward);
+}
+
+dog.faceOnInteraction = true;
+dog.onEnterEvent = function() {
+    dogsound.play();
 }
 
 jukebox.onEnterEvent = function() {

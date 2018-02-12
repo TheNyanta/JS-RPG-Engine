@@ -153,7 +153,7 @@ function updateComponents() {
         // Character has to be able to interacted:
         if (character.front != undefined)
             for (var i = 0; i < maps_objects[mapID].length; i++) character.updateInteraction(maps_objects[mapID][i]);
-        // Update the movement of all components in maps_objects[mapID] (this includes mapCollsion resolving)
+        // Update the movement of all components in maps_objects[mapID] (this includes mapCollision resolving)
         for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateMovement();
         // Check each combination pair of components in maps_objects[mapID] for component-component-collision
         for (var i = 0; i < maps_objects[mapID].length; i++)

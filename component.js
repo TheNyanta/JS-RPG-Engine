@@ -237,7 +237,7 @@ function component(x, y) {
         * [TODO: Check if there is no collision between the old and the new position
         * (only happens if moving really fast!)]
         */
-        this.mapCollsion = function() {
+        this.mapCollision = function() {
             var tmp = this.speedY;
             
             // X Collision
@@ -316,76 +316,70 @@ function component(x, y) {
         }
         
         /**
-        * Prevent collsion with other components
+        * Prevent Collision with other components
         * Has to be called in the main loop for all combinations after the control updates of all components
         */
         this.componentCollision = function(otherobj) {
             if (!this.collidable || !otherobj.collidable) return false;
             
+            // Saving y-speed
             var tmp1 = this.speedY;
             var tmp2 = otherobj.speedY;
+            
+            // Checking X Collision
             this.speedY = 0;
             otherobj.speedY = 0;
-        
+            
             if ((this.y + this.offset_y + this.speedY + this.offset_height <= otherobj.y + otherobj.offset_y + otherobj.speedY) ||
                 (this.y + this.offset_y + this.speedY >= otherobj.y + otherobj.offset_y + otherobj.speedY + otherobj.offset_height) ||
                 (this.x + this.offset_x + this.speedX + this.offset_width <= otherobj.x + otherobj.offset_x + otherobj.speedX) ||
                 (this.x + this.offset_x + this.speedX >= otherobj.x + otherobj.offset_x + otherobj.speedX + otherobj.offset_width)) {
                 // No X Collision
-                this.xCollision = false;
-                otherobj.xCollision = false;
+                this.xLeftCollision = false;
+                this.xRightCollision = false;
             }
             else {
-                this.speedX = 0;
-                otherobj.speedX = 0;
-                this.xCollision = true;
-                otherobj.xCollision = true;
+                if ((this.x + this.offset_x + this.speedX + this.offset_width > otherobj.x + otherobj.offset_x + otherobj.speedX)) {
+                    // X Right Collision
+                    this.xRightCollision = true;
+                    if (this.speedX <= 0) this.speedX = 0;
+                    if (otherobj.speedX >= 0) otherobj.speedX = 0;
+                }
+                if ((this.x + this.offset_x + this.speedX < otherobj.x + otherobj.offset_x + otherobj.speedX + otherobj.offset_width)) {
+                    // X Left Collision
+                    this.xLeftCollision = true;
+                    if (this.speedX >= 0) this.speedX = 0;
+                    if (otherobj.speedX <= 0) otherobj.speedX = 0;
+                }    
             }
             
+            // Checking Y Collision
             this.speedY = tmp1;
             otherobj.speedY = tmp2;
+            
             if ((this.y + this.offset_y + this.speedY + this.offset_height <= otherobj.y + otherobj.offset_y + otherobj.speedY) ||
                 (this.y + this.offset_y + this.speedY >= otherobj.y + otherobj.offset_y + otherobj.speedY + otherobj.offset_height) ||
                 (this.x + this.offset_x + this.speedX + this.offset_width <= otherobj.x + otherobj.offset_x + otherobj.speedX) ||
                 (this.x + this.offset_x + this.speedX >= otherobj.x + otherobj.offset_x + otherobj.speedX + otherobj.offset_width)) {
                 // NO Y Collision
-                this.yCollision = false;
-                otherobj.yCollision = false;
+                this.yTopCollision = false;
+                this.yBottomCollision = false;
             }
             else {
-                this.speedY = 0;
-                otherobj.speedY = 0;
-                this.yCollision = true;
-                otherobj.yCollision = true;
+                if ((this.y + this.offset_y + this.speedY + this.offset_height > otherobj.y + otherobj.offset_y + otherobj.speedY)) {
+                    // Y Top Collision
+                    this.yTopCollision = true;
+                    if (this.speedY >= 0) this.speedY = 0;
+                    if (otherobj.speedY <= 0) otherobj.speedY = 0;
+                }
+                if ((this.y + this.offset_y + this.speedY < otherobj.y + otherobj.offset_y + otherobj.speedY + otherobj.offset_height)) {
+                    // Y Bottom Collision
+                    this.yBottomCollision = true;
+                    if (this.speedY >= 0) this.speedY = 0;
+                    if (otherobj.speedY <= 0) otherobj.speedY = 0;
+                }
             }
-            /*
-            else {
-                //if (!otherobj.moveable) {
-                    
-                    this.speedX = 0;
-                    this.speedY = 0;
-                    otherobj.speedX = 0;
-                    otherobj.speedY = 0;
-                //}
-                else {
-                otherobj.speedX = this.speedX;
-                otherobj.speedY = this.speedY;
-                // TODO: Prevent moving into other components
-                
-                for (i = 0; i < maps_objects[mapID].length; i++) {
-                if (maps_objects[mapID][i] != this && maps_objects[mapID][i] != otherobj) {
-                if ()
-                }
-                }
-                if (!otherobj.isMapWalkable()) {
-                this.speedX = 0;
-                this.speedY = 0;
-                otherobj.speedX = 0;
-                otherobj.speedY = 0;
-                }   
-                }
-                return true;
-            }*/
+            
         }
         
         /**
@@ -551,7 +545,7 @@ function component(x, y) {
         if (this.direction != undefined) this.updateDirection();
         
         // Checks if there is a collision with the map and adjust movement if needed
-        this.mapCollsion();
+        this.mapCollision();
         
         return this;
     }
