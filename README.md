@@ -2,16 +2,14 @@
 
 Prototype Engine for a top-down rpg or a plattformer
 
-## TODO:            
-Refine Collision Detection and Resolving with Objects
+## TODO:        
+Refine Events + Dialogs
 
-Implement Events + Dialogs-Events
+Implement Click/Touch-Interaction with Objects
 
-Implement Enter/Touch-Interaction with Objects
+Implement/Refine Touch Control
 
-Refine Touch Control
-
-Implement Save & Load Gamestate (maybe by using cookies?)
+Implement Save & Load Gamestate (localStorage)
 
 Implement proper Audio Select/Play System
 
