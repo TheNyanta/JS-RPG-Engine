@@ -24,7 +24,7 @@ var char2 = new component(204, 176)
 .collision(4,16,16,16);
 
 // Setup Cat
-var cat = new component(156, 100)
+var cat = new component(164, 384)
 .velocity(1)
 .sprite("Assets/Image/cat.png", 24, 32, 8, 12)
 .animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
@@ -71,15 +71,22 @@ catdialog.event = function(choice) {
 }
 
 // ## Cat walk  ##
-cat.turn = false; // Add turn to cat for turning
+cat.route = [[160, 380], [160, 90], [450, 90], [450, 220], [540, 220], [540, 380]];
+cat.routeIndex = 0;
 // You can use this.variable in the function because it will be called in the cat component
 cat.movementEvent = function() {
     if (!gameSequence) {
-        if (this.turn) this.speedY = -this.speed;
-        else this.speedY = this.speed;
+        if (this.routeIndex >= this.route.length) this.routeIndex = 0;
         
-        if (this.y > 120) this.turn = true;
-        if (this.y < 60) this.turn = false;
+        // First reach x
+        if (this.x == this.route[this.routeIndex][0]) {
+            // Than reach y
+            if (this.y == this.route[this.routeIndex][1]) this.routeIndex++;
+            else if (this.y < this.route[this.routeIndex][1]) this.speedY = this.speed;
+            else this.speedY = -this.speed;
+        }
+        else if (this.x < this.route[this.routeIndex][0]) this.speedX = this.speed;
+        else this.speedX = -this.speed;
     }
 }
 
