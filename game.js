@@ -147,7 +147,6 @@ function everyinterval(n) {
 * Updates the current map with all it's components
 */
 function updateComponents() {
-    // # Reminder: Add x/y collision => while x-collision allow movement in y direction and vice versa
     
     // In a gameSequence there will be no movement (i.e. activate gameSequence when opening a menu)
     if (!gameSequence) {

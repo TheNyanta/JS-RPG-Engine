@@ -238,13 +238,23 @@ function component(x, y) {
         * (only happens if moving really fast!)]
         */
         this.mapCollsion = function() {
+            var tmp = this.speedY;
+            
+            // X Collision
+            this.speedY = 0;
             if (!this.isMapWalkable()) {
                 this.updateDirection();
                 this.speedX = 0;
+                this.xCollisionMap = true;
+            } else this.xCollisionMap = false;
+            
+            // Y Collision
+            this.speedY = tmp;
+            if (!this.isMapWalkable()) {
+                this.updateDirection();
                 this.speedY = 0;
-                this.collided = true;
-            }
-            else this.collided = false;
+                this.yCollisionMap = true;
+            } else this.yCollisionMap = false;
         }   
         
         /**
@@ -311,21 +321,53 @@ function component(x, y) {
         */
         this.componentCollision = function(otherobj) {
             if (!this.collidable || !otherobj.collidable) return false;
+            
+            var tmp1 = this.speedY;
+            var tmp2 = otherobj.speedY;
+            this.speedY = 0;
+            otherobj.speedY = 0;
         
             if ((this.y + this.offset_y + this.speedY + this.offset_height <= otherobj.y + otherobj.offset_y + otherobj.speedY) ||
                 (this.y + this.offset_y + this.speedY >= otherobj.y + otherobj.offset_y + otherobj.speedY + otherobj.offset_height) ||
                 (this.x + this.offset_x + this.speedX + this.offset_width <= otherobj.x + otherobj.offset_x + otherobj.speedX) ||
                 (this.x + this.offset_x + this.speedX >= otherobj.x + otherobj.offset_x + otherobj.speedX + otherobj.offset_width)) {
-                return false
+                // No X Collision
+                this.xCollision = false;
+                otherobj.xCollision = false;
             }
             else {
-                if (!otherobj.moveable) {
+                this.speedX = 0;
+                otherobj.speedX = 0;
+                this.xCollision = true;
+                otherobj.xCollision = true;
+            }
+            
+            this.speedY = tmp1;
+            otherobj.speedY = tmp2;
+            if ((this.y + this.offset_y + this.speedY + this.offset_height <= otherobj.y + otherobj.offset_y + otherobj.speedY) ||
+                (this.y + this.offset_y + this.speedY >= otherobj.y + otherobj.offset_y + otherobj.speedY + otherobj.offset_height) ||
+                (this.x + this.offset_x + this.speedX + this.offset_width <= otherobj.x + otherobj.offset_x + otherobj.speedX) ||
+                (this.x + this.offset_x + this.speedX >= otherobj.x + otherobj.offset_x + otherobj.speedX + otherobj.offset_width)) {
+                // NO Y Collision
+                this.yCollision = false;
+                otherobj.yCollision = false;
+            }
+            else {
+                this.speedY = 0;
+                otherobj.speedY = 0;
+                this.yCollision = true;
+                otherobj.yCollision = true;
+            }
+            /*
+            else {
+                //if (!otherobj.moveable) {
+                    
                     this.speedX = 0;
                     this.speedY = 0;
                     otherobj.speedX = 0;
                     otherobj.speedY = 0;
-                }
-                /*else {
+                //}
+                else {
                 otherobj.speedX = this.speedX;
                 otherobj.speedY = this.speedY;
                 // TODO: Prevent moving into other components
@@ -341,9 +383,9 @@ function component(x, y) {
                 otherobj.speedX = 0;
                 otherobj.speedY = 0;
                 }   
-                }*/
+                }
                 return true;
-            }
+            }*/
         }
         
         /**
