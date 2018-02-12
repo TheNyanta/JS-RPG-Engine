@@ -13,7 +13,7 @@ function dialog(text, img, choices) {
     this.text = text;
     
     this.started = false;
-    this.enterEvent = false;
+    this.enterPush = false;
     
     this.setDialog = function(text, img, choices) {
         this.text = text;
@@ -87,13 +87,13 @@ function dialog(text, img, choices) {
         if (myGameArea.keys) {
             // Enter key down
             if (myGameArea.keys[KEY_ENTER]) {
-                if (this.enterEvent) {
+                if (this.enterPush) {
                     this.chatCounter++;
-                    this.enterEvent = false;
+                    this.enterPush = false;
                 }
             }
-            // Enter key up: Enable enter event
-            else this.enterEvent = true;
+            // Enter key up: Enable next enter push
+            else this.enterPush = true;
         }
     }
 }

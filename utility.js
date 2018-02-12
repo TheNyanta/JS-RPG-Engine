@@ -100,6 +100,40 @@ function resizeCanvas() {
     else myGameArea.canvas.height = myGameArea.canvas.height = document.body.clientHeight;
 }
 
+/**
+* Use localStorage to save game state
+* TODO: Change to save all the game state values
+*/
+function saveGameState(address, value) {
+    // Check browser support
+    if (typeof(Storage) !== "undefined") {
+        // Store
+        localStorage.setItem(address, value);
+        console.log("Stored: " + value);
+    }
+    else {
+        alert("Sorry, your browser does not support Web Storage...");
+    }
+}
+
+/**
+* Use localStorage to load game state
+* TODO: Change to load all the game state values & apply them
+*/
+function loadGameState(address) {
+    // Check browser support
+    if (typeof(Storage) !== "undefined") {
+        var value = localStorage.getItem(address);
+        // Retrieve
+        console.log("Retrieved: " + value);
+    }
+    else {
+        alert("Sorry, your browser does not support Web Storage...");
+    }
+}
+
+/*
+// https://www.w3schools.com/html/html5_webstorage.asp better way
 function setCookie(cname,cvalue,exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
@@ -121,7 +155,7 @@ function getCookie(cname) {
         }
     }
     return "";
-}
+}*/
 
 function toggle(boolean) {
     if (boolean) return false;
