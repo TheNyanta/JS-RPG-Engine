@@ -18,9 +18,6 @@ var myGameArea = {
         
         this.frameNo = 0;
         
-        // Animation Counter
-        InitalizeAnimationCounters();
-        
         //this.canvas.style.cursor = "none"; //hide the original cursor
         this.context = this.canvas.getContext("2d");
         
@@ -78,11 +75,9 @@ var myGameArea = {
         window.addEventListener('keydown', function (e) {
             myGameArea.keys = (myGameArea.keys || []);
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
-            if (e.keyCode == KEY_ENTER) enter_down = true;
         })
         window.addEventListener('keyup', function (e) {
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
-            if (e.keyCode == KEY_ENTER) enter_down = false;
         })
         window.addEventListener('mousedown', function (e) {
             myGameArea.mousedown = true;
@@ -127,7 +122,6 @@ var myGameArea = {
         function gameLoop() {
             requestAnimationFrame(gameLoop);
             if (document.active) {
-                ResetAnimationCounter();
                 updateGameArea();
             }
         }
@@ -154,19 +148,28 @@ function everyinterval(n) {
 */
 function updateComponents() {
     // # Reminder: Add x/y collision => while x-collision allow movement in y direction and vice versa
-    if (!chatSequence/*maybe change it to gameSequence, hm?*/) {
-        // Update the movement of all components in maps_objects[mapID] (incl. mapCollsion resolving)
-        for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateControl();
-        // Check each combination of components in maps_objects[mapID] for component-component-collision
+    
+    // In a gameSequence there will be no movement (i.e. activate gameSequence when opening a menu)
+    if (!gameSequence) {
+        // Character has to be able to interacted:
+        if (character.front != undefined)
+            for (var i = 0; i < maps_objects[mapID].length; i++) character.updateInteraction(maps_objects[mapID][i]);
+        // Update the movement of all components in maps_objects[mapID] (this includes mapCollsion resolving)
+        for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateMovement();
+        // Check each combination pair of components in maps_objects[mapID] for component-component-collision
         for (var i = 0; i < maps_objects[mapID].length; i++)
             for (var j = i + 1; j < maps_objects[mapID].length; j++)
                 maps_objects[mapID][i].componentCollision(maps_objects[mapID][j]);
         // Update the position of all components in maps_objects[mapID]
         for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updatePosition();
+        
     }
     
-    // Interacting character: select choice in dialog
-    character.keyEvent();
+    // Update Events
+    //for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateEvent();
+    
+    
+    
     gameCamera.update();
 }
 
@@ -198,111 +201,22 @@ function drawComponents() {
 function updateGameArea() {
     myGameArea.frameNo += 1;
     
-    walking_cat();
-    
-    // "gameEvent();" //TODO: Put all events in here   
-    updateComponents();  
-    drawComponents(); 
-    
     dialogTesting();
+    
+    updateComponents();  
+    drawComponents();
+    
+    // Draw dialog
+    if (gameSequence) currentDialog.update();
+    
 }
 
 // ####################################
 // ## HARDCODE FUNCTIONS FOR TESTING ##
 // ####################################
 
-// ## Cat walk  ##
-var turn = false; // For cat turn
-function walking_cat() {
-    
-    if (!chatSequence) {
-        if (turn) cat.speedY = -cat.speed;
-        else cat.speedY = cat.speed;
-        
-        if (cat.y > 188) turn = true;
-        if (cat.y < 100) turn = false;
-    }
-}
 
-//DIALOG EVENT: same pattern for each obj
-var enter_down = false; // For dialog
-function dialogTesting() { 
-    // Enter KEY
-    if (character.front.collisionOverlap(char2)) {
-        currentDialog = testdialog;
-        if (enter_down) {
-            if (!currentDialog.next) {
-                currentDialog.chatCounter++;
-                chatSequence = true;
-                character.interacting = true;
-                // Turn char2 to face character
-                if (character.direction == DIR_N) char2.direction = DIR_S;
-                if (character.direction == DIR_S) char2.direction = DIR_N;
-                if (character.direction == DIR_E) char2.direction = DIR_W;
-                if (character.direction == DIR_W) char2.direction = DIR_E;
-                char2.updateAnimation();
-                // Stop running animation if Enter is pressed while moving
-                character.updateAnimation();
-            }
-            currentDialog.next = true;
-        }
-        else {
-            if (currentDialog.next)
-            currentDialog.next = false;
-        }        
-        if (chatSequence)
-            currentDialog.update();
-        else
-            character.interacting = false;
-    }    
-    else if (character.front.collisionOverlap(cat) && mapID==0) {
-        currentDialog = catdialog;
-        if (enter_down) {
-            if (!currentDialog.next) {
-                currentDialog.chatCounter++;
-                chatSequence = true;
-                character.interacting = true;
-                // Turn cat to face character
-                if (character.direction == DIR_N) cat.direction = DIR_S;
-                if (character.direction == DIR_S) cat.direction = DIR_N;
-                if (character.direction == DIR_E) cat.direction = DIR_W;
-                if (character.direction == DIR_W) cat.direction = DIR_E;
-                cat.updateAnimation();
-                // Stop running animation if Enter is pressed while moving
-                character.updateAnimation();
-            }
-            currentDialog.next = true;
-        }
-        else {
-            if (currentDialog.next)
-            currentDialog.next = false;
-        }        
-        if (chatSequence)
-            currentDialog.update();
-        else
-            character.interacting = false;
-    }
-    else if (character.front.collisionOverlap(jukebox) && mapID==1) {
-        currentDialog = musicdialog;
-        if (enter_down) {
-            if (!currentDialog.next) {
-                currentDialog.chatCounter++;
-                chatSequence = true;
-                character.interacting = true;
-                // Stop running animation if Enter is pressed while moving
-                character.updateAnimation();
-            }
-            currentDialog.next = true;
-        }
-        else {
-            if (currentDialog.next)
-            currentDialog.next = false;
-        }        
-        if (chatSequence)
-            currentDialog.update();
-        else
-            character.interacting = false;
-    }
+function dialogTesting() {
     
     // Changing dialog text based on mapID
     

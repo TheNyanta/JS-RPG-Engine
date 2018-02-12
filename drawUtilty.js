@@ -139,7 +139,7 @@ var Vector = function(_x, _y) {
     
 };
 
-var chatSequence = false;
+var gameSequence = false;
 var dialogText = "";
 
 function DrawDialog(text, img, isChat) {
@@ -157,6 +157,6 @@ function DrawDialog(text, img, isChat) {
     }
     // Stop all motions if its a chat sequence
     if (isChat) {
-        chatSequence = true;
+        gameSequence = true;
     }
 }

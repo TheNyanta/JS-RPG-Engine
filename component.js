@@ -62,17 +62,16 @@ function component(x, y) {
             if (this.sequence != undefined) {
                 // Animation: Moving / Idle
                 if (this.sequence.length != undefined) {
-                    if (AnimationCounter[AnimationCounterIndex].animationDelay++ >= this.animationTime) {
-                        AnimationCounter[AnimationCounterIndex].animationDelay = 0;
-                        AnimationCounter[AnimationCounterIndex].animationIndexCounter++;
-                        if (AnimationCounter[AnimationCounterIndex].animationIndexCounter >= this.sequence.length) {
-                            AnimationCounter[AnimationCounterIndex].animationIndexCounter = 0;
+                    if (this.animationDelay++ >= this.animationTime) {
+                        this.animationDelay = 0;
+                        this.animationIndexCounter++;
+                        if (this.animationIndexCounter >= this.sequence.length) {
+                            this.animationIndexCounter = 0;
                         }
-                        AnimationCounter[AnimationCounterIndex].animationCurrentFrame = this.sequence[AnimationCounter[AnimationCounterIndex].animationIndexCounter];
+                        this.animationCurrentFrame = this.sequence[this.animationIndexCounter];
                     }
-                    var res = i2xy(AnimationCounter[AnimationCounterIndex].animationCurrentFrame, Math.max(this.spritesX, this.spritesY));
+                    var res = i2xy(this.animationCurrentFrame, Math.max(this.spritesX, this.spritesY));
                     ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
-                    AnimationCounterIndex++;
                 }
                 // No Animation: Just sprite image
                 else {
@@ -87,6 +86,8 @@ function component(x, y) {
     
         /**
         * Update the facing direction based on the speed
+        * This is used for drawing the right animation sequence and
+        * to determinate the front of the component for interactions
         * For 4-direction movement (for 8-direction add more cases)
         */
         this.updateDirection = function() {
@@ -102,7 +103,7 @@ function component(x, y) {
         */
         this.updateAnimation = function() {
             // Idle (Animation or Still)
-            if (this.speedX == 0 && this.speedY == 0){
+            if (this.speedX == 0 && this.speedY == 0 || gameSequence){
                 if (this.direction == DIR_N) this.sequence = this.idleUp;
                 if (this.direction == DIR_S) this.sequence = this.idleDown;
                 if (this.direction == DIR_W) this.sequence = this.idleLeft;
@@ -164,6 +165,27 @@ function component(x, y) {
         
         this.disableControls = false;
         
+        /**
+        * Key Control: Setup keys with the control function
+        * move the component up/down/left/right if the key is pressed
+        */
+        this.keyControl = function() {
+            // Check if it key control is allowed
+            if (!this.disableControls /*&& !this.finishMove*/) {
+                // Listen to keys: "Else if" to limit movement in only one direction at the same time (no diagonal moving)
+                if (myGameArea.keys) {
+                    if (myGameArea.keys[this.up])
+                        this.speedY = -this.speed;
+                    else if (myGameArea.keys[this.down])
+                        this.speedY = this.speed;
+                    else if (myGameArea.keys[this.left])
+                        this.speedX = -this.speed;
+                    else if (myGameArea.keys[this.right])
+                        this.speedX = this.speed;
+                }
+            }
+        }
+        
         return this;
     }
     
@@ -182,6 +204,10 @@ function component(x, y) {
         this.moveLeft = moveLeft;
         this.moveRight = moveRight;
         this.direction = DIR_S; // Default Direction
+        
+        this.animationDelay = 0;
+        this.animationIndexCounter = 0;
+        this.animationCurrentFrame = 0;
         
         return this;
     }
@@ -339,8 +365,6 @@ function component(x, y) {
     this.interactive = function() {
         // The front of the component
         this.front = new component().rectangle(16, 16, "black", false, "white", true).collision(0, 0, 16, 16);
-        // It's interacting state
-        this.interacting = false;
         
         this.updateFront = function() {
             if (this.direction == DIR_N) {
@@ -359,6 +383,44 @@ function component(x, y) {
                 this.front.x = this.x + this.offset_x + 16;
                 this.front.y = this.y + this.offset_y;
             }
+        }
+        
+        // Interaction available if this front is overlapping with another object
+        // Press enter to start
+        this.updateInteraction = function(otherobj) {
+            if (this.front.collisionOverlap(otherobj)) {
+                // You can set an event if an interaction is available (i.e. maybe a little sparkling animation for hidden things or highlight for dialog [maybe also show what kind of event?])
+                // if (otherobj.onInRangeForInteraction != undefined) otherobj.onInRangeForInteraction();
+                
+                if (myGameArea.keys) {
+                    // Enter key down
+                    if (myGameArea.keys[KEY_ENTER]) {
+                        if (otherobj.enterEvent) {
+                            if (otherobj.faceOnInteraction) this.turntoface(otherobj);
+                            if (otherobj.onEnterEvent != undefined) otherobj.onEnterEvent();
+                            otherobj.enterEvent = false;
+                        }
+                    }
+                    // Enter key up: Enable enter event
+                    else otherobj.enterEvent = true;
+                }
+            }
+            else otherobj.enterEvent = false;
+        }
+        
+        /**
+        * Turn other object if interaction
+        * If you talk to a other person you expect them to turn to face you
+        */
+        this.turntoface = function(otherobj) {
+            // Stop running animation if Enter is pressed while moving
+            this.updateAnimation();
+            // Turn otherobj to face this
+            if (this.direction == DIR_N) otherobj.direction = DIR_S;
+            if (this.direction == DIR_S) otherobj.direction = DIR_N;
+            if (this.direction == DIR_E) otherobj.direction = DIR_W;
+            if (this.direction == DIR_W) otherobj.direction = DIR_E;
+            otherobj.updateAnimation(); 
         }
         
         return this;
@@ -381,8 +443,7 @@ function component(x, y) {
             
             if (this.click)
                 if (this.clickEvent) {
-                    if (this.onClickEvent != undefined)
-                        this.onClickEvent();
+                    if (this.onClickEvent != undefined) this.onClickEvent();
                     this.clickEvent = false;
                 }
         }
@@ -431,26 +492,30 @@ function component(x, y) {
     
     
     /**
-    * Update the components speedX/Y value based on the control-input
+    * Update the components movement (based on speedX/Y values)
+    * Movement can change through user control, movement events (and TODO: moveable interaction)
     */
-    this.updateControl = function() {
-        // A component is moved by setting it's speedX/Y and adding it to it's x/y position after checking for collisions
-        this.keyControl();
+    this.updateMovement = function() {
+        // If the component has a key control
+        if (this.keyControl != undefined) this.keyControl();
         
-        // If the component has an onClick Event this will check if it is clicked
+        // If the component has an movement event it will be called here
+        if (this.movementEvent != undefined) this.movementEvent();
+        
+        // If the component has an onClick event this will check if it is clicked
         if (this.onClickEvent != undefined) this.updateClick();
         
-        // After the speedX/Y is set the direction the component is facing can be updated
+        // The direction the component is facing can be updated after the speedX/Y is set
         if (this.direction != undefined) this.updateDirection();
         
-        // Checks if there is a collision with the map
+        // Checks if there is a collision with the map and adjust movement if needed
         this.mapCollsion();
         
         return this;
     }
     
     /**
-    * Update the components position
+    * Update the components position after all collision checks are done
     */
     this.updatePosition = function() {
         // Sets Animations if defined based on moving and direction
@@ -475,6 +540,14 @@ function component(x, y) {
         return this;
     }
     
+    /*
+    this.updateEvent = function() {
+        // If the component has a repeating Event it will be called here: it has to be defined extra
+        if (this.repeatingEvent != undefined) this.repeatingEvent();
+        // Character stands infront of the component and presses enter
+        if (this.interactionEvent != undefined) this.interactionEvent();
+    }*/
+    
     /**
     * Render component
     * Draw it on the canvas
@@ -489,8 +562,11 @@ function component(x, y) {
         
         // Sprite
         else if (this.type == "sprite") {
+            // Extra drawings for debugging
             if (debug) {
+                // Draw Standing tiles
                 if (this.rects != undefined) this.showStandingOnTiles();
+                // Draw Front
                 if (this.front != undefined) this.front.draw(myGameArea.context);
                 // Draw Collision Box
                 ctx.strokeStyle = "black";
@@ -510,48 +586,7 @@ function component(x, y) {
         }
         
         return this;
-    }
-    
-    /**
-    * Key Control: Setup keys with the control function
-    * move the component up/down/left/right if the key is pressed
-    */
-    this.keyControl = function() {
-        // Check if it key control is allowed
-        if (!this.disableControls /*&& !this.finishMove*/) {
-            // Listen to keys: "Else if" to limit movement in only one direction at the same time (no diagonal moving)
-            if (myGameArea.keys) {
-                if (myGameArea.keys[this.up])
-                    this.speedY = -this.speed;
-                else if (myGameArea.keys[this.down])
-                    this.speedY = this.speed;
-                else if (myGameArea.keys[this.left])
-                    this.speedX = -this.speed;
-                else if (myGameArea.keys[this.right])
-                    this.speedX = this.speed;
-            }
-        }
-    }
-    
-    /**
-    * Key Events
-    * Interaction ??? Extra class might be better
-    */
-    this.keyEvent = function() {
-        // Key Events for moving the component
-        if (chatSequence) {
-            if (myGameArea.keys && this.interacting) {
-                if (myGameArea.keys[this.up])
-                    currentDialog.selected = 0
-                else if (myGameArea.keys[this.down])
-                    currentDialog.selected = 1;
-                else if (myGameArea.keys[this.left])
-                    currentDialog.selected = 2;
-                else if (myGameArea.keys[this.right])
-                    currentDialog.selected = 3;
-            }
-        }
-    }    
+    }   
     
     /**
     * Always stop on a whole tile

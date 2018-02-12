@@ -1,15 +1,19 @@
-var chatSequence = false;
+var gameSequence = false;
 var currentDialog;
 
-function Dialog(text, img, choices) {
+/**
+* 
+* Dialog types: normal text, interactive text [choices]
+*/
+function dialog(text, img, choices) {
      
     this.chatCounter = 0;
-    this.choices = choices
+    this.choices = choices;
     this.selected = 0;
     this.text = text;
     
     this.started = false;
-    this.next = false;
+    this.enterEvent = false;
     
     this.setDialog = function(text, img, choices) {
         this.text = text;
@@ -25,8 +29,9 @@ function Dialog(text, img, choices) {
     this.event = function() {}
     
     this.update = function() {
+        this.enter();
         if (this.chatCounter >= this.text.length) {
-            chatSequence = false;
+            gameSequence = false;
             this.started = false;
             this.chatCounter = 0;
         }
@@ -41,9 +46,9 @@ function Dialog(text, img, choices) {
             ctx.font = '30px serif';
             ctx.fillStyle = 'white';
             if (this.text[this.chatCounter]=="#choice") {
-                // Changing choices needs a delay if you dont use a different key to select each choice: i.E. only up/down
-                if (this.selected < 0) this.selected = this.selected + this.choices.length;
-                else this.selected = this.selected % this.choices.length;
+                    
+                this.selectChoice();
+                
                 for (i=0; i < this.choices.length; i++) {
                     if (i == this.selected)
                         ctx.fillStyle = 'white';
@@ -60,6 +65,35 @@ function Dialog(text, img, choices) {
             }
             else
                 ctx.fillText(this.text[this.chatCounter], 50, 335);
+        }
+    }
+    
+    this.selectChoice = function() {
+        if (gameSequence) {
+            if (myGameArea.keys) {
+                if (myGameArea.keys[KEY_1] || myGameArea.keys[KEY_W]) currentDialog.selected = 0
+                else if (myGameArea.keys[KEY_2] || myGameArea.keys[KEY_S]) currentDialog.selected = 1;
+                else if (myGameArea.keys[KEY_3]) currentDialog.selected = 2;
+                else if (myGameArea.keys[KEY_4]) currentDialog.selected = 3;
+            }
+        }
+        
+        // Changing choices needs a delay or single press checker if you don't use a different key to select each choice: i.E. only up/down
+        if (this.selected < 0) this.selected = this.selected + this.choices.length;
+        else this.selected = this.selected % this.choices.length;
+    }
+    
+    this.enter = function() {
+        if (myGameArea.keys) {
+            // Enter key down
+            if (myGameArea.keys[KEY_ENTER]) {
+                if (this.enterEvent) {
+                    this.chatCounter++;
+                    this.enterEvent = false;
+                }
+            }
+            // Enter key up: Enable enter event
+            else this.enterEvent = true;
         }
     }
 }

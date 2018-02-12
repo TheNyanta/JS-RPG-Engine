@@ -24,7 +24,7 @@ var char2 = new component(204, 176)
 .collision(4,16,16,16);
 
 // Setup Cat
-var cat = new component(156, 160)
+var cat = new component(156, 100)
 .velocity(1)
 .sprite("Assets/Image/cat.png", 24, 32, 8, 12)
 .animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
@@ -53,8 +53,8 @@ audio1.volume = 0.2;
 catsound.volume = 0.2;
 
 // Dialog [Test] #
-var testdialog = new Dialog();
-var musicdialog = new Dialog();
+var testdialog = new dialog();
+var musicdialog = new dialog();
 musicdialog.setDialog(["This is jukebox!","Wanna here some music?", "#choice", "#entered"], null, ["Yes", "No"]);
 musicdialog.event = function(choice) {
     if (choice == 0)
@@ -62,13 +62,45 @@ musicdialog.event = function(choice) {
     if (choice == 1)
         audio1.pause();
 } 
-var catdialog = new Dialog();
+var catdialog = new dialog();
 catdialog.setDialog(["Meow!", "Want meow to meow?", "#choice", "#entered"], null, ["Yes", "No"]);
 catdialog.event = function(choice) {
     if (choice == 0)
         catsound.play();
     if (choice == 1) {}    
 }
+
+// ## Cat walk  ##
+cat.turn = false; // Add turn to cat for turning
+// You can use this.variable in the function because it will be called in the cat component
+cat.movementEvent = function() {
+    if (!gameSequence) {
+        if (this.turn) this.speedY = -this.speed;
+        else this.speedY = this.speed;
+        
+        if (this.y > 120) this.turn = true;
+        if (this.y < 60) this.turn = false;
+    }
+}
+
+char2.faceOnInteraction = true;
+char2.onEnterEvent = function() {
+    currentDialog = testdialog;
+    gameSequence = true;
+}
+
+cat.faceOnInteraction = true;
+cat.onEnterEvent = function() {
+    currentDialog = catdialog;
+    gameSequence = true;
+}
+
+jukebox.onEnterEvent = function() {
+    currentDialog = musicdialog;
+    gameSequence = true;
+}
+
+
 //###
 
 // Maps (TODO: Seperate files for maps???)
