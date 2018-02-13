@@ -107,7 +107,7 @@ function component(x, y, width, height) {
         */
         this.updateAnimation = function() {
             // Idle (Animation or Still)
-            if (this.speedX == 0 && this.speedY == 0 || gameSequence){
+            if (this.speedX == 0 && this.speedY == 0 || myGameArea.gameSequence){
                 if (this.direction == DIR_N) this.sequence = this.idleUp;
                 if (this.direction == DIR_S) this.sequence = this.idleDown;
                 if (this.direction == DIR_W) this.sequence = this.idleLeft;
@@ -458,6 +458,19 @@ function component(x, y, width, height) {
     }
     
     /**
+    * Tell this obj overlaps with another obj
+    */
+    this.rectangleOverlap = function(otherobj) {        
+        if ((this.y + this.offset_y + this.offset_height <= otherobj.y) ||
+            (this.y + this.offset_y >= otherobj.y + otherobj.height) ||
+            (this.x + this.offset_x + this.offset_width <= otherobj.x) ||
+            (this.x + this.offset_x >= otherobj.x + otherobj.width))
+            return false
+        
+        return true;
+    }
+    
+    /**
     * Add Interactions
     * Interactions are started if the component stands in front of another component
     * that has an event if for i.e. the "enter"-key is pressed (or it's clicked/touched).
@@ -466,19 +479,6 @@ function component(x, y, width, height) {
     this.interactive = function(enter) {
         // The front of the component
         this.front = new component().rectangle(16, 16, "black", false, "white", true).collision(0, 0, 16, 16);
-        
-        /**
-        * Tell if this front overlaps with another obj
-        */
-        this.front.rectangleOverlap = function(otherobj) {        
-            if ((this.y + this.offset_y + this.offset_height <= otherobj.y) ||
-                (this.y + this.offset_y >= otherobj.y + otherobj.height) ||
-                (this.x + this.offset_x + this.offset_width <= otherobj.x) ||
-                (this.x + this.offset_x >= otherobj.x + otherobj.width))
-                return false
-            
-            return true;
-        }
         
         // Update fronts position based on the direction of this component
         this.updateFront = function() {
@@ -503,10 +503,7 @@ function component(x, y, width, height) {
         // Interaction available if this front is overlapping with another object
         // Press enter to start
         this.updateInteraction = function(otherobj) {
-            if (this.front.rectangleOverlap(otherobj)) {
-                // You can set an event if an interaction is available (i.e. maybe a little sparkling animation for hidden things or highlight for dialog [maybe also show what kind of event?])
-                if (otherobj.inRangeEvent != undefined) otherobj.inRangeEvent();
-                
+            if (this.front.rectangleOverlap(otherobj)) {                
                 if (myGameArea.keys) {
                     // Enter key down
                     if (myGameArea.keys[KEY_ENTER]) {
@@ -521,6 +518,11 @@ function component(x, y, width, height) {
                 }
             }
             else otherobj.enterEvent = false;
+            
+            // onStepOn: i.E. map switch teleport
+            if (this.rectangleOverlap(otherobj)) {
+                if (otherobj.onStepEvent != undefined) otherobj.onStepEvent();
+            }
         }
         
         /**

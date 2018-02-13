@@ -162,6 +162,12 @@ function toggle(boolean) {
     return true;
 }
 
+function blackTransition() {
+    ctx = myGameArea.context;
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, maps[mapID].mapWidth * maps[mapID].tileWidth, maps[mapID].mapHeight * maps[mapID].tileHeight);
+}
+
 function extraGuiRect() {
     ctx = myGameArea.context;
     ctx.globalAlpha = 0.5;

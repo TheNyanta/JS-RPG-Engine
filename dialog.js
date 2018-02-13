@@ -1,4 +1,3 @@
-var gameSequence = false;
 var currentDialog;
 
 /**
@@ -40,7 +39,7 @@ function dialog(text, img, choices) {
         
         this.enter();
         if (this.chatCounter >= this.text.length) {
-            gameSequence = false;
+            myGameArea.gameSequence = false;
             this.started = false;
             this.chatCounter = 0;
             currentDialog = undefined;
@@ -85,7 +84,7 @@ function dialog(text, img, choices) {
     }
     
     this.selectChoice = function() {
-        if (gameSequence) {
+        if (myGameArea.gameSequence) {
             if (myGameArea.keys) {
                 if (myGameArea.keys[KEY_W] || myGameArea.keys[KEY_S]) {
                     if (this.keyPush) {

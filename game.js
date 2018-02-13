@@ -17,6 +17,10 @@ var myGameArea = {
         $(window).blur(function() {document.active = false;});
         
         this.frameNo = 0;
+        this.gameSequence = false;
+        
+        this.minWidth = 1600;
+        this.minHeight = 900;
         
         //this.canvas.style.cursor = "none"; //hide the original cursor
         this.context = this.canvas.getContext("2d");
@@ -31,14 +35,18 @@ var myGameArea = {
         this.foreground = document.createElement('canvas');
         this.cgx3 = this.foreground.getContext("2d");
         
-        this.panorama.width = myGameArea.canvas.width;
-        this.panorama.height = myGameArea.canvas.height;
-        
         // Initalize Maps
         for (i=0; i<maps.length; i++) {
             maps[i].init();
-            maps[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);         
+            maps[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);
+            this.minWidth = Math.min(this.minWidth, maps[i].mapWidth * maps[i].tileWidth);
+            this.minHeight = Math.min(this.minHeight, maps[i].mapHeight * maps[i].tileHeight);
         }
+        
+        // Smallest map
+        this.canvas.width = this.minWidth;
+        this.canvas.height = this.minHeight;
+        
         // Draw the first or current map onto the cached canvas'
         maps[mapID].drawCache();
         
@@ -46,9 +54,9 @@ var myGameArea = {
         var myGameButtons =
             '<br>' +
             '<button onclick="enterFullscreen()">Fullscreen</button>' +
-            '<button onclick="{character.x = 100; character.y = 150;}">Unstuck</button>' +
-            '<button onclick="debug=toggle(debug)", unselectable="on">Debug On/Off</button>' +
-            '<button onclick="showExtra=toggle(showExtra)">Show InfoGui On/Off</button>' +
+            '<button onclick="{character.x = 120; character.y = 150;}">Unstuck</button>' +
+            '<button onclick="debug=toggle(debug)", unselectable="on">Debug-Info On/Off</button>' +
+            '<button onclick="showExtra=toggle(showExtra)">GUI-Info On/Off</button>' +
             '<br>' +
             '<button onclick="gameCamera.setTarget(character)">Camera on Character</button>' +
             '<button onclick="gameCamera.setTarget(cat)">Camera on Cat</button>' +
@@ -148,13 +156,13 @@ function everyinterval(n) {
 */
 function updateComponents() {
     
-    // In a gameSequence there will be no movement (i.e. activate gameSequence when opening a menu)
-    if (!gameSequence) {
+    // In a myGameArea.gameSequence there will be no movement (i.e. activate myGameArea.gameSequence when opening a menu)
+    if (!myGameArea.gameSequence) {
         // Character has to be able to interacted
         if (character.front != undefined)
             for (var i = 0; i < maps_objects[mapID].length; i++) character.updateInteraction(maps_objects[mapID][i]);
         // Update the movement of all components in maps_objects[mapID] (this includes mapCollision resolving)
-        for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateMovement();
+        if (!myGameArea.transition) for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateMovement();
         // Check each combination pair of components in maps_objects[mapID] for component-component-collision
         for (var i = 0; i < maps_objects[mapID].length; i++)
             for (var j = i + 1; j < maps_objects[mapID].length; j++)
@@ -202,15 +210,19 @@ function drawComponents() {
 */
 function updateGameArea() {
     myGameArea.frameNo += 1;
-    // Redraw map on map change
+    // Redraw caches' on map change + map switch transition
     if (mapID != currentMapID) {
         currentMapID = mapID;
         maps[mapID].drawCache();
+        setTimeout(function() { myGameArea.transition = false; }, 400);
     }
     
-    updateComponents();  
-    drawComponents();
+    updateComponents();
+    
+    // Draw transition
+    if (myGameArea.transition) blackTransition();
+    else drawComponents();
     
     // Draw dialog
-    if (gameSequence) currentDialog.update();
+    if (myGameArea.gameSequence && currentDialog != undefined) currentDialog.update();
 }

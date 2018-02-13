@@ -76,6 +76,9 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
     */
     this.drawCache = function() {
         // Adjust the cache canvas' size
+        myGameArea.panorama.width = myGameArea.canvas.width;
+        myGameArea.panorama.height = myGameArea.canvas.height;
+        
         myGameArea.background.width = this.mapWidth * this.tileWidth;
         myGameArea.background.height = this.mapHeight * this.tileHeight;
     
