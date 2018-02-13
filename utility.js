@@ -162,6 +162,21 @@ function toggle(boolean) {
     return true;
 }
 
+function extraGuiRect() {
+    ctx = myGameArea.context;
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "cyan";
+    ctx.fillRect(0,0,120,90);
+    ctx.globalAlpha = 1.0;
+}
+
+function showTime() {
+    ctx = myGameArea.context;
+    ctx.font =  "bold 20px Serif";
+    ctx.fillStyle = "black";
+    ctx.fillText("Timer : " + Math.round(time/1000), 5, 20);
+}
+
 // Init FPS and time
 var start,before,now,time,fps;
 start=Date.now();
@@ -178,20 +193,14 @@ function updateFPS() {
 
 function showFPS() {
     ctx = myGameArea.context;
-    ctx.font =  "bold 20px red";
+    ctx.font =  "bold 20px Serif";
     ctx.fillStyle = "black";
-    ctx.fillText("FPS : " + fps, 470, 40);
+    ctx.fillText("FPS : " + fps, 5, 40);
 }
 
 function showPosition(target) {
     ctx = myGameArea.context;
     ctx.fillStyle = "black";
-    ctx.fillText("x:" + (target.x + target.offset_x) + ", y:" + (target.y + target.offset_y), 5, 20);
-    ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x)/16) + ", " + Math.floor((target.y + target.offset_y)/16) + "]", 5, 40);
-}
-
-function showTime() {
-    ctx = myGameArea.context;
-    ctx.fillStyle = "black";
-    ctx.fillText("Timer : " + Math.round(time/1000), 440, 20);
+    ctx.fillText("x:" + (target.x + target.offset_x) + ", y:" + (target.y + target.offset_y), 5, 60);
+    ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x)/16) + ", " + Math.floor((target.y + target.offset_y)/16) + "]", 5, 80);
 }

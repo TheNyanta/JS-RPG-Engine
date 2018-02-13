@@ -22,5 +22,11 @@ function camera(x, y) {
             this.y = 0;
         if (this.y > maps[mapID].mapHeight * maps[mapID].tileHeight-myGameArea.canvas.height)
             this.y = maps[mapID].mapHeight * maps[mapID].tileHeight-myGameArea.canvas.height;
+        // Camera 0 if map smaller than canvas
+        if (maps[mapID].mapWidth * maps[mapID].tileWidth-myGameArea.canvas.width < 0)
+            this.x = 0;
+        if (maps[mapID].mapHeight * maps[mapID].tileHeight-myGameArea.canvas.height < 0)
+            this.y = 0;
+        
     }
 }

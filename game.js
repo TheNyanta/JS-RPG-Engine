@@ -45,14 +45,14 @@ var myGameArea = {
         // Add buttons
         var myGameButtons =
             '<br>' +
-            '<button onclick="enterFullscreen()" unselectable="on">Fullscreen</button>' +
-            '<button onclick="EnableScrollbar()" unselectable="on">Scrollbar On</button>' +
-            '<button onclick="DisableScrollbar()" unselectable="on">Scrollbar Off</button>' +
+            '<button onclick="enterFullscreen()">Fullscreen</button>' +
+            '<button onclick="{character.x = 100; character.y = 150;}">Unstuck</button>' +
             '<button onclick="debug=toggle(debug)", unselectable="on">Debug On/Off</button>' +
+            '<button onclick="showExtra=toggle(showExtra)">Show InfoGui On/Off</button>' +
             '<br>' +
             '<button onclick="gameCamera.setTarget(character)">Camera on Character</button>' +
             '<button onclick="gameCamera.setTarget(cat)">Camera on Cat</button>' +
-            '<button onclick="gameCamera.setTarget(char2)">Camera on Girl</button>' +
+            '<button onclick="gameCamera.setTarget(girl)">Camera on Girl</button>' +
             '<br>' +
             '<a>Talk to the girl or the cat by pressing enter in front of them.</a>';
                 
@@ -150,7 +150,7 @@ function updateComponents() {
     
     // In a gameSequence there will be no movement (i.e. activate gameSequence when opening a menu)
     if (!gameSequence) {
-        // Character has to be able to interacted:
+        // Character has to be able to interacted
         if (character.front != undefined)
             for (var i = 0; i < maps_objects[mapID].length; i++) character.updateInteraction(maps_objects[mapID][i]);
         // Update the movement of all components in maps_objects[mapID] (this includes mapCollision resolving)
@@ -158,9 +158,10 @@ function updateComponents() {
         // Check each combination pair of components in maps_objects[mapID] for component-component-collision
         for (var i = 0; i < maps_objects[mapID].length; i++)
             for (var j = i + 1; j < maps_objects[mapID].length; j++)
-                maps_objects[mapID][i].componentCollision(maps_objects[mapID][j]);
-        // Update the position of all components in maps_objects[mapID]
-        for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updatePosition();
+                if (maps_objects[mapID][i].componentCollision != undefined)
+                    maps_objects[mapID][i].componentCollision(maps_objects[mapID][j]);
+        // Update the position of all "moveable" components in maps_objects[mapID]
+        for (var i = 0; i < maps_objects[mapID].length; i++) if (maps_objects[mapID][i].speed != undefined) maps_objects[mapID][i].updatePosition();
         
     }
     
@@ -186,11 +187,13 @@ function drawComponents() {
     maps[mapID].drawForeground();
     
     // Extras
-    updateFPS();
-    showFPS();
-    
-    showTime();
-    showPosition(character);
+    if (showExtra) {
+        extraGuiRect();
+        showTime();
+        updateFPS();
+        showFPS();
+        showPosition(character);
+    }
 }
 
 /**
@@ -199,44 +202,15 @@ function drawComponents() {
 */
 function updateGameArea() {
     myGameArea.frameNo += 1;
-    
-    dialogTesting();
+    // Redraw map on map change
+    if (mapID != currentMapID) {
+        currentMapID = mapID;
+        maps[mapID].drawCache();
+    }
     
     updateComponents();  
     drawComponents();
     
     // Draw dialog
     if (gameSequence) currentDialog.update();
-    
-}
-
-// ####################################
-// ## HARDCODE FUNCTIONS FOR TESTING ##
-// ####################################
-
-
-function dialogTesting() {
-    
-    // Changing dialog text based on mapID
-    
-    if (mapID==0) {
-        testdialog.setDialog(["Hello!","Do you want to visit the snow map?", "#choice", "#entered"], null, ["Yes", "No"]);
-        testdialog.event = function(choice) {
-            if (choice == 0) {
-                mapID = 1;
-                // Redraw Cache on map switch!
-                maps[mapID].drawCache();
-            }
-        }       
-    }
-    if (mapID==1) {
-        testdialog.setDialog(["Hi Again!","Do you want to visit the grass map?", "#choice", "#entered"], null, ["Yes", "No"]);
-        testdialog.event = function(choice) {
-            if (choice == 0) {
-                mapID = 0;
-                // Redraw Cache on map switch!s
-                maps[mapID].drawCache();
-            }
-        }
-    }
 }

@@ -4,11 +4,15 @@
 * @param x-position
 * @param y-position
 */
-function component(x, y) {
+function component(x, y, width, height) {
     // Standard Properties of any component
     this.x = x;
     this.y = y;
     
+    if (width != undefined && height != undefined) {
+        this.width = width;
+        this.height = height;
+    }
     //this.lastx = x;
     //this.lasty = y;
     
@@ -191,10 +195,14 @@ function component(x, y) {
     
     /**
     * add animations
-    * 
+    * TODO: clean-up, add special onetime animations (i.e. open door, box, ...)
     */
     this.animation = function(animationTime, idleUp, idleDown, idleLeft, idleRight, moveUp, moveDown, moveLeft, moveRight) {
         this.animationTime = animationTime;
+        this.animationDelay = 0;
+        this.animationIndexCounter = 0;
+        this.animationCurrentFrame = 0;
+        
         this.idleUp = idleUp;
         this.idleDown = idleDown;
         this.idleLeft = idleLeft;
@@ -204,10 +212,6 @@ function component(x, y) {
         this.moveLeft = moveLeft;
         this.moveRight = moveRight;
         this.direction = DIR_S; // Default Direction
-        
-        this.animationDelay = 0;
-        this.animationIndexCounter = 0;
-        this.animationCurrentFrame = 0;
         
         return this;
     }
@@ -259,9 +263,10 @@ function component(x, y) {
         
         /**
         * Calculates the new position and checks if it's walkable by using the maps collision layer
-        * Only for width/height=16: => with tile-height/width=16 only max 4 tiles to stand on
         * "may TODO": Adept for all sizes
         */
+        /*
+        // 16x16 tiles
         this.isMapWalkable = function() {
             if (!this.collidable) return true;
             
@@ -297,6 +302,65 @@ function component(x, y) {
           
             // Use collision layer of the map and check if all 4 tiles are walkable (=true)
             return (maps[mapID].layerC[xy2i(x1,y1,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x1,y2,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x2,y1,maps[mapID].mapWidth)] && maps[mapID].layerC[xy2i(x2,y2,maps[mapID].mapWidth)]);
+        }
+        */
+        // 8x8 tiles
+        this.isMapWalkable = function() {
+            if (!this.collidable) return true;
+        
+            // Converts the cartesian to grid coordiantes
+            var x1 = Math.floor((this.x+this.offset_x+this.speedX)/8);
+            var y1 = Math.floor((this.y+this.offset_y+this.speedY)/8);
+            var x2 = x1+1;
+            var y2 = y1+1;
+            var x3 = Math.floor((this.x+this.offset_x+this.offset_width+this.speedX)/8);
+            var y3 = Math.floor((this.y+this.offset_y+this.offset_height+this.speedY)/8);
+        
+            // Check if standing exactly on a tile-axis; tolarance=0.1
+            if (Math.abs(x3-(this.x+this.offset_x+this.offset_width+this.speedX)/8) < 0.1) x3 = x2;
+            if (Math.abs(y3-(this.y+this.offset_y+this.offset_height+this.speedY)/8) < 0.1) y3 = y2;
+        
+            // Debugging Map Collision: Shows on which tiles the object is standing and map collisions
+            if (debug) {
+                this.rects = [];
+                for (i = 0; i < 9; i++) this.rects[i] = new component().rectangle(8, 8, "black", false, "blue", true);
+        
+                this.rects[0].x = x1*8; this.rects[0].y = y1*8;
+                this.rects[1].x = x1*8; this.rects[1].y = y2*8;
+                this.rects[2].x = x1*8; this.rects[2].y = y3*8;
+                this.rects[3].x = x2*8; this.rects[3].y = y1*8;
+                this.rects[4].x = x2*8; this.rects[4].y = y2*8;
+                this.rects[5].x = x2*8; this.rects[5].y = y3*8;
+                this.rects[6].x = x3*8; this.rects[6].y = y1*8;
+                this.rects[7].x = x3*8; this.rects[7].y = y2*8;
+                this.rects[8].x = x3*8; this.rects[8].y = y3*8;
+            
+            
+                if (maps[mapID].layerC[xy2i(x1,y1,maps[mapID].mapWidth)]) this.rects[0].outlineColor = "blue"; else this.rects[0].outlineColor = "red";
+                if (maps[mapID].layerC[xy2i(x1,y2,maps[mapID].mapWidth)]) this.rects[1].outlineColor = "blue"; else this.rects[1].outlineColor = "red";
+                if (maps[mapID].layerC[xy2i(x1,y3,maps[mapID].mapWidth)]) this.rects[2].outlineColor = "blue"; else this.rects[2].outlineColor = "red";
+                if (maps[mapID].layerC[xy2i(x2,y1,maps[mapID].mapWidth)]) this.rects[3].outlineColor = "blue"; else this.rects[3].outlineColor = "red";
+                if (maps[mapID].layerC[xy2i(x2,y2,maps[mapID].mapWidth)]) this.rects[4].outlineColor = "blue"; else this.rects[4].outlineColor = "red";
+                if (maps[mapID].layerC[xy2i(x2,y3,maps[mapID].mapWidth)]) this.rects[5].outlineColor = "blue"; else this.rects[5].outlineColor = "red";
+                if (maps[mapID].layerC[xy2i(x3,y1,maps[mapID].mapWidth)]) this.rects[6].outlineColor = "blue"; else this.rects[6].outlineColor = "red";
+                if (maps[mapID].layerC[xy2i(x3,y2,maps[mapID].mapWidth)]) this.rects[7].outlineColor = "blue"; else this.rects[7].outlineColor = "red";
+                if (maps[mapID].layerC[xy2i(x3,y3,maps[mapID].mapWidth)]) this.rects[8].outlineColor = "blue"; else this.rects[8].outlineColor = "red";
+            }
+        
+            // Check map borders
+            if (x1 < 0 || y1 < 0 || x2 > maps[mapID].mapWidth - 1 || y2 > maps[mapID].mapHeight - 1)
+                return false;
+          
+            // Use collision layer of the map and check if all 4 tiles are walkable (=true)
+            return (maps[mapID].layerC[xy2i(x1,y1,maps[mapID].mapWidth)] &&
+                    maps[mapID].layerC[xy2i(x1,y2,maps[mapID].mapWidth)] &&
+                    maps[mapID].layerC[xy2i(x1,y3,maps[mapID].mapWidth)] &&
+                    maps[mapID].layerC[xy2i(x2,y1,maps[mapID].mapWidth)] &&
+                    maps[mapID].layerC[xy2i(x2,y2,maps[mapID].mapWidth)] &&
+                    maps[mapID].layerC[xy2i(x2,y3,maps[mapID].mapWidth)] &&
+                    maps[mapID].layerC[xy2i(x3,y1,maps[mapID].mapWidth)] &&
+                    maps[mapID].layerC[xy2i(x3,y2,maps[mapID].mapWidth)] &&
+                    maps[mapID].layerC[xy2i(x3,y3,maps[mapID].mapWidth)]);
         }
     
         /**
@@ -397,11 +461,26 @@ function component(x, y) {
     * Add Interactions
     * Interactions are started if the component stands in front of another component
     * that has an event if for i.e. the "enter"-key is pressed (or it's clicked/touched).
+    * @param Enable enter interaction
     */
-    this.interactive = function() {
+    this.interactive = function(enter) {
         // The front of the component
         this.front = new component().rectangle(16, 16, "black", false, "white", true).collision(0, 0, 16, 16);
         
+        /**
+        * Tell if this front overlaps with another obj
+        */
+        this.front.rectangleOverlap = function(otherobj) {        
+            if ((this.y + this.offset_y + this.offset_height <= otherobj.y) ||
+                (this.y + this.offset_y >= otherobj.y + otherobj.height) ||
+                (this.x + this.offset_x + this.offset_width <= otherobj.x) ||
+                (this.x + this.offset_x >= otherobj.x + otherobj.width))
+                return false
+            
+            return true;
+        }
+        
+        // Update fronts position based on the direction of this component
         this.updateFront = function() {
             if (this.direction == DIR_N) {
                 this.front.x = this.x + this.offset_x;
@@ -424,9 +503,9 @@ function component(x, y) {
         // Interaction available if this front is overlapping with another object
         // Press enter to start
         this.updateInteraction = function(otherobj) {
-            if (this.front.collisionOverlap(otherobj)) {
+            if (this.front.rectangleOverlap(otherobj)) {
                 // You can set an event if an interaction is available (i.e. maybe a little sparkling animation for hidden things or highlight for dialog [maybe also show what kind of event?])
-                // if (otherobj.onInRangeForInteraction != undefined) otherobj.onInRangeForInteraction();
+                if (otherobj.inRangeEvent != undefined) otherobj.inRangeEvent();
                 
                 if (myGameArea.keys) {
                     // Enter key down
@@ -545,7 +624,7 @@ function component(x, y) {
         if (this.direction != undefined) this.updateDirection();
         
         // Checks if there is a collision with the map and adjust movement if needed
-        this.mapCollision();
+        if (this.mapCollision != undefined) this.mapCollision();
         
         return this;
     }

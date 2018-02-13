@@ -14,6 +14,10 @@ function dialog(text, img, choices) {
     
     this.started = false;
     this.enterPush = false;
+    this.keyPush = false;
+    
+    this.y = 0;
+    this.width;
     
     this.setDialog = function(text, img, choices) {
         this.text = text;
@@ -29,19 +33,27 @@ function dialog(text, img, choices) {
     this.event = function() {}
     
     this.update = function() {
+        
+        // TODO: Get a good position for the dialog on every map
+        this.width = Math.min(maps[mapID].mapWidth * maps[mapID].tileWidth, myGameArea.canvas.width);
+        this.y = Math.min(maps[mapID].mapHeight * maps[mapID].tileHeight, myGameArea.canvas.height) - 50; //40 => two lines á 30px serif
+        
         this.enter();
         if (this.chatCounter >= this.text.length) {
             gameSequence = false;
             this.started = false;
             this.chatCounter = 0;
+            currentDialog = undefined;
         }
-        else {             
+        else {
             ctx = myGameArea.context;
             // Box
+            ctx.globalAlpha = 0.8;
             ctx.fillStyle = "black";
             ctx.strokeStyle = "black";
-            ctx.fillRect(0, 300, 560, 50);
-            ctx.strokeRect(0, 300, 560, 50);
+            ctx.fillRect(0, this.y, this.width-1, 50);
+            ctx.strokeRect(0, this.y, this.width-1, 50);
+            ctx.globalAlpha = 1.0;
             // Text
             ctx.font = '30px serif';
             ctx.fillStyle = 'white';
@@ -53,7 +65,11 @@ function dialog(text, img, choices) {
                     if (i == this.selected)
                         ctx.fillStyle = 'white';
                     else ctx.fillStyle = 'gray';
-                    ctx.fillText(this.choices[i], 50, 325 + i*20);
+                    if (i == 0) ctx.fillText(this.choices[i], 50, this.y + 22);
+                    if (i == 1) ctx.fillText(this.choices[i], 50, this.y + 44);
+                    if (i == 2) ctx.fillText(this.choices[i], 200, this.y + 22);
+                    if (i == 3) ctx.fillText(this.choices[i], 200, this.y + 44);
+                        
                 }
             }
             else if (this.text[this.chatCounter]=="#entered") {
@@ -64,17 +80,21 @@ function dialog(text, img, choices) {
                 this.chatCounter++;
             }
             else
-                ctx.fillText(this.text[this.chatCounter], 50, 335);
+                ctx.fillText(this.text[this.chatCounter], 50, this.y + 22);
         }
     }
     
     this.selectChoice = function() {
         if (gameSequence) {
             if (myGameArea.keys) {
-                if (myGameArea.keys[KEY_1] || myGameArea.keys[KEY_W]) currentDialog.selected = 0
-                else if (myGameArea.keys[KEY_2] || myGameArea.keys[KEY_S]) currentDialog.selected = 1;
-                else if (myGameArea.keys[KEY_3]) currentDialog.selected = 2;
-                else if (myGameArea.keys[KEY_4]) currentDialog.selected = 3;
+                if (myGameArea.keys[KEY_W] || myGameArea.keys[KEY_S]) {
+                    if (this.keyPush) {
+                        if (myGameArea.keys[KEY_W]) currentDialog.selected--;
+                        else if (myGameArea.keys[KEY_S]) currentDialog.selected++;
+                        this.keyPush = false;
+                    }
+                }
+                else this.keyPush = true;
             }
         }
         

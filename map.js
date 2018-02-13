@@ -31,20 +31,7 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
     * Initalizes Panorama, Background and Foreground
     * After changing a map call drawCache() to draw the map on the cached canvas
     */
-    this.init = function() {
-        myGameArea.background.width = this.mapWidth * this.tileWidth;
-        myGameArea.background.height = this.mapHeight * this.tileHeight;
-    
-        myGameArea.foreground.width = this.mapWidth * this.tileWidth;
-        myGameArea.foreground.height = this.mapHeight * this.tileHeight;
-        
-        // Panorama
-        if (this.image != undefined) {  
-            myGameArea.cgx1.drawImage(this.image, this.x, this.y, myGameArea.panorama.width, myGameArea.panorama.height);
-            // TODO: Moving background image, see https://www.w3schools.com/graphics/game_images.asp
-            //ctx.drawImage(this.image, this.x + myGameArea.canvas.width, this.y, myGameArea.canvas.width, myGameArea.canvas.height);
-        }
-        
+    this.init = function() {        
         // Create a components that represents each tile on the map
         var mapIndex = 0;
         var tile_w, tile_h;
@@ -88,8 +75,21 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
     * If the cached images need to be updated
     */
     this.drawCache = function() {
+        // Adjust the cache canvas' size
+        myGameArea.background.width = this.mapWidth * this.tileWidth;
+        myGameArea.background.height = this.mapHeight * this.tileHeight;
+    
+        myGameArea.foreground.width = this.mapWidth * this.tileWidth;
+        myGameArea.foreground.height = this.mapHeight * this.tileHeight;
+        
+        // Clear the canvas' ...
+        myGameArea.context.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
+        myGameArea.cgx1.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
         myGameArea.cgx2.clearRect(0, 0, myGameArea.background.width, myGameArea.background.height);
         myGameArea.cgx3.clearRect(0, 0, myGameArea.foreground.width, myGameArea.foreground.height);
+        
+        // ...  and repaint!
+        if (this.image != undefined) myGameArea.cgx1.drawImage(this.image, this.x, this.y, myGameArea.panorama.width, myGameArea.panorama.height);
         // Assume all layers have the same size!
         for (var i = 0; i < this.layers[0].length; i++) {
             this.layers[0][i].draw(myGameArea.cgx2);
