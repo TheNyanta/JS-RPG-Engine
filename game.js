@@ -79,49 +79,81 @@ var myGameArea = {
         || window.mozCancelAnimationFrame
         || function(requestID){clearTimeout(requestID)}; //fall back
         
-        // INITIALIZE USER INPUT       
+        // OnCanvas
+        this.onCanvas = function(x, y, canvas) {
+            if (x >= canvas.getBoundingClientRect().x &&
+                x <= canvas.getBoundingClientRect().x + canvas.width &&
+                y >= canvas.getBoundingClientRect().y &&
+                y <= canvas.getBoundingClientRect().y + canvas.height) return true;
+            return false;
+        }
+        
+        // INITIALIZE USER INPUT
+        // Keydown
         window.addEventListener('keydown', function (e) {
             myGameArea.keys = (myGameArea.keys || []);
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
         })
+        // Keyup
         window.addEventListener('keyup', function (e) {
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
         })
+        // Mouse down
         window.addEventListener('mousedown', function (e) {
             myGameArea.mousedown = true;
-            myGameArea.clickdownX = e.pageX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
-            myGameArea.clickdownY = e.pageY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
-            
-            if (myGameArea.clickdownX > 0 && 
-                myGameArea.clickdownY > 0 &&
-                myGameArea.clickdownX < myGameArea.canvas.width &&
-                myGameArea.clickdownY < myGameArea.canvas.height)
+            if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
+                myGameArea.clickdownX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
+                myGameArea.clickdownY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
                 myGameArea.clicked = true;
+            }
         })
+        // Mouse up
         window.addEventListener('mouseup', function (e) {
             myGameArea.mousedown = false;
-            myGameArea.clickupX = e.pageX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
-            myGameArea.clickupY = e.pageY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
+            if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
+                myGameArea.clickupX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
+                myGameArea.clickupY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
+            }
         })
+        // Mouse move
         window.addEventListener('mousemove', function (e) {
-            myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
-            myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
+            if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
+                myGameArea.x = Math.floor(e.clientX - myGameArea.canvas.getBoundingClientRect().x);
+                myGameArea.y = Math.floor(e.clientY - myGameArea.canvas.getBoundingClientRect().y);
+            }
+            else {
+                myGameArea.x = undefined;
+                myGameArea.y = undefined;
+            }
         })
+        // Touch start
         window.addEventListener('touchstart', function (e) {
             myGameArea.touchdown = true;
-            myGameArea.clickdownX = e.pageX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
-            myGameArea.clickdownY = e.pageY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
+            if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
+                myGameArea.clickdownX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
+                myGameArea.clickdownY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
+                myGameArea.clicked = true;
+            }
         })
+        // Touch end
         window.addEventListener('touchend', function (e) {
             myGameArea.touchdown = false;
-            myGameArea.clickupX = e.pageX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
-            myGameArea.clickupY = e.pageY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
+            if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
+                myGameArea.clickupX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
+                myGameArea.clickupY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
+            }
         })
-        window.addEventListener('touchmove', function (e) {
-            myGameArea.x = e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
-            myGameArea.y = e.touches[0].clientY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
+        // Touch move
+        window.addEventListener('touchmove', function (e) {            
+            if (myGameArea.onCanvas(e.touches[0].clientX, e.touches[0].clientY, myGameArea.canvas)) {
+                myGameArea.x = Math.floor(e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().x);
+                myGameArea.y = Math.floor(e.touches[0].clientY - myGameArea.tileset.getBoundingClientRect().y);
+            }
+            else {
+                myGameArea.x = undefined;
+                myGameArea.y = undefined;
+            }
         })
-        
     },
     
     start : function() {
