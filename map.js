@@ -1,3 +1,14 @@
+/**
+* Define a map
+* @param a background panorama
+* @param a spritesheet with the tiles for the map
+* @param the maps number of tiles in x direction
+* @param the maps number of tiles in y direction
+* @param the width of a single tile on the spritesheet
+* @param the height of a single tile on the spritesheet
+* @param the spritesheets number of tiles in x direction
+* @param the spritesheets number of tiles in y direction
+*/
 function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX, tilesY) {
     
     // Panorama Image
@@ -22,6 +33,10 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
     this.tileHeight = tileHeight;
     this.tilesX = tilesX;
     this.tilesY = tilesY;
+    
+    // Pixel width & height
+    this.width = this.mapWidth * this.tileWidth;
+    this.height = this.mapHeight * this.tileHeight;
     
     // Map Layers
     this.layers = [[],[],[]];
@@ -79,11 +94,11 @@ function map(image, tileset, mapWidth, mapHeight, tileWidth, tileHeight, tilesX,
         myGameArea.panorama.width = myGameArea.canvas.width;
         myGameArea.panorama.height = myGameArea.canvas.height;
         
-        myGameArea.background.width = this.mapWidth * this.tileWidth;
-        myGameArea.background.height = this.mapHeight * this.tileHeight;
+        myGameArea.background.width = this.width;
+        myGameArea.background.height = this.height;
     
-        myGameArea.foreground.width = this.mapWidth * this.tileWidth;
-        myGameArea.foreground.height = this.mapHeight * this.tileHeight;
+        myGameArea.foreground.width = this.width;
+        myGameArea.foreground.height = this.height;
         
         // Clear the canvas' ...
         myGameArea.context.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);

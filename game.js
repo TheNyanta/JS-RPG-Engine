@@ -129,9 +129,8 @@ var myGameArea = {
         // New gameLoop
         function gameLoop() {
             requestAnimationFrame(gameLoop);
-            if (document.active) {
+            if (document.active)
                 updateGameArea();
-            }
         }
         
         gameLoop();      
@@ -154,7 +153,7 @@ function everyinterval(n) {
 /**
 * Updates the current map with all it's components
 */
-function updateComponents() {
+function update() {
     
     // In a myGameArea.gameSequence there will be no movement (i.e. activate myGameArea.gameSequence when opening a menu)
     if (!myGameArea.gameSequence) {
@@ -182,9 +181,13 @@ function updateComponents() {
 }
 
 /**
-* Draws the current map with all it's components
+* Draws the canvas
+* First it draws the background
+* Second it draws the objects
+* Third it draws the foreground
+* Four it draws the gui
 */
-function drawComponents() {
+function draw() {
     maps[mapID].drawBackground();
     
     // Sorts the array after it's y value so that components with bigger y are drawn later
@@ -205,7 +208,7 @@ function drawComponents() {
 }
 
 /**
-* Update Canvas
+* Updates the canvas
 * This is the core function of the game
 */
 function updateGameArea() {
@@ -217,11 +220,11 @@ function updateGameArea() {
         setTimeout(function() { myGameArea.transition = false; }, 400);
     }
     
-    updateComponents();
+    update();
     
     // Draw transition
     if (myGameArea.transition) blackTransition();
-    else drawComponents();
+    else draw();
     
     // Draw dialog
     if (myGameArea.gameSequence && currentDialog != undefined) currentDialog.update();

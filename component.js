@@ -40,8 +40,8 @@ function component(x, y, width, height) {
     /**
     * sprite component
     * @param {file} sprite src
-    * @param width of on sprite on the spritesheet
-    * @param height of on sprite on the spritesheet
+    * @param width of a single sprite on the spritesheet
+    * @param height of a single sprite on the spritesheet
     * @param number of sprites horizontal
     * @param number of sprites vertical
     */
@@ -53,6 +53,8 @@ function component(x, y, width, height) {
         this.height = height;
         this.spritesX = spritesX;
         this.spritesY = spritesY;
+        // Default first sprite image
+        this.sequence = 0;
         
         // ######################
         // ## Sprite functions ##
@@ -63,64 +65,26 @@ function component(x, y, width, height) {
         * animated & still
         */
         this.drawSprite = function(ctx) {
-            if (this.sequence != undefined) {
-                // Animation: Moving / Idle
-                if (this.sequence.length != undefined) {
-                    if (this.animationDelay++ >= this.animationTime) {
-                        this.animationDelay = 0;
-                        this.animationIndexCounter++;
-                        if (this.animationIndexCounter >= this.sequence.length) {
-                            this.animationIndexCounter = 0;
-                        }
-                        this.animationCurrentFrame = this.sequence[this.animationIndexCounter];
-                    }
-                    var res = i2xy(this.animationCurrentFrame, Math.max(this.spritesX, this.spritesY));
-                    ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
+            // Animation: Moving / Idle
+            if (this.sequence.length != undefined) {
+                if (this.animationDelay++ >= this.animationTime) {
+                    this.animationDelay = 0;
+                    this.animationIndexCounter++;
+                    if (this.animationIndexCounter >= this.sequence.length) this.animationIndexCounter = 0;
+                    this.animationCurrentFrame = this.sequence[this.animationIndexCounter];
                 }
-                // No Animation: Just sprite image
-                else {
-                    var res = i2xy(this.sequence, Math.max(this.spritesX, this.spritesY));
-                    // For cached tiles
-                    if (this.static) ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x, this.y, this.width, this.height);
-                    // For moving objects
-                    else ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
-                }
+                var res = i2xy(this.animationCurrentFrame, Math.max(this.spritesX, this.spritesY));
+                ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
             }
-        }
-    
-        /**
-        * Update the facing direction based on the speed
-        * This is used for drawing the right animation sequence and
-        * to determinate the front of the component for interactions
-        * For 4-direction movement (for 8-direction add more cases)
-        */
-        this.updateDirection = function() {
-            if (this.speedY < 0) this.direction = DIR_N;
-            if (this.speedY > 0) this.direction = DIR_S;
-            if (this.speedX < 0) this.direction = DIR_W;
-            if (this.speedX > 0) this.direction = DIR_E;
-        }
-    
-        /**
-        * Updates the shown animation sequence based on the direction te component is facing
-        * For 4-direction movement (for 8-direction add more cases)
-        */
-        this.updateAnimation = function() {
-            // Idle (Animation or Still)
-            if (this.speedX == 0 && this.speedY == 0 || myGameArea.gameSequence){
-                if (this.direction == DIR_N) this.sequence = this.idleUp;
-                if (this.direction == DIR_S) this.sequence = this.idleDown;
-                if (this.direction == DIR_W) this.sequence = this.idleLeft;
-                if (this.direction == DIR_E) this.sequence = this.idleRight; 
-            }
-            // Moving
+            // No Animation: Just sprite image
             else {
-                if (this.direction == DIR_N) this.sequence = this.moveUp;
-                if (this.direction == DIR_S) this.sequence = this.moveDown;
-                if (this.direction == DIR_W) this.sequence = this.moveLeft;
-                if (this.direction == DIR_E) this.sequence = this.moveRight;
+                var res = i2xy(this.sequence, Math.max(this.spritesX, this.spritesY));
+                // For cached tiles
+                if (this.static) ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x, this.y, this.width, this.height);
+                // For moving objects
+                else ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
             }
-        }        
+        }       
         
         return this;
     }
@@ -153,6 +117,13 @@ function component(x, y, width, height) {
         this.speedX = 0;
         this.speedY = 0;
         this.speed = speed;
+        
+        this.moving = false;
+        this.isMoving = function() {
+            if (this.speedX == 0 && this.speedY == 0) this.moving = false;
+            else this.moving = true;
+        }
+        
         return this;
     }
     
@@ -197,21 +168,97 @@ function component(x, y, width, height) {
     * add animations
     * TODO: clean-up, add special onetime animations (i.e. open door, box, ...)
     */
-    this.animation = function(animationTime, idleUp, idleDown, idleLeft, idleRight, moveUp, moveDown, moveLeft, moveRight) {
-        this.animationTime = animationTime;
+    this.animation = function() {
+        this.animationTime = 0;
         this.animationDelay = 0;
         this.animationIndexCounter = 0;
         this.animationCurrentFrame = 0;
-        
-        this.idleUp = idleUp;
-        this.idleDown = idleDown;
-        this.idleLeft = idleLeft;
-        this.idleRight = idleRight;
-        this.moveUp = moveUp;
-        this.moveDown = moveDown;
-        this.moveLeft = moveLeft;
-        this.moveRight = moveRight;
         this.direction = DIR_S; // Default Direction
+        
+        this.idleAnimation = function(idleAnimationTime, idleUp, idleDown, idleLeft, idleRight) {
+            this.idleAnimationTime = idleAnimationTime;
+            
+            this.idleUp = idleUp;
+            this.idleDown = idleDown;
+            this.idleLeft = idleLeft;
+            this.idleRight = idleRight;            
+            
+            return this;
+        }
+        
+        this.moveAnimation = function(moveAnimationTime, moveUp, moveDown, moveLeft, moveRight) {
+            this.moveAnimationTime = moveAnimationTime;
+            
+            this.moveUp = moveUp;
+            this.moveDown = moveDown;
+            this.moveLeft = moveLeft;
+            this.moveRight = moveRight;
+            
+            return this;
+        }       
+        
+        this.specialAnimation = function(specialAnimationTime, special) {
+            this.specialAnimationTime = specialAnimationTime;
+            this.special = special;
+            this.specialOn = false;
+            this.specialTimer = new timer();
+            
+            this.startSpecial = function() {
+                this.specialOn = true;
+                this.animationTime = this.specialAnimationTime;
+                this.specialTimer.init(1000);
+            }
+            
+            return this;
+        }
+        
+        /**
+        * Update the facing direction based on the speed
+        * This is used for drawing the right animation sequence and
+        * to determinate the front of the component for interactions
+        * For 4-direction movement (for more than four directions add more cases)
+        */
+        this.updateDirection = function() {
+            if (this.speedY < 0) this.direction = DIR_N;
+            if (this.speedY > 0) this.direction = DIR_S;
+            if (this.speedX < 0) this.direction = DIR_W;
+            if (this.speedX > 0) this.direction = DIR_E;
+        }
+    
+        /**
+        * Updates the shown animation sequence based on the direction te component is facing
+        * For 4-direction movement (for more than four directions add more cases)
+        */
+        this.updateAnimation = function() {
+            this.sequence = 0; // Default
+            // Special animation
+            if (this.specialAnimationTime != undefined) {
+                if (this.specialTimer.check()) this.specialOn = false;
+            }
+            if (this.specialOn) {
+                this.sequence = this.special;
+            }
+            // Idle (Animation or Still)
+            else if (!this.moving || myGameArea.gameSequence){
+                if (this.idleAnimationTime != undefined) {
+                    this.animationTime = this.idleAnimationTime;
+                    if (this.direction == DIR_N) this.sequence = this.idleUp;
+                    if (this.direction == DIR_S) this.sequence = this.idleDown;
+                    if (this.direction == DIR_W) this.sequence = this.idleLeft;
+                    if (this.direction == DIR_E) this.sequence = this.idleRight; 
+                }
+            }
+            // Moving
+            else {
+                if (this.moveAnimationTime != undefined) {
+                    this.animationTime = this.moveAnimationTime;
+                    if (this.direction == DIR_N) this.sequence = this.moveUp;
+                    if (this.direction == DIR_S) this.sequence = this.moveDown;
+                    if (this.direction == DIR_W) this.sequence = this.moveLeft;
+                    if (this.direction == DIR_E) this.sequence = this.moveRight;
+                }
+            } 
+        }
         
         return this;
     }
@@ -382,6 +429,7 @@ function component(x, y, width, height) {
         /**
         * Prevent Collision with other components
         * Has to be called in the main loop for all combinations after the control updates of all components
+        * (TODO: Pushable components -> if (pushable && otherobj.noMapCollision) => push) 
         */
         this.componentCollision = function(otherobj) {
             if (!this.collidable || !otherobj.collidable) return false;
@@ -634,11 +682,7 @@ function component(x, y, width, height) {
     /**
     * Update the components position after all collision checks are done
     */
-    this.updatePosition = function() {
-        // Sets Animations if defined based on moving and direction
-        if (this.type == "sprite")
-            this.updateAnimation();
-        
+    this.updatePosition = function() {        
         // Update Position
         this.x += this.speedX;
         this.y += this.speedY;
@@ -646,6 +690,9 @@ function component(x, y, width, height) {
         // Update Front
         if (this.front != undefined)
             this.updateFront();
+        
+        // Check if moving
+        this.isMoving()
         
         // Reset Movement
         this.speedX = 0;
@@ -689,6 +736,10 @@ function component(x, y, width, height) {
                 ctx.strokeStyle = "black";
                 ctx.strokeRect(this.x + this.offset_x - gameCamera.x, this.y + this.offset_y - gameCamera.y, this.offset_width , this.offset_height);
             }
+            
+            // Sets Animations if defined (based on moving and direction)        
+            if (this.updateAnimation != undefined) this.updateAnimation();
+            
             // Draw Sprite
             this.drawSprite(ctx);                       
         }

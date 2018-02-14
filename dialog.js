@@ -34,8 +34,8 @@ function dialog(text, img, choices) {
     this.update = function() {
         
         // TODO: Get a good position for the dialog on every map
-        this.width = Math.min(maps[mapID].mapWidth * maps[mapID].tileWidth, myGameArea.canvas.width);
-        this.y = Math.min(maps[mapID].mapHeight * maps[mapID].tileHeight, myGameArea.canvas.height) - 50; //40 => two lines á 30px serif
+        this.width = Math.min(maps[mapID].width, myGameArea.canvas.width);
+        this.y = Math.min(maps[mapID].height, myGameArea.canvas.height) - 50; //40 => two lines á 30px serif
         
         this.enter();
         if (this.chatCounter >= this.text.length) {

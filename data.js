@@ -12,7 +12,7 @@ var character = new component(240, 280)
 .sprite("Assets/Image/character.png", 24, 32, 8, 12)
 .velocity(2)
 .control(KEY_W, KEY_S, KEY_A, KEY_D)
-.animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
+.animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
 .collision(4,16,16,16)
 .interactive();
 
@@ -21,7 +21,7 @@ var girl = new component(370, 210)
 .sprite("Assets/Image/girl.png", 24, 32, 8, 12)
 .velocity(2)
 .control(KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT)
-.animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
+.animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
 .collision(4,16,16,16);
 
 // ## Mountainforest
@@ -30,7 +30,7 @@ var girl = new component(370, 210)
 var cat = new component(160, 400)
 .velocity(1)
 .sprite("Assets/Image/cat.png", 24, 32, 8, 12)
-.animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
+.animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
 .collision(4, 16, 16, 16);
 
 // ## Snowforest
@@ -39,21 +39,20 @@ var cat = new component(160, 400)
 var dog = new component(100, 100)
 .velocity(1)
 .sprite("Assets/Image/animal.png", 24, 32, 8, 12)
-.animation(3, 1, 25, 37, 13, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
+.animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
 .collision(4, 16, 16, 16);
 
 // Setup Jukebox
 var jukebox = new component(260, 120)
 .sprite("Assets/Image/snow_jukebox.png", 24, 32, 8, 12)
 .collision(0, 16, 24, 16);
-jukebox.sequence = 0;
 
 // ## Castle front
 
 // Setup Castledoor
 var castledoor = new component(144, 62)
-.sprite("Assets/Image/castledoor_1.png", 47, 48, 1, 4);
-castledoor.sequence = 0;
+.sprite("Assets/Image/castledoor_1.png", 47, 48, 1, 4)
+.animation().specialAnimation(20, [0,1,2,3]);
 
 // Setup Stone
 var stone = new component(162, 188, 14, 10);
@@ -180,6 +179,7 @@ jukebox.onEnterEvent = function() {
 }
 
 castledoor.onEnterEvent = function() {
+    //castledoor.startSpecial();
     myGameArea.gameSequence = true;
     currentDialog = doordialog;
 }

@@ -85,16 +85,16 @@ function enterFullscreen() {
 
 // Size the canvas to the size of the map if it fits on the screen
 function resizeCanvas() {
-    if (document.body.clientWidth > maps[mapID].mapWidth * maps[mapID].tileWidth) {
+    if (document.body.clientWidth > maps[mapID].width) {
         // Screen bigger than map
-        myGameArea.canvas.width = maps[mapID].mapWidth * maps[mapID].tileWidth;
+        myGameArea.canvas.width = maps[mapID].width;
     }
     // Screen fits on map
     else myGameArea.canvas.width = myGameArea.canvas.width = document.body.clientWidth;
     
-    if (document.body.clientHeight > maps[mapID].mapHeight * maps[mapID].tileHeight) {
+    if (document.body.clientHeight > maps[mapID].height) {
         // Screen bigger than map
-        myGameArea.canvas.height = maps[mapID].mapHeight * maps[mapID].tileHeight;
+        myGameArea.canvas.height = maps[mapID].height;
     }
     // Screen fits on map
     else myGameArea.canvas.height = myGameArea.canvas.height = document.body.clientHeight;
@@ -132,31 +132,6 @@ function loadGameState(address) {
     }
 }
 
-/*
-// https://www.w3schools.com/html/html5_webstorage.asp better way
-function setCookie(cname,cvalue,exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires=" + d.toGMTString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
-
-function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}*/
-
 function toggle(boolean) {
     if (boolean) return false;
     return true;
@@ -165,7 +140,7 @@ function toggle(boolean) {
 function blackTransition() {
     ctx = myGameArea.context;
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, maps[mapID].mapWidth * maps[mapID].tileWidth, maps[mapID].mapHeight * maps[mapID].tileHeight);
+    ctx.fillRect(0, 0, maps[mapID].width, maps[mapID].height);
 }
 
 function extraGuiRect() {
@@ -189,6 +164,24 @@ start=Date.now();
 before=Date.now();
 fps=0;    
 
+/**
+* Timer
+*/
+function timer() {    
+    this.init = function(delta) {
+        this.start = Date.now();
+        this.delta = delta;
+    }
+    this.check = function() {
+        if (this.delta != undefined) {
+            if (Date.now() - this.start >= this.delta) {
+                this.delta = undefined;
+                return true;
+            }
+            else return false;
+        }
+    }  
+}
 
 function updateFPS() {
     now=Date.now();
