@@ -89,8 +89,8 @@ var myGameArea = {
         })
         window.addEventListener('mousedown', function (e) {
             myGameArea.mousedown = true;
-            myGameArea.clickdownX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.clickdownY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.clickdownX = e.pageX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
+            myGameArea.clickdownY = e.pageY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
             
             if (myGameArea.clickdownX > 0 && 
                 myGameArea.clickdownY > 0 &&
@@ -100,26 +100,26 @@ var myGameArea = {
         })
         window.addEventListener('mouseup', function (e) {
             myGameArea.mousedown = false;
-            myGameArea.clickupX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.clickupY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.clickupX = e.pageX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
+            myGameArea.clickupY = e.pageY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
         })
         window.addEventListener('mousemove', function (e) {
-            myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.x = e.pageX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
+            myGameArea.y = e.pageY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
         })
         window.addEventListener('touchstart', function (e) {
             myGameArea.touchdown = true;
-            myGameArea.clickdownX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.clickdownY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.clickdownX = e.pageX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
+            myGameArea.clickdownY = e.pageY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
         })
         window.addEventListener('touchend', function (e) {
             myGameArea.touchdown = false;
-            myGameArea.clickupX = e.pageX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.clickupY = e.pageY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.clickupX = e.pageX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
+            myGameArea.clickupY = e.pageY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
         })
         window.addEventListener('touchmove', function (e) {
-            myGameArea.x = e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().left;
-            myGameArea.y = e.touches[0].clientY - myGameArea.canvas.getBoundingClientRect().top;
+            myGameArea.x = e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().x + window.scrollX;
+            myGameArea.y = e.touches[0].clientY - myGameArea.canvas.getBoundingClientRect().y + window.scrollY;
         })
         
     },
