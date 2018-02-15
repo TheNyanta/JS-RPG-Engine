@@ -21,4 +21,4 @@ Implement Battle System (Realtime and/or Roundbased) + Stats (Health, Mana, Stre
 
 ## DEMO
 
-https://thenyanta.github.io/HTML-JavaScript-RPG-Engine/
+https://thenyanta.github.io/JS-RPG-Engine/
