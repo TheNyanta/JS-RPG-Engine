@@ -121,7 +121,9 @@ function map(image, tileset, mapWidth, mapHeight) {
         ctx.drawImage(myGameArea.foreground, -myGameArea.gameCamera.x, -myGameArea.gameCamera.y);
     }
     
-    // Map Editor functions
+    // ################
+    // ## Map Editor ##
+    // ################
     
     /**
     * print layers as string to console
@@ -164,12 +166,15 @@ function map(image, tileset, mapWidth, mapHeight) {
         console.log(output);        
     }
     
+    // Map editing: get tiles from tileset and place them on the map
     this.clickedTile = function(x, y) {
-        var x = Math.floor(x/this.tileset.spriteWidth);
-        var y = Math.floor(y/this.tileset.spriteHeight);
+        var x;
+        var y;
         
         // Click on Map
         if (activeCanvas == 0) {
+            x = Math.floor((x+myGameArea.gameCamera.x)/this.tileset.spriteWidth);
+            y = Math.floor((y+myGameArea.gameCamera.y)/this.tileset.spriteHeight);
             if (drawingOn) {
                 this.layers[currentLayer-1][xy2i(x, y, this.mapWidth)] = tiletype;
                 maps[mapID].drawCache();
@@ -179,6 +184,8 @@ function map(image, tileset, mapWidth, mapHeight) {
         }
         // Click on Tileset
         if (activeCanvas == 1) {
+            x = Math.floor(x/this.tileset.spriteWidth);
+            y = Math.floor(y/this.tileset.spriteHeight);
             tiletype = xy2i(x, y, this.tileset.spritesX) + 1;
             document.getElementById("SelectedTile").innerHTML = tiletype;
             document.getElementById("clickedX").innerHTML = x;
