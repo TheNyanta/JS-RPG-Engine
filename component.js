@@ -74,7 +74,7 @@ function component(x, y, width, height) {
                     this.animationCurrentFrame = this.sequence[this.animationIndexCounter];
                 }
                 var res = i2xy(this.animationCurrentFrame, Math.max(this.spritesX, this.spritesY));
-                ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
+                ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);
             }
             // No Animation: Just sprite image
             else {
@@ -82,7 +82,7 @@ function component(x, y, width, height) {
                 // For cached tiles
                 if (this.static) ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x, this.y, this.width, this.height);
                 // For moving objects
-                else ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
+                else ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);
             }
         }       
         
@@ -294,7 +294,7 @@ function component(x, y, width, height) {
             // X Collision
             this.speedY = 0;
             if (!this.isMapWalkable()) {
-                this.updateDirection();
+                if (this.direction != undefined) this.updateDirection();
                 this.speedX = 0;
                 this.xCollisionMap = true;
             } else this.xCollisionMap = false;
@@ -302,7 +302,7 @@ function component(x, y, width, height) {
             // Y Collision
             this.speedY = tmp;
             if (!this.isMapWalkable()) {
-                this.updateDirection();
+                if (this.direction != undefined) this.updateDirection();
                 this.speedY = 0;
                 this.yCollisionMap = true;
             } else this.yCollisionMap = false;
@@ -625,13 +625,13 @@ function component(x, y, width, height) {
         
             // The game canvas by default
             if (activeCanvas == undefined) {
-                var clickX = myGameArea.clickdownX + gameCamera.x;
-                var clickY = myGameArea.clickdownY + gameCamera.y;
+                var clickX = myGameArea.clickdownX + myGameArea.gameCamera.x;
+                var clickY = myGameArea.clickdownY + myGameArea.gameCamera.y;
             }                
-            // The game canvas can move so you have to add the gameCameras x and y  
+            // The game canvas can move so you have to add the myGameArea.gameCameras x and y  
             else if (activeCanvas == 0) {
-                var clickX = myGameArea.clickdownX + gameCamera.x;
-                var clickY = myGameArea.clickdownY + gameCamera.y;
+                var clickX = myGameArea.clickdownX + myGameArea.gameCamera.x;
+                var clickY = myGameArea.clickdownY + myGameArea.gameCamera.y;
             }
             // The tileset canvas will be always full drawn
             else if (activeCanvas == 1) {
@@ -721,7 +721,7 @@ function component(x, y, width, height) {
         
         // Image
         if (this.type == "image") {
-            ctx.drawImage(this.img, this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
+            ctx.drawImage(this.img, this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);
         }
         
         // Sprite
@@ -734,7 +734,7 @@ function component(x, y, width, height) {
                 if (this.front != undefined) this.front.draw(myGameArea.context);
                 // Draw Collision Box
                 ctx.strokeStyle = "black";
-                ctx.strokeRect(this.x + this.offset_x - gameCamera.x, this.y + this.offset_y - gameCamera.y, this.offset_width , this.offset_height);
+                ctx.strokeRect(this.x + this.offset_x - myGameArea.gameCamera.x, this.y + this.offset_y - myGameArea.gameCamera.y, this.offset_width , this.offset_height);
             }
             
             // Sets Animations if defined (based on moving and direction)        
@@ -748,9 +748,9 @@ function component(x, y, width, height) {
         else if (this.type == "rectangle"){
             ctx.fillStyle = this.fillColor;
             ctx.strokeStyle = this.outlineColor;
-            if (this.filled) ctx.fillRect(this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);
+            if (this.filled) ctx.fillRect(this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);
             else if (this.filled == undefined) ctx.fillRect(this.x, this.y, this.width, this.height);
-            if (this.outline) ctx.strokeRect(this.x-gameCamera.x, this.y-gameCamera.y, this.width, this.height);     
+            if (this.outline) ctx.strokeRect(this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);     
         }
         
         return this;

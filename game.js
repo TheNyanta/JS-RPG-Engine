@@ -35,12 +35,41 @@ var myGameArea = {
         this.foreground = document.createElement('canvas');
         this.cgx3 = this.foreground.getContext("2d");
         
+        // Camera
+        this.gameCamera = new function() {
+            this.x = 0;
+            this.y = 0;
+            
+            this.setTarget = function(target) {
+                this.target = target;
+            }
+            
+            this.update = function() {
+                // Follow target
+                if (this.target != undefined) {
+                    this.x = this.target.x - myGameArea.canvas.width/2;
+                    this.y = this.target.y - myGameArea.canvas.height/2;
+                }
+                
+                // Keep camera view inside the map
+                if (this.x < 0) this.x = 0;
+                if (this.x > maps[mapID].width - myGameArea.canvas.width) this.x = maps[mapID].width - myGameArea.canvas.width;
+                if (this.y < 0) this.y = 0;
+                if (this.y > maps[mapID].height - myGameArea.canvas.height) this.y = maps[mapID].height - myGameArea.canvas.height;
+                
+                // Camera (0,0) if map smaller than canvas
+                if (maps[mapID].width - myGameArea.canvas.width < 0) this.x = 0;
+                if (maps[mapID].height - myGameArea.canvas.height < 0) this.y = 0;              
+            }
+        }
+        // Init Camera Target
+        this.gameCamera.setTarget(cameraTarget);
+        
         // Initalize Maps
         for (i=0; i<maps.length; i++) {
-            maps[i].init();
             maps[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);
-            this.minWidth = Math.min(this.minWidth, maps[i].mapWidth * maps[i].tileWidth);
-            this.minHeight = Math.min(this.minHeight, maps[i].mapHeight * maps[i].tileHeight);
+            this.minWidth = Math.min(this.minWidth, maps[i].mapWidth * maps[i].tileset.spriteWidth);
+            this.minHeight = Math.min(this.minHeight, maps[i].mapHeight * maps[i].tileset.spriteHeight);
         }
         
         // Smallest map
@@ -58,9 +87,9 @@ var myGameArea = {
             '<button onclick="debug=toggle(debug)", unselectable="on">Debug-Info On/Off</button>' +
             '<button onclick="showExtra=toggle(showExtra)">GUI-Info On/Off</button>' +
             '<br>' +
-            '<button onclick="gameCamera.setTarget(character)">Camera on Character</button>' +
-            '<button onclick="gameCamera.setTarget(cat)">Camera on Cat</button>' +
-            '<button onclick="gameCamera.setTarget(girl)">Camera on Girl</button>' +
+            '<button onclick="myGameArea.gameCamera.setTarget(character)">Camera on Character</button>' +
+            '<button onclick="myGameArea.gameCamera.setTarget(cat)">Camera on Cat</button>' +
+            '<button onclick="myGameArea.gameCamera.setTarget(girl)">Camera on Girl</button>' +
             '<br>' +
             '<a>Talk to the girl or the cat by pressing enter in front of them.</a>';
                 
@@ -209,7 +238,7 @@ function update() {
     
     
     
-    gameCamera.update();
+    myGameArea.gameCamera.update();
 }
 
 /**

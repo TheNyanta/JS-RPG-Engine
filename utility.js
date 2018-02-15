@@ -1,14 +1,41 @@
-//convert spritesheet to tile index coordinates
+//convert 2dim array coordinates to 1dim array coordinates
 function xy2i(x, y, width) {
     var index = y * width + x;
     return index;
 }
 
-//convert tile index to spritesheet coordinates
+//convert 1dim array coordinates to 2dim array coordinates
 function i2xy(index, width) {
     var x = index % width;
     var y = Math.floor(index / width);
     return [x,y];
+}
+
+/**
+* Draw a specific sprite of a spritesheet
+* @param the context where to draw it
+* @param the spritesheet where the source image is
+* @param the specific sprite
+* @param x position
+* @param y position
+*/
+ function drawSprite(ctx, spritesheet, number, x, y) {
+     var res = i2xy(number, Math.max(spritesheet.spritesX, spritesheet.spritesY));
+     ctx.drawImage(spritesheet.img, res[0]*spritesheet.spriteWidth, res[1]*spritesheet.spriteHeight, spritesheet.spriteWidth, spritesheet.spriteHeight, x, y, spritesheet.spriteWidth, spritesheet.spriteHeight);
+ }
+
+/**
+* Spritesheet for map-tiles and objects
+*/
+function spritesheet(img, spritesX, spritesY, spriteWidth, spriteHeight) {
+    this.img = new Image();
+    this.img.src = img;
+    this.width = spritesX * spriteWidth;
+    this.height = spritesY * spriteHeight;
+    this.spritesX = spritesX;
+    this.spritesY = spritesY;
+    this.spriteWidth = spriteWidth;
+    this.spriteHeight = spriteHeight;
 }
 
 //convert listmap to a grid
