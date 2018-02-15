@@ -231,7 +231,35 @@ function showPosition(target) {
     ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x)/16) + ", " + Math.floor((target.y + target.offset_y)/16) + "]", 5, 80);
 }
 
+// Button functions
+
+function debugButton() {
+    debug = toggle(debug);
+    if (debug) {
+        document.getElementById("debugButton").style.backgroundColor = "#4CAF50";
+        document.getElementById("debugButton").innerHTML = "Debug On";
+    }
+    else {
+        document.getElementById("debugButton").style.backgroundColor = "#F44336";
+        document.getElementById("debugButton").innerHTML = "Debug Off";
+    }
+}
+
+function guiButton() {
+    showExtra = toggle(showExtra);
+    if (showExtra) {
+        document.getElementById("guiButton").style.backgroundColor = "#4CAF50";
+        document.getElementById("guiButton").innerHTML = "GUI On";
+    }
+    else {
+        document.getElementById("guiButton").style.backgroundColor = "#F44336";
+        document.getElementById("guiButton").innerHTML = "GUI Off";
+    }
+}
+
+// ##########
 // Map Editor
+// ##########
 
 function layerButton(i) {
     currentLayer = i;
@@ -261,17 +289,5 @@ function drawButton() {
     else {
         document.getElementById("drawButton").style.backgroundColor = "#F44336";
         document.getElementById("drawButton").innerHTML = "Drawing Off";
-    }
-}
-
-function debugButton() {
-    debug = toggle(debug);
-    if (debug) {
-        document.getElementById("debugButton").style.backgroundColor = "#4CAF50";
-        document.getElementById("debugButton").innerHTML = "Debug On";
-    }
-    else {
-        document.getElementById("debugButton").style.backgroundColor = "#F44336";
-        document.getElementById("debugButton").innerHTML = "Debug Off";
     }
 }
