@@ -230,3 +230,48 @@ function showPosition(target) {
     ctx.fillText("x:" + (target.x + target.offset_x) + ", y:" + (target.y + target.offset_y), 5, 60);
     ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x)/16) + ", " + Math.floor((target.y + target.offset_y)/16) + "]", 5, 80);
 }
+
+// Map Editor
+
+function layerButton(i) {
+    currentLayer = i;
+    if (i == 1) {
+        document.getElementById("layer1Button").style.backgroundColor = "#4CAF50";
+        document.getElementById("layer2Button").style.backgroundColor = "#008CBA";
+        document.getElementById("layer3Button").style.backgroundColor = "#008CBA";
+    }
+    if (i == 2) {
+        document.getElementById("layer1Button").style.backgroundColor = "#008CBA";
+        document.getElementById("layer2Button").style.backgroundColor = "#4CAF50";
+        document.getElementById("layer3Button").style.backgroundColor = "#008CBA";
+    }
+    if (i == 3) {
+        document.getElementById("layer1Button").style.backgroundColor = "#008CBA";
+        document.getElementById("layer2Button").style.backgroundColor = "#008CBA";
+        document.getElementById("layer3Button").style.backgroundColor = "#4CAF50";
+    }
+}
+
+function drawButton() {
+    drawingOn = toggle(drawingOn);
+    if (drawingOn) {
+        document.getElementById("drawButton").style.backgroundColor = "#4CAF50";
+        document.getElementById("drawButton").innerHTML = "Drawing On";
+    }
+    else {
+        document.getElementById("drawButton").style.backgroundColor = "#F44336";
+        document.getElementById("drawButton").innerHTML = "Drawing Off";
+    }
+}
+
+function debugButton() {
+    debug = toggle(debug);
+    if (debug) {
+        document.getElementById("debugButton").style.backgroundColor = "#4CAF50";
+        document.getElementById("debugButton").innerHTML = "Debug On";
+    }
+    else {
+        document.getElementById("debugButton").style.backgroundColor = "#F44336";
+        document.getElementById("debugButton").innerHTML = "Debug Off";
+    }
+}
