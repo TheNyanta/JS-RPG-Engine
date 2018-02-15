@@ -187,17 +187,15 @@ function map(image, tileset, mapWidth, mapHeight) {
                 else this.layerC[xy2i(x, y, this.mapWidth)] = toggle(this.layerC[xy2i(x, y, this.mapWidth)]);
                 maps[mapID].drawCache();
             }
-            document.getElementById("clickedX").innerHTML = x;
-            document.getElementById("clickedY").innerHTML = y;
+            document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
         }
         // Click on Tileset
         if (activeCanvas == 1) {
             x = Math.floor(x/this.tileset.spriteWidth);
             y = Math.floor(y/this.tileset.spriteHeight);
             tiletype = xy2i(x, y, this.tileset.spritesX) + 1;
-            document.getElementById("SelectedTile").innerHTML = tiletype;
-            document.getElementById("clickedX").innerHTML = x;
-            document.getElementById("clickedY").innerHTML = y;
+            document.getElementById("selectedTile").innerHTML = tiletype;
+            document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
         }
     }
     
