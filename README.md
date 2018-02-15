@@ -1,8 +1,10 @@
 # HTML-JAVASCRIPT
 
-Prototype Engine for a top-down rpg or a plattformer
+Prototype Engine for a top-down rpg (or a plattformer)
 
-## TODO:        
+## TODO:
+Store game date properly
+
 Refine Events + Dialogs
 
 Implement Click/Touch-Interaction with Objects
