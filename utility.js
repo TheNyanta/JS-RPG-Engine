@@ -264,21 +264,31 @@ function guiButton() {
 
 function layerButton(i) {
     currentLayer = i;
-    if (i == 1) {
+    if (i == 0) {
         document.getElementById("layer1Button").style.backgroundColor = "#4CAF50";
         document.getElementById("layer2Button").style.backgroundColor = "#008CBA";
         document.getElementById("layer3Button").style.backgroundColor = "#008CBA";
+        document.getElementById("layerCButton").style.backgroundColor = "#008CBA";
     }
-    if (i == 2) {
+    if (i == 1) {
         document.getElementById("layer1Button").style.backgroundColor = "#008CBA";
         document.getElementById("layer2Button").style.backgroundColor = "#4CAF50";
         document.getElementById("layer3Button").style.backgroundColor = "#008CBA";
+        document.getElementById("layerCButton").style.backgroundColor = "#008CBA";
+    }
+    if (i == 2) {
+        document.getElementById("layer1Button").style.backgroundColor = "#008CBA";
+        document.getElementById("layer2Button").style.backgroundColor = "#008CBA";
+        document.getElementById("layer3Button").style.backgroundColor = "#4CAF50";
+        document.getElementById("layerCButton").style.backgroundColor = "#008CBA";
     }
     if (i == 3) {
         document.getElementById("layer1Button").style.backgroundColor = "#008CBA";
         document.getElementById("layer2Button").style.backgroundColor = "#008CBA";
-        document.getElementById("layer3Button").style.backgroundColor = "#4CAF50";
+        document.getElementById("layer3Button").style.backgroundColor = "#008CBA";
+        document.getElementById("layerCButton").style.backgroundColor = "#4CAF50";
     }
+    
 }
 
 function drawButton() {
