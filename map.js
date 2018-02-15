@@ -87,13 +87,20 @@ function map(image, tileset, mapWidth, mapHeight) {
         var tile_w, tile_h;
         for (var h = 0; h < this.mapHeight; h++) {
             for (var w = 0; w < this.mapWidth; w++, mapIndex++) {
-                // Components position
                 tile_w = w * this.tileset.spriteWidth;
                 tile_h = h * this.tileset.spriteHeight;
                 //(ctx, spritesheet, number, x, y)
                 if (this.layers[0][mapIndex]-1 >= 0) drawSprite(myGameArea.cgx2, this.tileset, this.layers[0][mapIndex]-1, tile_w, tile_h);
                 if (this.layers[1][mapIndex]-1 >= 0) drawSprite(myGameArea.cgx2, this.tileset, this.layers[1][mapIndex]-1, tile_w, tile_h);
                 if (this.layers[2][mapIndex]-1 >= 0) drawSprite(myGameArea.cgx3, this.tileset, this.layers[2][mapIndex]-1, tile_w, tile_h);
+                // Draw maps collision layer
+                if (debug) {
+                    myGameArea.cgx3.globalAlpha = 0.3;
+                    if (this.layerC[mapIndex]) myGameArea.cgx3.fillStyle = "blue";
+                    else myGameArea.cgx3.fillStyle = "red";
+                    myGameArea.cgx3.fillRect(tile_w, tile_h, this.tileset.spriteWidth, this.tileset.spriteHeight);
+                    myGameArea.cgx3.globalAlpha = 1.0;
+                }
             }
         }
     }
@@ -176,7 +183,8 @@ function map(image, tileset, mapWidth, mapHeight) {
             x = Math.floor((x+myGameArea.gameCamera.x)/this.tileset.spriteWidth);
             y = Math.floor((y+myGameArea.gameCamera.y)/this.tileset.spriteHeight);
             if (drawingOn) {
-                this.layers[currentLayer-1][xy2i(x, y, this.mapWidth)] = tiletype;
+                if (currentLayer < 3) this.layers[currentLayer][xy2i(x, y, this.mapWidth)] = tiletype;
+                else this.layerC[xy2i(x, y, this.mapWidth)] = toggle(this.layerC[xy2i(x, y, this.mapWidth)]);
                 maps[mapID].drawCache();
             }
             document.getElementById("clickedX").innerHTML = x;

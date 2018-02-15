@@ -12,10 +12,11 @@ function component(x, y, width, height) {
     if (width != undefined && height != undefined) {
         this.width = width;
         this.height = height;
+        this.draw = function() {};
     }
-    //this.lastx = x;
-    //this.lasty = y;
     
+    //this.lastx = x;
+    //this.lasty = y;    
     
     // Other properties
     // TODO: https://www.w3schools.com/graphics/tryit.asp?filename=trygame_rotate_game

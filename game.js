@@ -82,14 +82,14 @@ var myGameArea = {
         // Add buttons
         var myGameButtons =
             '<br>' +
-            '<button onclick="enterFullscreen()">Fullscreen</button>' +
-            '<button onclick="{character.x = 120; character.y = 150;}">Unstuck</button>' +
-            '<button onclick="debug=toggle(debug)", unselectable="on">Debug-Info On/Off</button>' +
-            '<button onclick="showExtra=toggle(showExtra)">GUI-Info On/Off</button>' +
+            '<button class="button button2" onclick="enterFullscreen()">Fullscreen</button>' +
+            '<button class="button button2" onclick="{character.x = 120; character.y = 150;}">Unstuck</button>' +
+            '<button class="button button1" id="debugButton" onclick="debugButton()">Debug Off</button>' +
+            '<button class="button button1" id="guiButton" onclick="guiButton()">GUI Off</button>' +
             '<br>' +
-            '<button onclick="myGameArea.gameCamera.setTarget(character)">Camera on Character</button>' +
-            '<button onclick="myGameArea.gameCamera.setTarget(cat)">Camera on Cat</button>' +
-            '<button onclick="myGameArea.gameCamera.setTarget(girl)">Camera on Girl</button>' +
+            '<button class="button button2" onclick="myGameArea.gameCamera.setTarget(character)">Camera on Character</button>' +
+            '<button class="button button2" onclick="myGameArea.gameCamera.setTarget(cat)">Camera on Cat</button>' +
+            '<button class="button button2" onclick="myGameArea.gameCamera.setTarget(girl)">Camera on Girl</button>' +
             '<br>' +
             '<a>Talk to the girl or the cat by pressing enter in front of them.</a>';
                 

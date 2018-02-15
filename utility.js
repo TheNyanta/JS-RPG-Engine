@@ -235,6 +235,7 @@ function showPosition(target) {
 
 function debugButton() {
     debug = toggle(debug);
+    maps[mapID].drawCache();
     if (debug) {
         document.getElementById("debugButton").style.backgroundColor = "#4CAF50";
         document.getElementById("debugButton").innerHTML = "Debug On";
