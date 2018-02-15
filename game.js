@@ -81,17 +81,18 @@ var myGameArea = {
         
         // Add buttons
         var myGameButtons =
+            '<div class="w3-container w3-padding-64">' +
+            '<button class="w3-button w3-green" onclick="enterFullscreen()">Fullscreen</button>' +
+            '<button class="w3-button w3-green" onclick="{character.x = 120; character.y = 150;}">Unstuck</button>' +
+            '<button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug Off</button>' +
+            '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +
             '<br>' +
-            '<button class="button button2" onclick="enterFullscreen()">Fullscreen</button>' +
-            '<button class="button button2" onclick="{character.x = 120; character.y = 150;}">Unstuck</button>' +
-            '<button class="button button1" id="debugButton" onclick="debugButton()">Debug Off</button>' +
-            '<button class="button button1" id="guiButton" onclick="guiButton()">GUI Off</button>' +
+            '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(character)">Camera on Character</button>' +
+            '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(cat)">Camera on Cat</button>' +
+            '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(girl)">Camera on Girl</button>' +
             '<br>' +
-            '<button class="button button2" onclick="myGameArea.gameCamera.setTarget(character)">Camera on Character</button>' +
-            '<button class="button button2" onclick="myGameArea.gameCamera.setTarget(cat)">Camera on Cat</button>' +
-            '<button class="button button2" onclick="myGameArea.gameCamera.setTarget(girl)">Camera on Girl</button>' +
-            '<br>' +
-            '<a>Talk to the girl or the cat by pressing enter in front of them.</a>';
+            '<a>Talk to the girl or the cat by pressing enter in front of them.</a>' +
+            '</div>';
                 
         document.getElementById("startGame").insertAdjacentHTML('afterend',myGameButtons);
         

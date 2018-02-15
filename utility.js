@@ -237,11 +237,11 @@ function debugButton() {
     debug = toggle(debug);
     maps[mapID].drawCache();
     if (debug) {
-        document.getElementById("debugButton").style.backgroundColor = "#4CAF50";
+        document.getElementById("debugButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("debugButton").innerHTML = "Debug On";
     }
     else {
-        document.getElementById("debugButton").style.backgroundColor = "#F44336";
+        document.getElementById("debugButton").setAttribute("class", "w3-button w3-red");
         document.getElementById("debugButton").innerHTML = "Debug Off";
     }
 }
@@ -249,11 +249,11 @@ function debugButton() {
 function guiButton() {
     showExtra = toggle(showExtra);
     if (showExtra) {
-        document.getElementById("guiButton").style.backgroundColor = "#4CAF50";
+        document.getElementById("guiButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("guiButton").innerHTML = "GUI On";
     }
     else {
-        document.getElementById("guiButton").style.backgroundColor = "#F44336";
+        document.getElementById("guiButton").setAttribute("class", "w3-button w3-red");
         document.getElementById("guiButton").innerHTML = "GUI Off";
     }
 }
@@ -265,28 +265,28 @@ function guiButton() {
 function layerButton(i) {
     currentLayer = i;
     if (i == 0) {
-        document.getElementById("layer1Button").style.backgroundColor = "#4CAF50";
-        document.getElementById("layer2Button").style.backgroundColor = "#008CBA";
-        document.getElementById("layer3Button").style.backgroundColor = "#008CBA";
-        document.getElementById("layerCButton").style.backgroundColor = "#008CBA";
+        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-green");
+        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-red");
     }
     if (i == 1) {
-        document.getElementById("layer1Button").style.backgroundColor = "#008CBA";
-        document.getElementById("layer2Button").style.backgroundColor = "#4CAF50";
-        document.getElementById("layer3Button").style.backgroundColor = "#008CBA";
-        document.getElementById("layerCButton").style.backgroundColor = "#008CBA";
+        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-green");
+        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-red");
     }
     if (i == 2) {
-        document.getElementById("layer1Button").style.backgroundColor = "#008CBA";
-        document.getElementById("layer2Button").style.backgroundColor = "#008CBA";
-        document.getElementById("layer3Button").style.backgroundColor = "#4CAF50";
-        document.getElementById("layerCButton").style.backgroundColor = "#008CBA";
+        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-green");
+        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-red");
     }
     if (i == 3) {
-        document.getElementById("layer1Button").style.backgroundColor = "#008CBA";
-        document.getElementById("layer2Button").style.backgroundColor = "#008CBA";
-        document.getElementById("layer3Button").style.backgroundColor = "#008CBA";
-        document.getElementById("layerCButton").style.backgroundColor = "#4CAF50";
+        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-green");
     }
     
 }
@@ -294,11 +294,11 @@ function layerButton(i) {
 function drawButton() {
     drawingOn = toggle(drawingOn);
     if (drawingOn) {
-        document.getElementById("drawButton").style.backgroundColor = "#4CAF50";
+        document.getElementById("drawButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("drawButton").innerHTML = "Drawing On";
     }
     else {
-        document.getElementById("drawButton").style.backgroundColor = "#F44336";
+        document.getElementById("drawButton").setAttribute("class", "w3-button w3-red");
         document.getElementById("drawButton").innerHTML = "Drawing Off";
     }
 }
