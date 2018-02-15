@@ -228,7 +228,7 @@ function showPosition(target) {
     ctx = myGameArea.context;
     ctx.fillStyle = "black";
     ctx.fillText("x:" + (target.x + target.offset_x) + ", y:" + (target.y + target.offset_y), 5, 60);
-    ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x)/16) + ", " + Math.floor((target.y + target.offset_y)/16) + "]", 5, 80);
+    ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x)/maps[mapID].tileset.spriteWidth) + ", " + Math.floor((target.y + target.offset_y)/maps[mapID].tileset.spriteHeight) + "]", 5, 80);
 }
 
 // Button functions
