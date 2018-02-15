@@ -8,17 +8,17 @@ var map2_obj = [];
 var map3_obj = [];
 
 // Setup Map Spritesheets
-var bergwald_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/bergwald.png", 60, 32, 8, 8);
+var forest_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/forest.png", 60, 32, 8, 8);
 var snowforest_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snowforest.png", 60, 32, 8, 8);
 var castleEntrance_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castle.png", 60, 32, 8, 8);
 var castleTownMid_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castletown.png", 60, 32, 8, 8);
 
-var bergwald = new map("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/sunset1.png", bergwald_spritesheet, 80, 60, 8, 8, 60, 32);
+var forest = new map("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/sunset1.png", forest_spritesheet, 80, 60, 8, 8, 60, 32);
 var snowforest = new map(undefined, snowforest_spritesheet, 80, 60, 8, 8, 60, 32);
 var castleEntrance = new map(undefined, castleEntrance_spritesheet, 42, 40, 8, 8, 60, 32);
 var castleTownMid = new map(undefined, castleTownMid_spritesheet, 42, 60, 8, 8, 60, 32);
 
-var maps = [bergwald, snowforest, castleEntrance, castleTownMid];
+var maps = [forest, snowforest, castleEntrance, castleTownMid];
 var mapID = 0;
 var currentMapID = 0;
 
