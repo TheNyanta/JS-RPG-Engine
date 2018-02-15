@@ -5,25 +5,25 @@ function startGame() {
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
-    defaultWidth : 560,
-    defaultHeight : 350,
     init : function() {
+        // Game canvas
         this.canvas.width = 560;
         this.canvas.height = 350;
+        this.canvas.id = "game";
+        this.context = this.canvas.getContext("2d");
         
         // Pause game if not selected
         document.active = true;
         $(window).focus(function() {document.active = true;});
         $(window).blur(function() {document.active = false;});
         
-        this.frameNo = 0;
-        this.gameSequence = false;
-        
         this.minWidth = 1600;
         this.minHeight = 900;
         
+        this.frameNo = 0;
+        this.gameSequence = false;
+        
         //this.canvas.style.cursor = "none"; //hide the original cursor
-        this.context = this.canvas.getContext("2d");
         
         // "Cache" Map on an hidden canvas
         this.panorama = document.createElement('canvas');
@@ -186,8 +186,7 @@ var myGameArea = {
     },
     
     start : function() {
-
-        // New gameLoop
+        
         function gameLoop() {
             requestAnimationFrame(gameLoop);
             if (document.active)
@@ -235,8 +234,6 @@ function update() {
     
     // Update Events
     //for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateEvent();
-    
-    
     
     myGameArea.gameCamera.update();
 }
