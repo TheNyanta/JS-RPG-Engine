@@ -120,4 +120,89 @@ function map(image, tileset, mapWidth, mapHeight) {
         ctx = myGameArea.context;
         ctx.drawImage(myGameArea.foreground, -myGameArea.gameCamera.x, -myGameArea.gameCamera.y);
     }
+    
+    // Map Editor functions
+    
+    /**
+    * print layers as string to console
+    */
+    this.printLayers = function(name) {
+        var output = "";
+        // Layer 1
+        output += "var "+name+"_layer1 = [";
+        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+            output += this.layers[0][i];
+            if (i < this.mapWidth * this.mapHeight - 1)
+                output += ", ";
+        }
+        output += "];\n";
+        // Layer 2
+        output += "var "+name+"_layer2 = [";
+        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+            output += this.layers[1][i];
+            if (i < this.mapWidth * this.mapHeight - 1)
+                output += ", ";
+        }
+        output += "];\n";
+        // Layer 3
+        output += "var "+name+"_layer3 = [";
+        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+            output += this.layers[2][i];
+            if (i < this.mapWidth * this.mapHeight - 1)
+                output += ", ";
+        }
+        output += "];\n";
+        // Collision Layer
+        output += "var "+name+"_layerC = [";
+        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+            output += this.layerC[i];
+            if (i < this.mapWidth * this.mapHeight - 1)
+                output += ", ";
+        }
+        output += "];\n";
+        //Print
+        console.log(output);        
+    }
+    
+    this.clickedTile = function(x, y) {
+        var x = Math.floor(x/this.tileset.spriteWidth);
+        var y = Math.floor(y/this.tileset.spriteHeight);
+        
+        // Click on Map
+        if (activeCanvas == 0) {
+            if (drawingOn) {
+                this.layers[currentLayer-1][xy2i(x, y, this.mapWidth)] = tiletype;
+                maps[mapID].drawCache();
+            }
+            document.getElementById("clickedX").innerHTML = x;
+            document.getElementById("clickedY").innerHTML = y;
+        }
+        // Click on Tileset
+        if (activeCanvas == 1) {
+            tiletype = xy2i(x, y, this.tileset.spritesX) + 1;
+            document.getElementById("SelectedTile").innerHTML = tiletype;
+            document.getElementById("clickedX").innerHTML = x;
+            document.getElementById("clickedY").innerHTML = y;
+        }
+    }
+    
+    /**
+    * Draw the tileset on the tileset canvas
+    */
+    this.drawTileset = function() {
+        myGameArea.tileset.width = this.tileset.spriteWidth * this.tileset.spritesX;
+        myGameArea.tileset.height = this.tileset.spriteHeight * this.tileset.spritesY;
+        myGameArea.tilecontext.clearRect(0, 0, this.tileset.spriteWidth * this.tileset.spritesX, this.tileset.spriteHeight * this.tileset.spritesY);
+        
+        var mapIndex = 0;
+        var tile_w, tile_h;
+        for (var h = 0; h < this.tileset.spritesY; h++) {
+            for (var w = 0; w < this.tileset.spritesX; w++, mapIndex++) {
+                tile_w = w * this.tileset.spriteWidth;
+                tile_h = h * this.tileset.spriteHeight;
+                //(ctx, spritesheet, number, x, y)
+                drawSprite(myGameArea.tilecontext, this.tileset, mapIndex, tile_w, tile_h);
+            }
+        }
+    }
 }
