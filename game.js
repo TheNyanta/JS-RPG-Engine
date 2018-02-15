@@ -7,8 +7,8 @@ var myGameArea = {
     canvas : document.createElement("canvas"),
     init : function() {
         // Game canvas
-        this.canvas.width = 560;
-        this.canvas.height = 350;
+        this.canvas.width = 700;
+        this.canvas.height = 400;
         this.canvas.id = "game";
         this.context = this.canvas.getContext("2d");
         
@@ -68,13 +68,13 @@ var myGameArea = {
         // Initalize Maps
         for (i=0; i<maps.length; i++) {
             maps[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);
-            this.minWidth = Math.min(this.minWidth, maps[i].mapWidth * maps[i].tileset.spriteWidth);
-            this.minHeight = Math.min(this.minHeight, maps[i].mapHeight * maps[i].tileset.spriteHeight);
+            //this.minWidth = Math.min(this.minWidth, maps[i].mapWidth * maps[i].tileset.spriteWidth);
+            //this.minHeight = Math.min(this.minHeight, maps[i].mapHeight * maps[i].tileset.spriteHeight);
         }
         
         // Smallest map
-        this.canvas.width = this.minWidth;
-        this.canvas.height = this.minHeight;
+        //this.canvas.width = this.minWidth;
+        //this.canvas.height = this.minHeight;
         
         // Draw the first or current map onto the cached canvas'
         maps[mapID].drawCache();
