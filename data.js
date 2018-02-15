@@ -23,17 +23,16 @@ var mapID = 0;
 var currentMapID = 0;
 
 // Setup Objects Spritesheets
-var character_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/character.png", 24, 32, 16, 16);
-var girl_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/girl.png", 24, 32, 16, 16);
-var cat_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/cat.png", 24, 32, 16, 16);
-var dog_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/animal.png", 24, 32, 16, 16);
-var jukebox_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snow_jukebox.png", 24, 32, 16, 16);
-var castledoor_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castledoor_1.png", 47, 48, 1, 4);
-// TODO adept into component drawSprite
+var character_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/character.png", 12, 8, 24, 32);
+var girl_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/girl.png", 12, 8, 24, 32);
+var cat_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/cat.png", 12, 8, 24, 32);
+var dog_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/animal.png", 12, 8, 24, 32);
+var jukebox_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snow_jukebox.png", 12, 8, 24, 32);
+var castledoor_spritesheet = new spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castledoor_1.png", 1, 4, 47, 48);
 
 // Setup Character
 var character = new component(240, 280)
-.sprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/character.png", 24, 32, 8, 12)
+.sprite(character_spritesheet)
 .velocity(2)
 .control(KEY_W, KEY_S, KEY_A, KEY_D)
 .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
@@ -42,7 +41,7 @@ var character = new component(240, 280)
 
 // Setup Girl
 var girl = new component(370, 210)
-.sprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/girl.png", 24, 32, 8, 12)
+.sprite(girl_spritesheet,)
 .velocity(2)
 .control(KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT)
 .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
@@ -53,7 +52,7 @@ var girl = new component(370, 210)
 // Setup Cat
 var cat = new component(160, 400)
 .velocity(1)
-.sprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/cat.png", 24, 32, 8, 12)
+.sprite(cat_spritesheet)
 .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
 .collision(4, 16, 16, 16);
 
@@ -62,20 +61,20 @@ var cat = new component(160, 400)
 // Setup Dog
 var dog = new component(100, 100)
 .velocity(1)
-.sprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/animal.png", 24, 32, 8, 12)
+.sprite(dog_spritesheet)
 .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0,1,2], [24,25,26], [36,37,38], [12,13,14])
 .collision(4, 16, 16, 16);
 
 // Setup Jukebox
 var jukebox = new component(260, 120)
-.sprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snow_jukebox.png", 24, 32, 8, 12)
+.sprite(jukebox_spritesheet)
 .collision(0, 16, 24, 16);
 
 // ## Castle front
 
 // Setup Castledoor
 var castledoor = new component(144, 62)
-.sprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castledoor_1.png", 47, 48, 1, 4)
+.sprite(castledoor_spritesheet)
 .animation().specialAnimation(20, [0,1,2,3]);
 
 // Setup Stone

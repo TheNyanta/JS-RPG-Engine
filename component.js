@@ -34,58 +34,52 @@ function component(x, y, width, height) {
         this.img.src = img;
         this.width = width;
         this.height = height;
+        
+        this.draw = function (ctx) {
+            ctx.drawImage(this.img, this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);
+        }
         return this;
     }
     
     /**
     * sprite component
-    * @param {file} sprite src
-    * @param width of a single sprite on the spritesheet
-    * @param height of a single sprite on the spritesheet
-    * @param number of sprites horizontal
-    * @param number of sprites vertical
+    * @param {spritesheet} spritesheet
     */
-    this.sprite = function(spritesheet, width, height, spritesX, spritesY) {
+    this.sprite = function(spritesheet) {
         this.type = "sprite";
-        if (this.img == undefined) this.img = new Image();
-        this.img.src = spritesheet;
-        this.width = width;
-        this.height = height;
-        this.spritesX = spritesX;
-        this.spritesY = spritesY;
+        this.spritesheet = spritesheet;
+        this.width = this.spritesheet.spriteWidth;
+        this.height = this.spritesheet.spriteHeight;
         // Default first sprite image
         this.sequence = 0;
         
-        // ######################
-        // ## Sprite functions ##
-        // ######################
-        
-        /**
-        * Draw the sprite
-        * animated & still
-        */
-        this.drawSprite = function(ctx) {
+        this.draw = function (ctx) {
+            // Debug information
+            if (debug) {
+                // Draw Standing tiles
+                if (this.rects != undefined) this.showStandingOnTiles();
+                // Draw Front
+                if (this.front != undefined) this.front.draw(myGameArea.context);
+                // Draw Collision Box
+                ctx.strokeStyle = "black";
+                ctx.strokeRect(this.x + this.offset_x - myGameArea.gameCamera.x, this.y + this.offset_y - myGameArea.gameCamera.y, this.offset_width , this.offset_height);
+            }
+            
+            // Sets Animations if defined (based on moving and direction)        
+            if (this.updateAnimation != undefined) this.updateAnimation();
+            
             // Animation: Moving / Idle
             if (this.sequence.length != undefined) {
                 if (this.animationDelay++ >= this.animationTime) {
                     this.animationDelay = 0;
                     this.animationIndexCounter++;
                     if (this.animationIndexCounter >= this.sequence.length) this.animationIndexCounter = 0;
-                    this.animationCurrentFrame = this.sequence[this.animationIndexCounter];
                 }
-                var res = i2xy(this.animationCurrentFrame, Math.max(this.spritesX, this.spritesY));
-                ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);
+                drawSprite(ctx, this.spritesheet, this.sequence[this.animationIndexCounter], (this.x-myGameArea.gameCamera.x), (this.y-myGameArea.gameCamera.y));
             }
             // No Animation: Just sprite image
-            else {
-                var res = i2xy(this.sequence, Math.max(this.spritesX, this.spritesY));
-                // For cached tiles
-                if (this.static) ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x, this.y, this.width, this.height);
-                // For moving objects
-                else ctx.drawImage(this.img, res[0]*this.width, res[1]*this.height, this.width, this.height, this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);
-            }
-        }       
-        
+            else drawSprite(ctx, this.spritesheet, this.sequence, (this.x-myGameArea.gameCamera.x), (this.y-myGameArea.gameCamera.y));
+        }
         return this;
     }
     
@@ -106,6 +100,14 @@ function component(x, y, width, height) {
         this.filled = filled;
         this.outlineColor = outlineColor;
         this.outline = outline;
+        
+        this.draw = function (ctx) {
+            ctx.fillStyle = this.fillColor;
+            ctx.strokeStyle = this.outlineColor;
+            if (this.filled) ctx.fillRect(this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);
+            else if (this.filled == undefined) ctx.fillRect(this.x, this.y, this.width, this.height);
+            if (this.outline) ctx.strokeRect(this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);
+        }        
         return this;
     }
     
@@ -172,7 +174,6 @@ function component(x, y, width, height) {
         this.animationTime = 0;
         this.animationDelay = 0;
         this.animationIndexCounter = 0;
-        this.animationCurrentFrame = 0;
         this.direction = DIR_S; // Default Direction
         
         this.idleAnimation = function(idleAnimationTime, idleUp, idleDown, idleLeft, idleRight) {
@@ -710,51 +711,7 @@ function component(x, y, width, height) {
         if (this.repeatingEvent != undefined) this.repeatingEvent();
         // Character stands infront of the component and presses enter
         if (this.interactionEvent != undefined) this.interactionEvent();
-    }*/
-    
-    /**
-    * Render component
-    * Draw it on the canvas
-    */
-    this.draw = function (ctx) {        
-        //ctx = myGameArea.context;          
-        
-        // Image
-        if (this.type == "image") {
-            ctx.drawImage(this.img, this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);
-        }
-        
-        // Sprite
-        else if (this.type == "sprite") {
-            // Extra drawings for debugging
-            if (debug) {
-                // Draw Standing tiles
-                if (this.rects != undefined) this.showStandingOnTiles();
-                // Draw Front
-                if (this.front != undefined) this.front.draw(myGameArea.context);
-                // Draw Collision Box
-                ctx.strokeStyle = "black";
-                ctx.strokeRect(this.x + this.offset_x - myGameArea.gameCamera.x, this.y + this.offset_y - myGameArea.gameCamera.y, this.offset_width , this.offset_height);
-            }
-            
-            // Sets Animations if defined (based on moving and direction)        
-            if (this.updateAnimation != undefined) this.updateAnimation();
-            
-            // Draw Sprite
-            this.drawSprite(ctx);                       
-        }
-        
-        // Rectangle
-        else if (this.type == "rectangle"){
-            ctx.fillStyle = this.fillColor;
-            ctx.strokeStyle = this.outlineColor;
-            if (this.filled) ctx.fillRect(this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);
-            else if (this.filled == undefined) ctx.fillRect(this.x, this.y, this.width, this.height);
-            if (this.outline) ctx.strokeRect(this.x-myGameArea.gameCamera.x, this.y-myGameArea.gameCamera.y, this.width, this.height);     
-        }
-        
-        return this;
-    }   
+    }*/  
     
     /**
     * Always stop on a whole tile
