@@ -192,22 +192,22 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
         var y;
 
         // Click on Map
-        if (activeCanvas == 0) {
+        if (myGameArea.activeCanvas == 0) {
             x = Math.floor((x + myGameArea.gameCamera.x) / this.tileset.spriteWidth);
             y = Math.floor((y + myGameArea.gameCamera.y) / this.tileset.spriteHeight);
-            if (drawingOn) {
-                if (currentLayer < 3) this.layers[currentLayer][xy2i(x, y, this.mapWidth)] = tiletype;
+            if (myGameArea.drawingOn) {
+                if (myGameArea.currentLayer < 3) this.layers[myGameArea.currentLayer][xy2i(x, y, this.mapWidth)] = myGameArea.tiletype;
                 else this.layerC[xy2i(x, y, this.mapWidth)] = toggle(this.layerC[xy2i(x, y, this.mapWidth)]);
                 maps.data[maps.currentMap].drawCache();
             }
             document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
         }
         // Click on Tileset
-        if (activeCanvas == 1) {
+        if (myGameArea.activeCanvas == 1) {
             x = Math.floor(x / this.tileset.spriteWidth);
             y = Math.floor(y / this.tileset.spriteHeight);
-            tiletype = xy2i(x, y, this.tileset.spritesX) + 1;
-            document.getElementById("selectedTile").innerHTML = tiletype;
+            myGameArea.tiletype = xy2i(x, y, this.tileset.spritesX) + 1;
+            document.getElementById("selectedTile").innerHTML = myGameArea.tiletype;
             document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
         }
     }
