@@ -17,6 +17,44 @@ function addMap(map) {
 }
 
 /**
+ * A Tile
+ * @param {spritesheet} spritesheet
+ */
+function Tile(spritesheet, x, y) {
+    this.spritesheet = spritesheet;
+    this.width = this.spritesheet.spriteWidth;
+    this.height = this.spritesheet.spriteHeight;
+    // Position
+    this.x = x;
+    this.y = y;
+    // Layers: Set which part of the spritesheet should be drawn
+    this.layer1 = 0;
+    this.layer2 = 0;
+    this.layer3 = 0;
+    // Collision (TODO: Advanced -> Direction depended collision)
+    this.collision = false;
+
+    /** This draws the tile on the cached canvas'
+     * @param Cached canvas context for layer 1 & 2 (Background)
+     * @param Cached canvas context for layer 3 (Foreground)
+     */
+    this.draw = function (ctx1, ctx2) {
+        if (this.layer1 - 1 >= 0) drawSprite(ctx1, this.spritesheet, this.layer1 - 1, this.x, this.y);
+        if (this.layer2 - 1 >= 0) drawSprite(ctx1, this.spritesheet, this.layer2 - 1, this.x, this.y);
+        if (this.layer3 - 1 >= 0) drawSprite(ctx2, this.spritesheet, this.layer3 - 1, this.x, this.y);
+        // Debug information: Show collision layer
+        if (myGameArea.debug) {
+            myGameArea.cgx3.globalAlpha = 0.3;
+            if (this.collision) myGameArea.cgx3.fillStyle = "blue";
+            else myGameArea.cgx3.fillStyle = "red";
+            myGameArea.cgx3.fillRect(this.x, this.y, this.width, this.height);
+            myGameArea.cgx3.globalAlpha = 1.0;
+
+        }
+    }
+}
+
+/**
  * Define a map
  * @param a background panorama
  * @param {Spritesheet} a spritesheet with the tiles for the map
@@ -44,16 +82,20 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
     this.mapWidth = mapWidth;
     this.mapHeight = mapHeight;
 
-    // Pixel width & height    
+    // Pixel width & height
     this.width = this.mapWidth * tileset.spriteWidth;
     this.height = this.mapHeight * tileset.spriteHeight;
 
     if (name != undefined) this.name = name;
     else this.name = tileset.name.match(/[\w]+/)[0];
 
-    // Map Layers
-    this.layers = [[], [], []];
-    this.layerC = [];
+    // Contains all the tiles
+    // A tile is a component which contains the layers and the collision
+    this.tiles = [];
+    for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+        var res = i2xy(i, this.mapWidth);
+        this.tiles.push(new Tile(this.tileset, res[0] * this.tileset.spriteWidth, res[1] * this.tileset.spriteHeight));
+    }
 
     /**
      * Load layers into the the map
@@ -63,14 +105,12 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
      * @param collision layer
      */
     this.loadLayers = function (l1, l2, l3, lc) {
-        // Layer 1: Background 1
-        this.layers[0] = l1;
-        // Layer 2: Background 2
-        this.layers[1] = l2;
-        // Layer 3: Foreground
-        this.layers[2] = l3;
-        // Collision Layer
-        this.layerC = lc;
+        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+            this.tiles[i].layer1 = l1[i];
+            this.tiles[i].layer2 = l2[i];
+            this.tiles[i].layer3 = l3[i];
+            this.tiles[i].collision = lc[i];
+        }
     }
 
     /**
@@ -96,26 +136,7 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
         // ...  and repaint!
         if (this.image != undefined) myGameArea.cgx1.drawImage(this.image, this.x, this.y, myGameArea.panorama.width, myGameArea.panorama.height);
 
-        var mapIndex = 0;
-        var tile_w, tile_h;
-        for (var h = 0; h < this.mapHeight; h++) {
-            for (var w = 0; w < this.mapWidth; w++, mapIndex++) {
-                tile_w = w * this.tileset.spriteWidth;
-                tile_h = h * this.tileset.spriteHeight;
-                //(ctx, spritesheet, number, x, y)
-                if (this.layers[0][mapIndex] - 1 >= 0) drawSprite(myGameArea.cgx2, this.tileset, this.layers[0][mapIndex] - 1, tile_w, tile_h);
-                if (this.layers[1][mapIndex] - 1 >= 0) drawSprite(myGameArea.cgx2, this.tileset, this.layers[1][mapIndex] - 1, tile_w, tile_h);
-                if (this.layers[2][mapIndex] - 1 >= 0) drawSprite(myGameArea.cgx3, this.tileset, this.layers[2][mapIndex] - 1, tile_w, tile_h);
-                // Draw maps collision layer
-                if (myGameArea.debug) {
-                    myGameArea.cgx3.globalAlpha = 0.3;
-                    if (this.layerC[mapIndex]) myGameArea.cgx3.fillStyle = "blue";
-                    else myGameArea.cgx3.fillStyle = "red";
-                    myGameArea.cgx3.fillRect(tile_w, tile_h, this.tileset.spriteWidth, this.tileset.spriteHeight);
-                    myGameArea.cgx3.globalAlpha = 1.0;
-                }
-            }
-        }
+        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) this.tiles[i].draw(myGameArea.cgx2, myGameArea.cgx3);
     }
 
     // ####################################

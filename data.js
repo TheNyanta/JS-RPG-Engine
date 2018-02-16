@@ -4,24 +4,10 @@ var map1_obj = [];
 var map2_obj = [];
 var map3_obj = [];
 
-// Setup Map Spritesheets
-/*
-var forest_spritesheet = new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/forest.png", 60, 32, 8, 8);
-var snowforest_spritesheet = new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snowforest.png", 60, 32, 8, 8);
-var castleEntrance_spritesheet = new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castle.png", 60, 32, 8, 8);
-var castleTownMid_spritesheet = new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castletown.png", 60, 32, 8, 8);
-*/
 addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/forest.png", 60, 32, 8, 8));
 addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snowforest.png", 60, 32, 8, 8));
 addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castle.png", 60, 32, 8, 8));
 addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castletown.png", 60, 32, 8, 8));
-
-/*
-var forest = new Map("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/sunset1.png", forest_spritesheet, 80, 60, 8, 8, 60, 32);
-var snowforest = new Map(undefined, snowforest_spritesheet, 80, 60, 8, 8, 60, 32);
-var castleEntrance = new Map(undefined, castleEntrance_spritesheet, 42, 40, 8, 8, 60, 32);
-var castleTownMid = new Map(undefined, castleTownMid_spritesheet, 42, 60, 8, 8, 60, 32);
-*/
 
 addMap(new Map("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/sunset1.png", spritesheets.data[0], 80, 60, 8, 8, 60, 32));
 addMap(new Map(undefined, spritesheets.data[1], 80, 60, 8, 8, 60, 32));
@@ -29,16 +15,16 @@ addMap(new Map(undefined, spritesheets.data[2], 42, 40, 8, 8, 60, 32));
 addMap(new Map(undefined, spritesheets.data[3], 42, 60, 8, 8, 60, 32));
 
 // Setup Objects Spritesheets
-var character_spritesheet = new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/character.png", 12, 8, 24, 32);
-var girl_spritesheet = new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/girl.png", 12, 8, 24, 32);
-var cat_spritesheet = new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/cat.png", 12, 8, 24, 32);
-var dog_spritesheet = new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/animal.png", 12, 8, 24, 32);
-var jukebox_spritesheet = new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snow_jukebox.png", 12, 8, 24, 32);
-var castledoor_spritesheet = new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castledoor_1.png", 1, 4, 47, 48);
+addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/character.png", 12, 8, 24, 32));
+addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/girl.png", 12, 8, 24, 32));
+addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/cat.png", 12, 8, 24, 32));
+addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/animal.png", 12, 8, 24, 32));
+addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snow_jukebox.png", 12, 8, 24, 32));
+addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castledoor_1.png", 1, 4, 47, 48));
 
 // Setup Character
 var character = new Component(240, 280)
-    .sprite(character_spritesheet)
+    .sprite(spritesheets.data[4])
     .velocity(2)
     .control(constants.KEY_W, constants.KEY_S, constants.KEY_A, constants.KEY_D)
     .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
@@ -47,7 +33,7 @@ var character = new Component(240, 280)
 
 // Setup Girl
 var girl = new Component(370, 210)
-    .sprite(girl_spritesheet, )
+    .sprite(spritesheets.data[5])
     .velocity(2)
     .control(constants.KEY_UP, constants.KEY_DOWN, constants.KEY_LEFT, constants.KEY_RIGHT)
     .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
@@ -56,9 +42,9 @@ var girl = new Component(370, 210)
 // ## Mountainforest
 
 // Setup Cat
-var cat = new Component(160, 400)
+var cat = new Component(160, 390)
     .velocity(1)
-    .sprite(cat_spritesheet)
+    .sprite(spritesheets.data[6])
     .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
     .collision(4, 16, 16, 16);
 
@@ -67,20 +53,20 @@ var cat = new Component(160, 400)
 // Setup Dog
 var dog = new Component(100, 100)
     .velocity(1)
-    .sprite(dog_spritesheet)
+    .sprite(spritesheets.data[7])
     .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
     .collision(4, 16, 16, 16);
 
 // Setup Jukebox
 var jukebox = new Component(260, 120)
-    .sprite(jukebox_spritesheet)
+    .sprite(spritesheets.data[8])
     .collision(0, 16, 24, 16);
 
 // ## Castle front
 
 // Setup Castledoor
 var castledoor = new Component(144, 62)
-    .sprite(castledoor_spritesheet)
+    .sprite(spritesheets.data[9])
     .animation().specialAnimation(20, [0, 1, 2, 3]);
 
 // Setup Stone
@@ -222,9 +208,9 @@ stone.onEnterEvent = function () {
 }
 
 // Cat walk
-cat.route = [[50, 400], [50, 380], [50, 150], [600, 150], [600, 400]];
+cat.route = [[50, 390], [50, 380], [50, 150], [600, 150], [600, 390]];
 cat.routeIndex = 0;
-cat.speed = 10;
+cat.speed = 5;
 cat.routeForward = true;
 // You can use this.variable in the function because it will be called in the cat Component
 cat.movementEvent = function () {
