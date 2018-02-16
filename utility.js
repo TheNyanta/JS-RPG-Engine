@@ -11,33 +11,6 @@ function i2xy(index, width) {
     return [x,y];
 }
 
-/**
-* Draw a specific sprite of a spritesheet
-* @param the context where to draw it
-* @param the spritesheet where the source image is
-* @param the specific sprite
-* @param x position
-* @param y position
-*/
- function drawSprite(ctx, spritesheet, number, x, y) {
-     var res = i2xy(number, Math.max(spritesheet.spritesX, spritesheet.spritesY));
-     ctx.drawImage(spritesheet.img, res[0]*spritesheet.spriteWidth, res[1]*spritesheet.spriteHeight, spritesheet.spriteWidth, spritesheet.spriteHeight, x, y, spritesheet.spriteWidth, spritesheet.spriteHeight);
- }
-
-/**
-* Spritesheet for map-tiles and objects
-*/
-function spritesheet(img, spritesX, spritesY, spriteWidth, spriteHeight) {
-    this.img = new Image();
-    this.img.src = img;
-    this.width = spritesX * spriteWidth;
-    this.height = spritesY * spriteHeight;
-    this.spritesX = spritesX;
-    this.spritesY = spritesY;
-    this.spriteWidth = spriteWidth;
-    this.spriteHeight = spriteHeight;
-}
-
 //convert listmap to a grid
 function getGrid(maplayer, width, height) {
     
@@ -57,9 +30,9 @@ function getGrid(maplayer, width, height) {
 
 //convert mapCL to a graph
 function getGraph() {
-    var mapCL = maps[mapID].layerC;
-    var mapWidth = maps[mapID].mapWidth;
-    var mapHeight = maps[mapID].mapHeight;
+    var mapCL = maps.data[maps.currentMap].layerC;
+    var mapWidth = maps.data[maps.currentMap].mapWidth;
+    var mapHeight = maps.data[maps.currentMap].mapHeight;
     
     var arr = Array();
     for (var i = 0; i < mapWidth; i++) {
@@ -112,16 +85,16 @@ function enterFullscreen() {
 
 // Size the canvas to the size of the map if it fits on the screen
 function resizeCanvas() {
-    if (document.body.clientWidth > maps[mapID].width) {
+    if (document.body.clientWidth > maps.data[maps.currentMap].width) {
         // Screen bigger than map
-        myGameArea.canvas.width = maps[mapID].width;
+        myGameArea.canvas.width = maps.data[maps.currentMap].width;
     }
     // Screen fits on map
     else myGameArea.canvas.width = myGameArea.canvas.width = document.body.clientWidth;
     
-    if (document.body.clientHeight > maps[mapID].height) {
+    if (document.body.clientHeight > maps.data[maps.currentMap].height) {
         // Screen bigger than map
-        myGameArea.canvas.height = maps[mapID].height;
+        myGameArea.canvas.height = maps.data[maps.currentMap].height;
     }
     // Screen fits on map
     else myGameArea.canvas.height = myGameArea.canvas.height = document.body.clientHeight;
@@ -167,7 +140,7 @@ function toggle(boolean) {
 function blackTransition() {
     ctx = myGameArea.context;
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, maps[mapID].width, maps[mapID].height);
+    ctx.fillRect(0, 0, maps.data[maps.currentMap].width, maps.data[maps.currentMap].height);
 }
 
 function extraGuiRect() {
@@ -228,15 +201,15 @@ function showPosition(target) {
     ctx = myGameArea.context;
     ctx.fillStyle = "black";
     ctx.fillText("x:" + (target.x + target.offset_x) + ", y:" + (target.y + target.offset_y), 5, 60);
-    ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x)/maps[mapID].tileset.spriteWidth) + ", " + Math.floor((target.y + target.offset_y)/maps[mapID].tileset.spriteHeight) + "]", 5, 80);
+    ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x)/maps.data[maps.currentMap].tileset.spriteWidth) + ", " + Math.floor((target.y + target.offset_y)/maps.data[maps.currentMap].tileset.spriteHeight) + "]", 5, 80);
 }
 
 // Button functions
 
 function debugButton() {
-    debug = toggle(debug);
-    maps[mapID].drawCache();
-    if (debug) {
+    myGameArea.debug = toggle(myGameArea.debug);
+    maps.data[maps.currentMap].drawCache();
+    if (myGameArea.debug) {
         document.getElementById("debugButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("debugButton").innerHTML = "Debug On";
     }
@@ -247,8 +220,8 @@ function debugButton() {
 }
 
 function guiButton() {
-    showExtra = toggle(showExtra);
-    if (showExtra) {
+    myGameArea.showExtra = toggle(myGameArea.showExtra);
+    if (myGameArea.showExtra) {
         document.getElementById("guiButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("guiButton").innerHTML = "GUI On";
     }
@@ -263,7 +236,7 @@ function guiButton() {
 // ##########
 
 function layerButton(i) {
-    currentLayer = i;
+    myGameArea.currentLayer = i;
     if (i == 0) {
         document.getElementById("layer1Button").setAttribute("class", "w3-button w3-green");
         document.getElementById("layer2Button").setAttribute("class", "w3-button w3-red");
@@ -292,8 +265,8 @@ function layerButton(i) {
 }
 
 function drawButton() {
-    drawingOn = toggle(drawingOn);
-    if (drawingOn) {
+    myGameArea.drawingOn = toggle(myGameArea.drawingOn);
+    if (myGameArea.drawingOn) {
         document.getElementById("drawButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("drawButton").innerHTML = "Drawing On";
     }

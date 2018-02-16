@@ -4,12 +4,13 @@ var scriptsToLoad = [
     'game.js',
     'astar.js',
     'constants.js',
+    'spritesheet.js',
     'utility.js',
     'component.js',
     'map.js',
     'dialog.js',
     'data.js'];
-scriptsToLoad.forEach(function(src) {
+scriptsToLoad.forEach(function (src) {
     var script = document.createElement('script');
     script.src = src;
     script.async = false;

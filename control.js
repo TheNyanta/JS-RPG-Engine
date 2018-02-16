@@ -2,10 +2,10 @@
 
 // TODO: Add goto a given position
 
-// TODO: Maybe fuse into component.js
+// TODO: Maybe fuse into Component.js
 
 /**
-* attach it to a component to add control: Following, Mouse Control -> goto click
+* attach it to a Component to add control: Following, Mouse Control -> goto click
 * @param obj
 */
 function control(obj) {
@@ -45,8 +45,8 @@ function control(obj) {
             if (myGameArea.clicked) {
                 // Update new click only if finished
                 if (this.finished) {
-                    this.destX = Math.floor((myGameArea.clickdownX+gameCamera.x)/16);
-                    this.destY = Math.floor((myGameArea.clickdownY+gameCamera.y)/16);
+                    this.destX = Math.floor((myGameArea.clickdownX+myGameArea.gameCamera.x)/16);
+                    this.destY = Math.floor((myGameArea.clickdownY+myGameArea.gameCamera.y)/16);
                     this.finished = false;
                 }
                 // Disable Key Control while going to obj
@@ -73,7 +73,7 @@ function control(obj) {
         
         // Map collision: Take astar route
         else {
-            if (!this.obj.componentCollision(this.target)) {
+            if (!this.obj.ComponentCollision(this.target)) {
                 // Create / Update route
                 this.createRoute(this.destX, this.destY);
                 
@@ -129,9 +129,9 @@ function control(obj) {
                     this.obj.speedY = -this.obj.speed;    
                 
                 // To show the Path
-                if (debug) {
+                if (myGameArea.debug) {
                     this.rects = [];
-                    for (i = 0; i < this.route.length; i++) this.rects[i] = new component(this.route[i].x * 16, this.route[i].y * 16).rectangle(16, 16, "black", false, "yellow", true);
+                    for (i = 0; i < this.route.length; i++) this.rects[i] = new Component(this.route[i].x * 16, this.route[i].y * 16).rectangle(16, 16, "black", false, "yellow", true);
                 }
                 
                 // Increase routeIndex to follow the given path until the destination is reached    

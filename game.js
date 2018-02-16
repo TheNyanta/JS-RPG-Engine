@@ -4,81 +4,87 @@ function startGame() {
 }
 
 var myGameArea = {
-    canvas : document.createElement("canvas"),
-    init : function() {
+    canvas: document.createElement("canvas"),
+    debug: false, // Global Variable for debugging
+    showExtra: false,
+    init: function () {
         // Game canvas
         this.canvas.width = 600;
         this.canvas.height = 400;
         this.canvas.id = "game";
         this.context = this.canvas.getContext("2d");
-        
+
         // Pause game if not selected
         document.active = true;
-        $(window).focus(function() {document.active = true;});
-        $(window).blur(function() {document.active = false;});
-        
+        $(window).focus(function () {
+            document.active = true;
+        });
+        $(window).blur(function () {
+            document.active = false;
+        });
+
         this.minWidth = 1600;
         this.minHeight = 900;
-        
+
         this.frameNo = 0;
         this.gameSequence = false;
-        
+
         //this.canvas.style.cursor = "none"; //hide the original cursor
-        
+
         // "Cache" Map on an hidden canvas
         this.panorama = document.createElement('canvas');
         this.cgx1 = this.panorama.getContext("2d");
-    
+
         this.background = document.createElement('canvas');
         this.cgx2 = this.background.getContext("2d");
-    
+
         this.foreground = document.createElement('canvas');
         this.cgx3 = this.foreground.getContext("2d");
-        
+
         // Camera
-        this.gameCamera = new function() {
+        this.gameCamera = new function () {
             this.x = 0;
             this.y = 0;
-            
-            this.setTarget = function(target) {
+
+            this.setTarget = function (target) {
                 this.target = target;
             }
-            
-            this.update = function() {
+
+            this.update = function () {
                 // Follow target
                 if (this.target != undefined) {
-                    this.x = this.target.x - myGameArea.canvas.width/2;
-                    this.y = this.target.y - myGameArea.canvas.height/2;
+                    this.x = this.target.x - myGameArea.canvas.width / 2;
+                    this.y = this.target.y - myGameArea.canvas.height / 2;
                 }
-                
+
                 // Keep camera view inside the map
                 if (this.x < 0) this.x = 0;
-                if (this.x > maps[mapID].width - myGameArea.canvas.width) this.x = maps[mapID].width - myGameArea.canvas.width;
+                if (this.x > maps.data[maps.currentMap].width - myGameArea.canvas.width) this.x = maps.data[maps.currentMap].width - myGameArea.canvas.width;
                 if (this.y < 0) this.y = 0;
-                if (this.y > maps[mapID].height - myGameArea.canvas.height) this.y = maps[mapID].height - myGameArea.canvas.height;
-                
+                if (this.y > maps.data[maps.currentMap].height - myGameArea.canvas.height) this.y = maps.data[maps.currentMap].height - myGameArea.canvas.height;
+
                 // Camera (0,0) if map smaller than canvas
-                if (maps[mapID].width - myGameArea.canvas.width < 0) this.x = 0;
-                if (maps[mapID].height - myGameArea.canvas.height < 0) this.y = 0;              
+                if (maps.data[maps.currentMap].width - myGameArea.canvas.width < 0) this.x = 0;
+                if (maps.data[maps.currentMap].height - myGameArea.canvas.height < 0) this.y = 0;
             }
         }
         // Init Camera Target
         this.gameCamera.setTarget(cameraTarget);
-        
+
         // Initalize Maps
-        for (i=0; i<maps.length; i++) {
-            maps[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);
-            //this.minWidth = Math.min(this.minWidth, maps[i].mapWidth * maps[i].tileset.spriteWidth);
-            //this.minHeight = Math.min(this.minHeight, maps[i].mapHeight * maps[i].tileset.spriteHeight);
+        for (i = 0; i < maps.data.length; i++) {
+            maps.data[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);
+            //this.minWidth = Math.min(this.minWidth, maps.data[i].mapWidth * maps.data[i].tileset.spriteWidth);
+            //this.minHeight = Math.min(this.minHeight, maps.data[i].mapHeight * maps.data[i].tileset.spriteHeight);
         }
-        
+
         // Smallest map
         //this.canvas.width = this.minWidth;
         //this.canvas.height = this.minHeight;
-        
+
         // Draw the first or current map onto the cached canvas'
-        maps[mapID].drawCache();
-        
+        maps.data[maps.currentMap].drawCache();
+
         // Add buttons
         var myGameButtons =
             '<div class="w3-container w3-padding-64">' +
@@ -93,31 +99,35 @@ var myGameArea = {
             '<br>' +
             '<a>Talk to the girl or the cat by pressing enter in front of them.</a>' +
             '</div>';
-                
-        document.getElementById("startGame").insertAdjacentHTML('afterend',myGameButtons);
-        
+
+        document.getElementById("startGame").insertAdjacentHTML('afterend', myGameButtons);
+
         // Replace Start Button with Canvas
         document.getElementById("startGame").parentElement.replaceChild(this.canvas, document.getElementById("startGame"));
-        
-        window.requestAnimationFrame = window.requestAnimationFrame
-        || window.mozRequestAnimationFrame
-        || window.webkitRequestAnimationFrame
-        || window.msRequestAnimationFrame
-        || function(f){return setTimeout(f, 1000/60)}; // simulate calling code 60 
- 
-        window.cancelAnimationFrame = window.cancelAnimationFrame
-        || window.mozCancelAnimationFrame
-        || function(requestID){clearTimeout(requestID)}; //fall back
-        
+
+        window.requestAnimationFrame = window.requestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.msRequestAnimationFrame ||
+            function (f) {
+                return setTimeout(f, 1000 / 60)
+            }; // simulate calling code 60 
+
+        window.cancelAnimationFrame = window.cancelAnimationFrame ||
+            window.mozCancelAnimationFrame ||
+            function (requestID) {
+                clearTimeout(requestID)
+            }; //fall back
+
         // OnCanvas
-        this.onCanvas = function(x, y, canvas) {
+        this.onCanvas = function (x, y, canvas) {
             if (x >= canvas.getBoundingClientRect().x &&
                 x <= canvas.getBoundingClientRect().x + canvas.width &&
                 y >= canvas.getBoundingClientRect().y &&
                 y <= canvas.getBoundingClientRect().y + canvas.height) return true;
             return false;
         }
-        
+
         // INITIALIZE USER INPUT
         // Keydown
         window.addEventListener('keydown', function (e) {
@@ -150,8 +160,7 @@ var myGameArea = {
             if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
                 myGameArea.x = Math.floor(e.clientX - myGameArea.canvas.getBoundingClientRect().x);
                 myGameArea.y = Math.floor(e.clientY - myGameArea.canvas.getBoundingClientRect().y);
-            }
-            else {
+            } else {
                 myGameArea.x = undefined;
                 myGameArea.y = undefined;
             }
@@ -174,90 +183,95 @@ var myGameArea = {
             }
         })
         // Touch move
-        window.addEventListener('touchmove', function (e) {            
+        window.addEventListener('touchmove', function (e) {
             if (myGameArea.onCanvas(e.touches[0].clientX, e.touches[0].clientY, myGameArea.canvas)) {
                 myGameArea.x = Math.floor(e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().x);
                 myGameArea.y = Math.floor(e.touches[0].clientY - myGameArea.tileset.getBoundingClientRect().y);
-            }
-            else {
+            } else {
                 myGameArea.x = undefined;
                 myGameArea.y = undefined;
             }
         })
     },
-    
-    start : function() {
-        
+
+    start: function () {
+
         function gameLoop() {
             requestAnimationFrame(gameLoop);
             if (document.active)
                 updateGameArea();
         }
-        
-        gameLoop();      
+
+        gameLoop();
     },
-    
-    stop : function() {
-        
+
+    stop: function () {
+
     },
-        
-    clear : function() {
+
+    clear: function () {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
-}
+};
 
 function everyinterval(n) {
-    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+    if ((myGameArea.frameNo / n) % 1 == 0) {
+        return true;
+    }
     return false;
 }
 
 /**
-* Updates the current map with all it's components
-*/
+ * Updates the current map with all it's Components
+ */
 function update() {
-    
+
     // In a myGameArea.gameSequence there will be no movement (i.e. activate myGameArea.gameSequence when opening a menu)
     if (!myGameArea.gameSequence) {
         // Character has to be able to interacted
         if (character.front != undefined)
-            for (var i = 0; i < maps_objects[mapID].length; i++) character.updateInteraction(maps_objects[mapID][i]);
-        // Update the movement of all components in maps_objects[mapID] (this includes mapCollision resolving)
-        if (!myGameArea.transition) for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateMovement();
-        // Check each combination pair of components in maps_objects[mapID] for component-component-collision
-        for (var i = 0; i < maps_objects[mapID].length; i++)
-            for (var j = i + 1; j < maps_objects[mapID].length; j++)
-                if (maps_objects[mapID][i].componentCollision != undefined)
-                    maps_objects[mapID][i].componentCollision(maps_objects[mapID][j]);
-        // Update the position of all "moveable" components in maps_objects[mapID]
-        for (var i = 0; i < maps_objects[mapID].length; i++) if (maps_objects[mapID][i].speed != undefined) maps_objects[mapID][i].updatePosition();
-        
+            for (var i = 0; i < maps_objects[maps.currentMap].length; i++) character.updateInteraction(maps_objects[maps.currentMap][i]);
+        // Update the movement of all Components in maps_objects[maps.currentMap] (this includes mapCollision resolving)
+        if (!myGameArea.transition)
+            for (var i = 0; i < maps_objects[maps.currentMap].length; i++) maps_objects[maps.currentMap][i].updateMovement();
+        // Check each combination pair of Components in maps_objects[maps.currentMap] for Component-Component-collision
+        for (var i = 0; i < maps_objects[maps.currentMap].length; i++)
+            for (var j = i + 1; j < maps_objects[maps.currentMap].length; j++)
+                if (maps_objects[maps.currentMap][i].ComponentCollision != undefined)
+                    maps_objects[maps.currentMap][i].ComponentCollision(maps_objects[maps.currentMap][j]);
+        // Update the position of all "moveable" Components in maps_objects[maps.currentMap]
+        for (var i = 0; i < maps_objects[maps.currentMap].length; i++)
+            if (maps_objects[maps.currentMap][i].speed != undefined) maps_objects[maps.currentMap][i].updatePosition();
+
     }
-    
+
     // Update Events
-    //for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].updateEvent();
-    
+    //for (var i = 0; i < maps_objects[maps.currentMap].length; i++) maps_objects[maps.currentMap][i].updateEvent();
+
     myGameArea.gameCamera.update();
 }
 
 /**
-* Draws the canvas
-* First it draws the background
-* Second it draws the objects
-* Third it draws the foreground
-* Four it draws the gui
-*/
+ * Draws the canvas
+ * First it draws the background
+ * Second it draws the objects
+ * Third it draws the foreground
+ * Four it draws the gui
+ */
 function draw() {
-    maps[mapID].drawBackground();
-    
-    // Sorts the array after it's y value so that components with bigger y are drawn later
-    maps_objects[mapID].sort(function(a,b) {return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0); });
+    maps.data[maps.currentMap].drawBackground();
+
+    // Sorts the array after it's y value so that Components with bigger y are drawn later
+    maps_objects[maps.currentMap].sort(function (a, b) {
+        return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);
+    });
     // Draw Objects of the current map
-    for (var i = 0; i < maps_objects[mapID].length; i++) maps_objects[mapID][i].draw(myGameArea.context);
-    
-    maps[mapID].drawForeground();
-    
+    for (var i = 0; i < maps_objects[maps.currentMap].length; i++) maps_objects[maps.currentMap][i].draw(myGameArea.context);
+
+    maps.data[maps.currentMap].drawForeground();
+
     // Extras
-    if (showExtra) {
+    if (myGameArea.showExtra) {
         extraGuiRect();
         showTime();
         updateFPS();
@@ -267,24 +281,26 @@ function draw() {
 }
 
 /**
-* Updates the canvas
-* This is the core function of the game
-*/
+ * Updates the canvas
+ * This is the core function of the game
+ */
 function updateGameArea() {
     myGameArea.frameNo += 1;
     // Redraw caches' on map change + map switch transition
-    if (mapID != currentMapID) {
-        currentMapID = mapID;
-        maps[mapID].drawCache();
-        setTimeout(function() { myGameArea.transition = false; }, 400);
+    if (maps.shownMap != maps.currentMap) {
+        maps.shownMap = maps.currentMap;
+        maps.data[maps.currentMap].drawCache();
+        setTimeout(function () {
+            myGameArea.transition = false;
+        }, 400);
     }
-    
+
     update();
-    
+
     // Draw transition
     if (myGameArea.transition) blackTransition();
     else draw();
-    
+
     // Draw dialog
     if (myGameArea.gameSequence && currentDialog != undefined) currentDialog.update();
 }

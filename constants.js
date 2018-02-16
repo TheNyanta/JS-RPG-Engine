@@ -2,61 +2,64 @@
 //#### Global Constants ####
 //##########################
 
-// Key Codes
-var KEY_ENTER = 13;
-var KEY_SHIFT = 16;
-var KEY_ESC = 27;
-var KEY_SPACE = 32;
-var KEY_LEFT = 37;
-var KEY_UP = 38;
-var KEY_RIGHT = 39;
-var KEY_DOWN = 40;
-var KEY_0 = 48;
-var KEY_1 = 49;
-var KEY_2 = 50;
-var KEY_3 = 51;
-var KEY_4 = 52;
-var KEY_5 = 53;
-var KEY_6 = 54;
-var KEY_7 = 55;
-var KEY_8 = 56;
-var KEY_9 = 57;
-var KEY_W = 87;
-var KEY_A = 65;
-var KEY_S = 83;
-var KEY_D = 68;
+var constants = {
+        // Key Codes
+        KEY_ENTER: 13,
+        KEY_ENTER: 13,
+        KEY_SHIFT: 16,
+        KEY_ESC: 27,
+        KEY_SPACE: 32,
+        KEY_LEFT: 37,
+        KEY_UP: 38,
+        KEY_RIGHT: 39,
+        KEY_DOWN: 40,
+        KEY_0: 48,
+        KEY_1: 49,
+        KEY_2: 50,
+        KEY_3: 51,
+        KEY_4: 52,
+        KEY_5: 53,
+        KEY_6: 54,
+        KEY_7: 55,
+        KEY_8: 56,
+        KEY_9: 57,
+        KEY_W: 87,
+        KEY_A: 65,
+        KEY_S: 83,
+        KEY_D: 68,
 
-var KEY_PLUS = 107;
-var KEY_MINUS = 109;
-var KEY_Q = 81;
-var KEY_E = 69;
-var KEY_R = 82;
-var KEY_T = 84;
-var KEY_Z = 90;
-var KEY_U = 85;
-var KEY_I = 73;
-var KEY_O = 79;    
-var KEY_P = 80;
-var KEY_F = 70;
-var KEY_G = 71;
-var KEY_H = 72;
-var KEY_J = 74;
-var KEY_K = 75;
-var KEY_L = 76;
-var KEY_Y = 89;
-var KEY_X = 88;
-var KEY_C = 67;
-var KEY_V = 86;
-var KEY_B = 66;
-var KEY_N = 78;
-var KEY_M = 77;
+        KEY_PLUS: 107,
+        KEY_MINUS: 109,
+        KEY_Q: 81,
+        KEY_E: 69,
+        KEY_R: 82,
+        KEY_T: 84,
+        KEY_Z: 90,
+        KEY_U: 85,
+        KEY_I: 73,
+        KEY_O: 79,
+        KEY_P: 80,
+        KEY_F: 70,
+        KEY_G: 71,
+        KEY_H: 72,
+        KEY_J: 74,
+        KEY_K: 75,
+        KEY_L: 76,
+        KEY_Y: 89,
+        KEY_X: 88,
+        KEY_C: 67,
+        KEY_V: 86,
+        KEY_B: 66,
+        KEY_N: 78,
+        KEY_M: 77,
 
-// Directions
-var DIR_E = 1;
-var DIR_NE = 2;
-var DIR_N = 4;
-var DIR_NW = 8;
-var DIR_W = 16;
-var DIR_SW = 32;
-var DIR_S = 64;
-var DIR_SE = 128;
+        // Directions
+        DIR_E: 1,
+        DIR_NE: 2,
+        DIR_N: 4,
+        DIR_NW: 8,
+        DIR_W: 16,
+        DIR_SW: 32,
+        DIR_S: 64,
+        DIR_SE: 128,
+}
