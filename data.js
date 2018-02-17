@@ -48,7 +48,6 @@ addSpritesheet(new Spritesheet("Assets/Image/cat.png", 12, 8, 24, 32));
 addSpritesheet(new Spritesheet("Assets/Image/animal.png", 12, 8, 24, 32));
 addSpritesheet(new Spritesheet("Assets/Image/snow_jukebox.png", 12, 8, 24, 32));
 addSpritesheet(new Spritesheet("Assets/Image/castledoor_1.png", 1, 4, 47, 48));
-*/
 
 // Music
 var audio1 = new Audio('Assets/Audio/banana-phone.m4a');
@@ -56,6 +55,7 @@ var audio1 = new Audio('Assets/Audio/banana-phone.m4a');
 // Sounds
 var catsound = new Audio('Assets/Audio/cat.m4a');
 var dogsound = new Audio('Assets/Audio/dog.m4a');
+*/
 
 audio1.volume = 0.2;
 catsound.volume = 0.2;
