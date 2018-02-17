@@ -30,6 +30,7 @@ var catsound = new Audio('https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio
 var dogsound = new Audio('https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/dog.m4a');
 
 /*
+// local
 addSpritesheet(new Spritesheet("Assets/Image/forest.png", 60, 32, 8, 8));
 addSpritesheet(new Spritesheet("Assets/Image/snowforest.png", 60, 32, 8, 8));
 addSpritesheet(new Spritesheet("Assets/Image/castle.png", 60, 32, 8, 8));
