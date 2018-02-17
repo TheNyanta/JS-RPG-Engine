@@ -166,45 +166,8 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
     // ## Map Editor ##
     // ################
 
-    /**
-     * print layers as string to console
-     */
-    this.printLayers = function (name) {
-        var output = "";
-        // Layer 1
-        output += "var " + name + "_layer1 = [";
-        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
-            output += this.layers[0][i];
-            if (i < this.mapWidth * this.mapHeight - 1)
-                output += ", ";
-        }
-        output += "];\n";
-        // Layer 2
-        output += "var " + name + "_layer2 = [";
-        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
-            output += this.layers[1][i];
-            if (i < this.mapWidth * this.mapHeight - 1)
-                output += ", ";
-        }
-        output += "];\n";
-        // Layer 3
-        output += "var " + name + "_layer3 = [";
-        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
-            output += this.layers[2][i];
-            if (i < this.mapWidth * this.mapHeight - 1)
-                output += ", ";
-        }
-        output += "];\n";
-        // Collision Layer
-        output += "var " + name + "_layerC = [";
-        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
-            output += this.layerC[i];
-            if (i < this.mapWidth * this.mapHeight - 1)
-                output += ", ";
-        }
-        output += "];\n";
-        //Print
-        console.log(output);
+    this.initTilesetEditor = function () {
+
     }
 
     // Map editing: get tiles from tileset and place them on the map
@@ -217,8 +180,11 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
             x = Math.floor((x + myGameArea.gameCamera.x) / this.tileset.spriteWidth);
             y = Math.floor((y + myGameArea.gameCamera.y) / this.tileset.spriteHeight);
             if (myGameArea.drawingOn) {
-                if (myGameArea.currentLayer < 3) this.layers[myGameArea.currentLayer][xy2i(x, y, this.mapWidth)] = myGameArea.tiletype;
-                else this.layerC[xy2i(x, y, this.mapWidth)] = toggle(this.layerC[xy2i(x, y, this.mapWidth)]);
+                if (myGameArea.currentLayer == 0) maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].layer1 = myGameArea.tiletype;
+                if (myGameArea.currentLayer == 1) maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].layer2 = myGameArea.tiletype;
+                if (myGameArea.currentLayer == 2) maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].layer3 = myGameArea.tiletype;
+                if (myGameArea.currentLayer == 3) maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].collision = toggle(maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].collision);
+
                 maps.data[maps.currentMap].drawCache();
             }
             document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
@@ -230,6 +196,7 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
             myGameArea.tiletype = xy2i(x, y, this.tileset.spritesX) + 1;
             document.getElementById("selectedTile").innerHTML = myGameArea.tiletype;
             document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
+            this.drawTileset();
         }
     }
 
@@ -249,7 +216,59 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
                 tile_h = h * this.tileset.spriteHeight;
                 //(ctx, spritesheet, number, x, y)
                 drawSprite(myGameArea.tilecontext, this.tileset, mapIndex, tile_w, tile_h);
+
+                // Show Tileset Grid
+                if (false) {
+                    myGameArea.tilecontext.strokeStyle = "black";
+                    myGameArea.tilecontext.strokeRect(tile_w, tile_h, 8, 8);
+                }
+
+                if (myGameArea.tiletype - 1 == mapIndex) {
+                    myGameArea.tilecontext.strokeStyle = "red";
+                    myGameArea.tilecontext.strokeRect(tile_w, tile_h, 8, 8);
+                }
             }
         }
+    }
+
+    /**
+     * print layers as string to console
+     */
+    this.printLayers = function (name) {
+        var output = "";
+        // Layer 1
+        output += "var " + name + "_layer1 = [";
+        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+            output += this.tiles[i].layer1;
+            if (i < this.mapWidth * this.mapHeight - 1)
+                output += ", ";
+        }
+        output += "];\n";
+        // Layer 2
+        output += "var " + name + "_layer2 = [";
+        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+            output += this.tiles[i].layer2;
+            if (i < this.mapWidth * this.mapHeight - 1)
+                output += ", ";
+        }
+        output += "];\n";
+        // Layer 3
+        output += "var " + name + "_layer3 = [";
+        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+            output += this.tiles[i].layer3;
+            if (i < this.mapWidth * this.mapHeight - 1)
+                output += ", ";
+        }
+        output += "];\n";
+        // Collision Layer
+        output += "var " + name + "_layerC = [";
+        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+            output += this.tiles[i].collision;
+            if (i < this.mapWidth * this.mapHeight - 1)
+                output += ", ";
+        }
+        output += "];\n";
+        //Print
+        console.log(output);
     }
 }

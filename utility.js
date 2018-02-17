@@ -239,27 +239,28 @@ function layerButton(i) {
     myGameArea.currentLayer = i;
     if (i == 0) {
         document.getElementById("layer1Button").setAttribute("class", "w3-button w3-green");
-        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-red");
-        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-red");
-        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-blue");
+        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-blue");
+        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-blue");
     }
     if (i == 1) {
-        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-blue");
         document.getElementById("layer2Button").setAttribute("class", "w3-button w3-green");
-        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-red");
-        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-blue");
+        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-blue");
     }
     if (i == 2) {
-        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-red");
-        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-blue");
+        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-blue");
         document.getElementById("layer3Button").setAttribute("class", "w3-button w3-green");
-        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-blue");
     }
     if (i == 3) {
-        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-red");
-        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-red");
-        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-red");
+        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-blue");
+        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-blue");
+        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-blue");
         document.getElementById("layerCButton").setAttribute("class", "w3-button w3-green");
+        if (!myGameArea.debug) debugButton();
     }
     
 }

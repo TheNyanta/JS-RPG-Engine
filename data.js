@@ -22,6 +22,44 @@ addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets
 addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snow_jukebox.png", 12, 8, 24, 32));
 addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castledoor_1.png", 1, 4, 47, 48));
 
+// Music
+var audio1 = new Audio('https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/banana-phone.m4a');
+
+// Sounds
+var catsound = new Audio('https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/cat.m4a');
+var dogsound = new Audio('https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/dog.m4a');
+
+/*
+addSpritesheet(new Spritesheet("Assets/Image/forest.png", 60, 32, 8, 8));
+addSpritesheet(new Spritesheet("Assets/Image/snowforest.png", 60, 32, 8, 8));
+addSpritesheet(new Spritesheet("Assets/Image/castle.png", 60, 32, 8, 8));
+addSpritesheet(new Spritesheet("Assets/Image/castletown.png", 60, 32, 8, 8));
+
+addMap(new Map("Assets/Image/sunset1.png", spritesheets.data[0], 80, 60, 8, 8, 60, 32));
+addMap(new Map(undefined, spritesheets.data[1], 80, 60, 8, 8, 60, 32));
+addMap(new Map(undefined, spritesheets.data[2], 42, 40, 8, 8, 60, 32));
+addMap(new Map(undefined, spritesheets.data[3], 42, 60, 8, 8, 60, 32));
+
+// Setup Objects Spritesheets
+addSpritesheet(new Spritesheet("Assets/Image/character.png", 12, 8, 24, 32));
+addSpritesheet(new Spritesheet("Assets/Image/girl.png", 12, 8, 24, 32));
+addSpritesheet(new Spritesheet("Assets/Image/cat.png", 12, 8, 24, 32));
+addSpritesheet(new Spritesheet("Assets/Image/animal.png", 12, 8, 24, 32));
+addSpritesheet(new Spritesheet("Assets/Image/snow_jukebox.png", 12, 8, 24, 32));
+addSpritesheet(new Spritesheet("Assets/Image/castledoor_1.png", 1, 4, 47, 48));
+*/
+
+// Music
+var audio1 = new Audio('Assets/Audio/banana-phone.m4a');
+
+// Sounds
+var catsound = new Audio('Assets/Audio/cat.m4a');
+var dogsound = new Audio('Assets/Audio/dog.m4a');
+
+audio1.volume = 0.2;
+catsound.volume = 0.2;
+dogsound.volume = 0.2;
+
 // Setup Character
 var character = new Component(240, 280)
     .sprite(spritesheets.data[4])
@@ -97,17 +135,6 @@ maps_objects.push(map0_obj, map1_obj, map2_obj, map3_obj);
 
 // Set Camera
 var cameraTarget = character;
-
-// Music
-var audio1 = new Audio('https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/banana-phone.m4a');
-
-// Sounds
-var catsound = new Audio('https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/cat.m4a');
-var dogsound = new Audio('https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/dog.m4a');
-
-audio1.volume = 0.2;
-catsound.volume = 0.2;
-dogsound.volume = 0.2;
 
 // Dialogs
 var girldialog = new dialog();

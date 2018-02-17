@@ -314,6 +314,7 @@ function Component(x, y, width, height) {
          * Calculates the new position and checks if it's walkable by using the maps collision layer
          * "may TODO": Adept for all sizes
          */
+
         // 8x8 tiles
         this.isMapWalkable = function () {
             if (!this.collidable) return true;
@@ -321,11 +322,63 @@ function Component(x, y, width, height) {
 
             // Converts the cartesian to grid coordiantes
             var x1 = Math.floor((this.x + this.offset_x + this.speedX) / 8);
-            var x2 = Math.floor((this.x + this.offset_x + this.speedX + this.offset_width) / 8);
+            var x2 = x1 + 1;
+            var x3 = Math.floor((this.x + this.offset_x + this.speedX + this.offset_width) / 8);
             var y1 = Math.floor((this.y + this.offset_y + this.speedY) / 8);
-            var y2 = Math.floor((this.y + this.offset_y + this.speedY + this.offset_height) / 8);
-            
+            var y2 = y1 + 1;
+            var y3 = Math.floor((this.y + this.offset_y + this.speedY + this.offset_height) / 8);
+
+            if (Math.abs(x3 - (this.x + this.offset_x + this.offset_width + this.speedX) / 8) < 0.1) x3 = x2;
+            if (Math.abs(y3 - (this.y + this.offset_y + this.offset_height + this.speedY) / 8) < 0.1) y3 = y2;
+
             var d = maps.data[maps.currentMap];
+
+            /*
+            // Debugging Map Collision: Shows on which tiles the object is standing and map collisions
+            if (myGameArea.debug) {
+                this.rects = [];
+                for (i = 0; i < 9; i++) this.rects[i] = new Component().rectangle(8, 8, "black", false, "blue", true);
+
+                this.rects[0].x = x1 * 8;
+                this.rects[0].y = y1 * 8;
+                this.rects[1].x = x1 * 8;
+                this.rects[1].y = y2 * 8;
+                this.rects[2].x = x1 * 8;
+                this.rects[2].y = y3 * 8;
+                this.rects[3].x = x2 * 8;
+                this.rects[3].y = y1 * 8;
+                this.rects[4].x = x2 * 8;
+                this.rects[4].y = y2 * 8;
+                this.rects[5].x = x2 * 8;
+                this.rects[5].y = y3 * 8;
+                this.rects[6].x = x3 * 8;
+                this.rects[6].y = y1 * 8;
+                this.rects[7].x = x3 * 8;
+                this.rects[7].y = y2 * 8;
+                this.rects[8].x = x3 * 8;
+                this.rects[8].y = y3 * 8;
+
+
+                if (d.tiles[xy2i(x1, y1, d.mapWidth)].collision) this.rects[0].outlineColor = "blue";
+                else this.rects[0].outlineColor = "red";
+                if (d.tiles[xy2i(x1, y2, d.mapWidth)].collision) this.rects[1].outlineColor = "blue";
+                else this.rects[1].outlineColor = "red";
+                if (d.tiles[xy2i(x1, y3, d.mapWidth)].collision) this.rects[2].outlineColor = "blue";
+                else this.rects[2].outlineColor = "red";
+                if (d.tiles[xy2i(x2, y1, d.mapWidth)].collision) this.rects[3].outlineColor = "blue";
+                else this.rects[3].outlineColor = "red";
+                if (d.tiles[xy2i(x2, y2, d.mapWidth)].collision) this.rects[4].outlineColor = "blue";
+                else this.rects[4].outlineColor = "red";
+                if (d.tiles[xy2i(x2, y3, d.mapWidth)].collision) this.rects[5].outlineColor = "blue";
+                else this.rects[5].outlineColor = "red";
+                if (d.tiles[xy2i(x3, y1, d.mapWidth)].collision) this.rects[6].outlineColor = "blue";
+                else this.rects[6].outlineColor = "red";
+                if (d.tiles[xy2i(x3, y2, d.mapWidth)].collision) this.rects[7].outlineColor = "blue";
+                else this.rects[7].outlineColor = "red";
+                if (d.tiles[xy2i(x3, y3, d.mapWidth)].collision) this.rects[8].outlineColor = "blue";
+                else this.rects[8].outlineColor = "red";
+            }
+            */
 
             // Check map borders
             if (this.x + this.offset_x + this.speedX < 0 ||
@@ -333,21 +386,16 @@ function Component(x, y, width, height) {
                 this.x + this.offset_x + this.speedX + this.offset_width > d.width ||
                 this.y + this.offset_y + this.speedY + this.offset_height > d.height)
                 return false;
-            
-          if (x2-x1 != 2) console.log("YEah");
 
-            // Use collision layer of the map and check if all 9 tiles are walkable (=true)
-            for (var i = 0; i < 3; i++) {
-                for (var j = 0; j < 3; j++) {
-                    if (d.tiles.length > xy2i(x1 + i, y1 + j, d.mapWidth))
-                        if (this.rectangleOverlap(d.tiles[xy2i(x1, y1, d.mapWidth)]))
-                            if (!d.tiles[xy2i(x1 + i, y1 + j, d.mapWidth)].collision) {
-                                //console.log((x1+i)+", "+(y1+j)+";;"+d.tiles[xy2i(x1 + i, y1 + j, d.mapWidth)].x+", "+d.tiles[xy2i(x1 + i, y1 + j, d.mapWidth)].x);
-                                return false;
-                            }
-                }
-            }
-            return true;
+            return (d.tiles[xy2i(x1, y1, d.mapWidth)].collision &&
+                d.tiles[xy2i(x1, y2, d.mapWidth)].collision &&
+                d.tiles[xy2i(x1, y3, d.mapWidth)].collision &&
+                d.tiles[xy2i(x2, y1, d.mapWidth)].collision &&
+                d.tiles[xy2i(x2, y2, d.mapWidth)].collision &&
+                d.tiles[xy2i(x2, y3, d.mapWidth)].collision &&
+                d.tiles[xy2i(x3, y1, d.mapWidth)].collision &&
+                d.tiles[xy2i(x3, y2, d.mapWidth)].collision &&
+                d.tiles[xy2i(x3, y3, d.mapWidth)].collision);
         }
 
         /**
@@ -447,10 +495,10 @@ function Component(x, y, width, height) {
      * Tell this obj overlaps with another obj
      */
     this.rectangleOverlap = function (otherobj) {
-        if ((this.y + this.offset_y + this.offset_height + this.speedY <= otherobj.y) ||
-            (this.y + this.offset_y + this.speedY >= otherobj.y + otherobj.height) ||
-            (this.x + this.offset_x + this.offset_width + this.speedX <= otherobj.x) ||
-            (this.x + this.offset_x + this.speedX >= otherobj.x + otherobj.width))
+        if ((this.y + this.offset_y + this.offset_height <= otherobj.y) ||
+            (this.y + this.offset_y >= otherobj.y + otherobj.height) ||
+            (this.x + this.offset_x + this.offset_width <= otherobj.x) ||
+            (this.x + this.offset_x >= otherobj.x + otherobj.width))
             return false
 
         return true;
@@ -464,25 +512,25 @@ function Component(x, y, width, height) {
      */
     this.interactive = function (enter) {
         // The front of the Component
-        this.front = new Component().rectangle(16, 16, "black", false, "white", true).collision(0, 0, 16, 16);
+        this.front = new Component().rectangle(8, 8, "black", false, "white", true).collision(0, 0, 8, 8);
 
         // Update fronts position based on the direction of this Component
         this.updateFront = function () {
             if (this.direction == constants.DIR_N) {
-                this.front.x = this.x + this.offset_x;
-                this.front.y = this.y + this.offset_y - 16;
+                this.front.x = this.x + this.offset_x + 4;
+                this.front.y = this.y + this.offset_y - 8;
             }
             if (this.direction == constants.DIR_S) {
-                this.front.x = this.x + this.offset_x
+                this.front.x = this.x + this.offset_x + 4;
                 this.front.y = this.y + this.offset_y + 16;
             }
             if (this.direction == constants.DIR_W) {
-                this.front.x = this.x + this.offset_x - 16;
-                this.front.y = this.y + this.offset_y;
+                this.front.x = this.x + this.offset_x - 8;
+                this.front.y = this.y + this.offset_y + 4;
             }
             if (this.direction == constants.DIR_E) {
                 this.front.x = this.x + this.offset_x + 16;
-                this.front.y = this.y + this.offset_y;
+                this.front.y = this.y + this.offset_y + 4;
             }
         }
 
