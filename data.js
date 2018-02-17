@@ -1,9 +1,3 @@
-var maps_objects = [];
-var map0_obj = [];
-var map1_obj = [];
-var map2_obj = [];
-var map3_obj = [];
-
 addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/forest.png", 60, 32, 8, 8));
 addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snowforest.png", 60, 32, 8, 8));
 addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castle.png", 60, 32, 8, 8));
@@ -98,6 +92,7 @@ var dog = new Component(100, 100)
 
 // Setup Jukebox
 var jukebox = new Component(260, 120)
+    .velocity(0)
     .sprite(spritesheets.data[8])
     .collision(0, 16, 24, 16);
 
@@ -127,6 +122,17 @@ gotoCastle.onStepEvent = function () {
     character.y = 284;
     myGameArea.transition = true;
 }
+
+var maps_objects = [];
+var map0_obj = [];
+var map1_obj = [];
+var map2_obj = [];
+var map3_obj = [];
+
+maps.data[0].addObject([character, girl, cat]);
+maps.data[1].addObject([character, girl, jukebox, dog]);
+maps.data[2].addObject([character, girl, castledoor, stone, gotoTown]);
+maps.data[3].addObject([character, gotoCastle]);
 
 map0_obj.push(character, girl, cat);
 map1_obj.push(character, girl, jukebox, dog);
@@ -263,16 +269,16 @@ cat.movementEvent = function () {
 dog.movementEvent = function () {
     if (!myGameArea.gameSequence) {
         // x move
-        if (Math.abs(this.x + this.offset_x - character.front.x) > Math.abs(this.y + this.offset_y - character.front.y)) {
-            if (this.x + this.offset_x != character.front.x) {
-                if (this.x + this.offset_x < character.front.x) this.speedX = this.speed;
+        if (Math.abs(this.x + this.offset_x - girl.x) > Math.abs(this.y + this.offset_y - girl.y)) {
+            if (this.x + this.offset_x != girl.x) {
+                if (this.x + this.offset_x < girl.x) this.speedX = this.speed;
                 else this.speedX = -this.speed;
             }
         }
         // y move
         else {
-            if (this.y + this.offset_y != character.front.y) {
-                if (this.y + this.offset_y < character.front.y) this.speedY = this.speed
+            if (this.y + this.offset_y != girl.y) {
+                if (this.y + this.offset_y < girl.y) this.speedY = this.speed
                 else this.speedY = -this.speed;
             }
         }

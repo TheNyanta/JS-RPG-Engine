@@ -96,6 +96,14 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
         var res = i2xy(i, this.mapWidth);
         this.tiles.push(new Tile(this.tileset, res[0] * this.tileset.spriteWidth, res[1] * this.tileset.spriteHeight));
     }
+    // Contains all the objects of the map
+    this.objects = [];
+    
+    this.addObject = function(object) {
+        if (object.length != undefined)
+            for(var i = 0; i < object.length; i++) this.objects.push(object[i]);
+        else this.objects.push(object);
+    }
 
     /**
      * Load layers into the the map

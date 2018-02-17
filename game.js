@@ -235,13 +235,13 @@ function update() {
         if (!myGameArea.transition)
             for (var i = 0; i < maps_objects[maps.currentMap].length; i++) maps_objects[maps.currentMap][i].updateMovement();
         // Check each combination pair of Components in maps_objects[maps.currentMap] for Component-Component-collision
-        for (var i = 0; i < maps_objects[maps.currentMap].length; i++)
-            for (var j = i + 1; j < maps_objects[maps.currentMap].length; j++)
-                if (maps_objects[maps.currentMap][i].ComponentCollision != undefined)
-                    maps_objects[maps.currentMap][i].ComponentCollision(maps_objects[maps.currentMap][j]);
+        for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
+            for (var j = i + 1; j < maps.data[maps.currentMap].objects.length; j++)
+                if (maps.data[maps.currentMap].objects[i].componentCollision != undefined)
+                    maps.data[maps.currentMap].objects[i].componentCollision(maps.data[maps.currentMap].objects[j]);
         // Update the position of all "moveable" Components in maps_objects[maps.currentMap]
-        for (var i = 0; i < maps_objects[maps.currentMap].length; i++)
-            if (maps_objects[maps.currentMap][i].speed != undefined) maps_objects[maps.currentMap][i].updatePosition();
+        for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
+            if (maps.data[maps.currentMap].objects[i].speed != undefined) maps.data[maps.currentMap].objects[i].updatePosition();
 
     }
 
@@ -259,15 +259,17 @@ function update() {
  * Four it draws the gui
  */
 function draw() {
+    // Draw Background
     maps.data[maps.currentMap].drawBackground();
 
     // Sorts the array after it's y value so that Components with bigger y are drawn later
-    maps_objects[maps.currentMap].sort(function (a, b) {
+    maps.data[maps.currentMap].objects.sort(function (a, b) {
         return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);
     });
     // Draw Objects of the current map
-    for (var i = 0; i < maps_objects[maps.currentMap].length; i++) maps_objects[maps.currentMap][i].draw(myGameArea.context);
+    for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++) maps.data[maps.currentMap].objects[i].draw(myGameArea.context);
 
+    // Draw Foreground
     maps.data[maps.currentMap].drawForeground();
 
     // Extras

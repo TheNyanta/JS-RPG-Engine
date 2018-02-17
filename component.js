@@ -318,7 +318,7 @@ function Component(x, y, width, height) {
         // 8x8 tiles
         this.isMapWalkable = function () {
             if (!this.collidable) return true;
-            if (this.speed == undefined) return true; // Something that can't move has no map collision
+            if (this.speed == undefined || this.speed == 0) return true; // Something that can't move has no map collision
 
             // Converts the cartesian to grid coordiantes
             var x1 = Math.floor((this.x + this.offset_x + this.speedX) / 8);
@@ -415,11 +415,11 @@ function Component(x, y, width, height) {
         }
 
         /**
-         * Prevent Collision with other Components
+         * Prevent collision with other Components
          * Has to be called in the main loop for all combinations after the control updates of all Components
          * (TODO: Pushable Components -> if (pushable && otherobj.noMapCollision) => push) 
          */
-        this.ComponentCollision = function (otherobj) {
+        this.componentCollision = function (otherobj) {
             if (!this.collidable || !otherobj.collidable) return false;
 
             // Saving y-speed
