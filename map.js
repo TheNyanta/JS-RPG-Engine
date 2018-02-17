@@ -287,11 +287,22 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
 }
 
 function loadImage(img) {
-    addSpritesheet(new Spritesheet(img, 60, 32, 8, 8));
+    var tmp;
+    for (var i = 0; i < spritesheets.data.length; i++) {
+        if (spritesheets.data[i].img.src.match(/[\w]+\.[A-Za-z]{3}$/)[0] == img.match(/[\w]+\.[A-Za-z]{3}$/)[0]) {
+            console.log("spritesheet already exists: taking existing one");
+            tmp = spritesheets.data[i];
+        }
+    }
+    if (tmp == undefined) {
+        console.log("created new spritesheet")
+        addSpritesheet(new Spritesheet(img, 60, 32, 8, 8));
+        tmp = spritesheets.data[spritesheets.data.length - 1];
+    }
     //maps.data[maps.currentMap].image.src = img;
-    maps.data[maps.currentMap].tileset = spritesheets.data[spritesheets.data.length - 1];
+    maps.data[maps.currentMap].tileset = tmp;
     maps.data[maps.currentMap].switchTileset();
-    
+
     setTimeout(function () {
         maps.data[maps.currentMap].drawCache();
         maps.data[maps.currentMap].drawTileset();
