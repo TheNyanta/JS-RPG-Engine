@@ -114,7 +114,8 @@ var myGameArea = {
                 '<button class="w3-button w3-green" id="layer1Button" onclick="layerButton(0)">Layer 1</button>' +
                 '<button class="w3-button w3-blue" id="layer2Button" onclick="layerButton(1)">Layer 2</button>' +
                 '<button class="w3-button w3-blue" id="layer3Button" onclick="layerButton(2)">Layer 3</button>' +
-                '<button class="w3-button w3-blue" id="layerCButton" onclick="layerButton(3)">Collision Layer</button><br>' +
+                '<button class="w3-button w3-blue" id="layerCButton" onclick="layerButton(3)">Collision Layer</button>' + 
+                '<input class="w3-button w3-blue" type="string" id="tilesetFile" onchange="loadImage(value)" value="/Assets/Image/xyz.png"><br>' +
                 '<button class="w3-button w3-red" id="drawButton" onclick="drawButton()">Drawing Off</button>' +
                 '<button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug Off</button>' +
                 '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +

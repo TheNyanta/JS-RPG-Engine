@@ -98,10 +98,10 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
     }
     // Contains all the objects of the map
     this.objects = [];
-    
-    this.addObject = function(object) {
+
+    this.addObject = function (object) {
         if (object.length != undefined)
-            for(var i = 0; i < object.length; i++) this.objects.push(object[i]);
+            for (var i = 0; i < object.length; i++) this.objects.push(object[i]);
         else this.objects.push(object);
     }
 
@@ -279,4 +279,21 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
         //Print
         console.log(output);
     }
+
+    // After the maps tileset was changed, change the tileset of the tiles
+    this.switchTileset = function () {
+        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) this.tiles[i].spritesheet = this.tileset;
+    }
+}
+
+function loadImage(img) {
+    addSpritesheet(new Spritesheet(img, 60, 32, 8, 8));
+    //maps.data[maps.currentMap].image.src = img;
+    maps.data[maps.currentMap].tileset = spritesheets.data[spritesheets.data.length - 1];
+    maps.data[maps.currentMap].switchTileset();
+    
+    setTimeout(function () {
+        maps.data[maps.currentMap].drawCache();
+        maps.data[maps.currentMap].drawTileset();
+    }, 100);
 }
