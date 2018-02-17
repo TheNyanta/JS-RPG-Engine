@@ -1,9 +1,12 @@
 # HTML-JAVASCRIPT
 
-Prototype Engine for a top-down rpg (or a plattformer)
+Prototype Engine for a top-down rpg
 
 ## TODO:
-Store game date properly!!!
+
+# Engine
+
+Refine storing of game data
 
 Refine Events + Dialogs
 
@@ -20,6 +23,14 @@ Implement proper GUI + Gamemenu (i.e. it opens by pressing "Esc")
 (Implement Custom Keybinding)
 
 Implement Battle System (Realtime and/or Roundbased) + Stats (Health, Mana, Strength, etc.)
+
+### Editor
+
+Map Editor: You can change the maps layers tile per tile
+
+Refine Map Editing
+
+Implement adding & editing objects
 
 ## DEMO
 
