@@ -1,13 +1,18 @@
 /**
- * A Component in the game that will be drawn
- * For Geometric Objects, Images & Sprites
+ * Component constructor
  * @param x-position
  * @param y-position
  */
-function Component(x, y) {
-    // Standard Properties of any Component
+function Component(x, y, spritesheet) {
+    // Properties
     this.x = x;
     this.y = y;
+
+    this.spritesheet = spritesheet;
+    this.width = this.spritesheet.spriteWidth;
+    this.height = this.spritesheet.spriteHeight;
+    // Default first sprite image
+    this.sequence = 0;
 
     //this.lastx = x;
     //this.lasty = y;    
@@ -17,93 +22,32 @@ function Component(x, y) {
     //this.angle = 0; 
     //this.angleSpeed = 0;
 
-    /**
-     * image component
-     * @param {file} image src
-     * @param image draw width
-     * @param image draw height
-     */
-    this.image = function (img, width, height) {
-        this.type = "image";
-        if (this.img == undefined) this.img = new Image();
-        this.img.src = img;
-        this.width = width;
-        this.height = height;
-
-        this.draw = function (ctx) {
-            ctx.drawImage(this.img, this.x - myGameArea.gameCamera.x, this.y - myGameArea.gameCamera.y, this.width, this.height);
+    this.draw = function (ctx) {
+        // Debug information
+        if (myGameArea.debug) {
+            // Draw Standing tiles
+            if (this.rects != undefined) this.showStandingOnTiles();
+            // Draw Front
+            if (this.front != undefined) this.front.draw(myGameArea.context);
+            // Draw Collision Box
+            ctx.strokeStyle = "black";
+            ctx.strokeRect(this.x + this.offset_x - myGameArea.gameCamera.x, this.y + this.offset_y - myGameArea.gameCamera.y, this.offset_width, this.offset_height);
         }
-        return this;
-    }
 
-    /**
-     * sprite component
-     * @param {spritesheet} spritesheet
-     */
-    this.sprite = function (spritesheet) {
-        this.type = "sprite";
-        this.spritesheet = spritesheet;
-        this.width = this.spritesheet.spriteWidth;
-        this.height = this.spritesheet.spriteHeight;
-        // Default first sprite image
-        this.sequence = 0;
+        // Sets Animations if defined (based on moving and direction)        
+        if (this.updateAnimation != undefined) this.updateAnimation();
 
-        this.draw = function (ctx) {
-            // Debug information
-            if (myGameArea.debug) {
-                // Draw Standing tiles
-                if (this.rects != undefined) this.showStandingOnTiles();
-                // Draw Front
-                if (this.front != undefined) this.front.draw(myGameArea.context);
-                // Draw Collision Box
-                ctx.strokeStyle = "black";
-                ctx.strokeRect(this.x + this.offset_x - myGameArea.gameCamera.x, this.y + this.offset_y - myGameArea.gameCamera.y, this.offset_width, this.offset_height);
+        // Animation: Moving / Idle
+        if (this.sequence.length != undefined) {
+            if (this.animationDelay++ >= this.animationTime) {
+                this.animationDelay = 0;
+                this.animationIndexCounter++;
+                if (this.animationIndexCounter >= this.sequence.length) this.animationIndexCounter = 0;
             }
-
-            // Sets Animations if defined (based on moving and direction)        
-            if (this.updateAnimation != undefined) this.updateAnimation();
-
-            // Animation: Moving / Idle
-            if (this.sequence.length != undefined) {
-                if (this.animationDelay++ >= this.animationTime) {
-                    this.animationDelay = 0;
-                    this.animationIndexCounter++;
-                    if (this.animationIndexCounter >= this.sequence.length) this.animationIndexCounter = 0;
-                }
-                drawSprite(ctx, this.spritesheet, this.sequence[this.animationIndexCounter], (this.x - myGameArea.gameCamera.x), (this.y - myGameArea.gameCamera.y));
-            }
-            // No Animation: Just sprite image
-            else drawSprite(ctx, this.spritesheet, this.sequence, (this.x - myGameArea.gameCamera.x), (this.y - myGameArea.gameCamera.y));
+            drawSprite(ctx, this.spritesheet, this.sequence[this.animationIndexCounter], (this.x - myGameArea.gameCamera.x), (this.y - myGameArea.gameCamera.y));
         }
-        return this;
-    }
-
-    /**
-     * rectangle component
-     * @param width of rectangle
-     * @param height of rectangle
-     * @param fillColor of rectangle
-     * @param {bool} rectangle filled or not
-     * @param outlineColor of rectangle
-     * @param {bool} rectangle outline or not
-     */
-    this.rectangle = function (width, height, fillColor, filled, outlineColor, outline) {
-        this.type = "rectangle";
-        this.width = width;
-        this.height = height;
-        this.fillColor = fillColor;
-        this.filled = filled;
-        this.outlineColor = outlineColor;
-        this.outline = outline;
-
-        this.draw = function (ctx) {
-            ctx.fillStyle = this.fillColor;
-            ctx.strokeStyle = this.outlineColor;
-            if (this.filled) ctx.fillRect(this.x - myGameArea.gameCamera.x, this.y - myGameArea.gameCamera.y, this.width, this.height);
-            else if (this.filled == undefined) ctx.fillRect(this.x, this.y, this.width, this.height);
-            if (this.outline) ctx.strokeRect(this.x - myGameArea.gameCamera.x, this.y - myGameArea.gameCamera.y, this.width, this.height);
-        }
-        return this;
+        // No Animation: Just sprite image
+        else drawSprite(ctx, this.spritesheet, this.sequence, (this.x - myGameArea.gameCamera.x), (this.y - myGameArea.gameCamera.y));
     }
 
     /**
@@ -335,15 +279,15 @@ function Component(x, y) {
 
             // Check if the tile has an onStepEvent
             if (this.actor) {
-                if (d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent();
-                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent();
-                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent();
-                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent();
-                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent();
-                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent();
-                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent();
-                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent();
-                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent();
+                if (d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent(this);
+                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent(this);
+                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent(this);
+                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent(this);
+                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent(this);
+                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent(this);
+                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent(this);
+                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent(this);
+                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent(this);
             }
 
             return (d.tiles[xy2i(x1, y1, d.mapWidth)].collision &&

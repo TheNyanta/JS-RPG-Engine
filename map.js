@@ -4,7 +4,7 @@
 var maps = {
     data: [], // Contains the maps
     currentMap: 0, // The map which is currently used
-    shownMap: 0 // The map that is shown
+    shownMap: 0, // The map that is shown
 };
 
 /**
@@ -38,7 +38,7 @@ function Tile(spritesheet, x, y) {
     this.layer2 = 0;
     this.layer3 = 0;
     // Collision (TODO: Advanced -> Direction depended collision)
-    this.collision = false;
+    this.collision = true;
 
     /** This draws the tile on the cached canvas'
      * @param Cached canvas context for layer 1 & 2 (Background)

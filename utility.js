@@ -8,23 +8,44 @@ function xy2i(x, y, width) {
 function i2xy(index, width) {
     var x = index % width;
     var y = Math.floor(index / width);
-    return [x,y];
+    return [x, y];
+}
+
+/** 
+ * Let a component change the map
+ * @param new components x
+ * @param new components y
+ * @param new map
+ * @param the component
+ */
+function componentMapSwitch(x, y, map, obj) {
+    // Change the components position
+    if (x != null) obj.x = x;
+    if (y != null) obj.y = y;
+    // Find the component on the current map and remove it
+    for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
+        if (maps.data[maps.currentMap].objects[i] == obj) maps.data[maps.currentMap].objects.splice(i, 1);
+    
+    // Add the component to the new map
+    maps.data[map].objects.push(obj);
+    // Activate a map transition
+    myGameArea.transition = true;
 }
 
 //convert listmap to a grid
 function getGrid(maplayer, width, height) {
-    
-    arr=[];
-    k=0;
-    for (i=0; i<height;i++){
-        tmp=[];
-        for (j=0;j<width;j++) {
-            tmp[j]=maplayer[k];
+
+    arr = [];
+    k = 0;
+    for (i = 0; i < height; i++) {
+        tmp = [];
+        for (j = 0; j < width; j++) {
+            tmp[j] = maplayer[k];
             k++;
         }
-        arr[i]=tmp;
+        arr[i] = tmp;
     }
-    
+
     return arr;
 }
 
@@ -33,12 +54,12 @@ function getGraph() {
     var mapCL = maps.data[maps.currentMap].layerC;
     var mapWidth = maps.data[maps.currentMap].mapWidth;
     var mapHeight = maps.data[maps.currentMap].mapHeight;
-    
+
     var arr = Array();
     for (var i = 0; i < mapWidth; i++) {
         arr.push(Array());
     }
-    for (var i = 0; i < mapWidth*mapHeight; i++) {
+    for (var i = 0; i < mapWidth * mapHeight; i++) {
         if (mapCL[i])
             arr[i % mapWidth][Math.floor(i / mapWidth)] = 1;
         else
@@ -57,7 +78,9 @@ function astarPath(startX, startY, endX, endY) {
     var end = graph.grid[endX][endY];
     //console.log("Start = ["+startX+"]["+startY+"]");
     //console.log("End = ["+endX+"]["+endY+"]");
-    return astar.search(graph, start, end, {closest : true});
+    return astar.search(graph, start, end, {
+        closest: true
+    });
 }
 
 function DisableScrollbar() {
@@ -72,13 +95,13 @@ function EnableScrollbar() {
 
 function enterFullscreen() {
     element = myGameArea.canvas;
-    if(element.requestFullscreen) {
+    if (element.requestFullscreen) {
         element.requestFullscreen();
-    } else if(element.mozRequestFullScreen) {
+    } else if (element.mozRequestFullScreen) {
         element.mozRequestFullScreen();
-    } else if(element.webkitRequestFullscreen) {
+    } else if (element.webkitRequestFullscreen) {
         element.webkitRequestFullscreen();
-    } else if(element.msRequestFullscreen) {
+    } else if (element.msRequestFullscreen) {
         element.msRequestFullscreen();
     }
 }
@@ -91,7 +114,7 @@ function resizeCanvas() {
     }
     // Screen fits on map
     else myGameArea.canvas.width = myGameArea.canvas.width = document.body.clientWidth;
-    
+
     if (document.body.clientHeight > maps.data[maps.currentMap].height) {
         // Screen bigger than map
         myGameArea.canvas.height = maps.data[maps.currentMap].height;
@@ -101,33 +124,31 @@ function resizeCanvas() {
 }
 
 /**
-* Use localStorage to save game state
-* TODO: Change to save all the game state values
-*/
+ * Use localStorage to save game state
+ * TODO: Change to save all the game state values
+ */
 function saveGameState(address, value) {
     // Check browser support
-    if (typeof(Storage) !== "undefined") {
+    if (typeof (Storage) !== "undefined") {
         // Store
         localStorage.setItem(address, value);
         console.log("Stored: " + value);
-    }
-    else {
+    } else {
         alert("Sorry, your browser does not support Web Storage...");
     }
 }
 
 /**
-* Use localStorage to load game state
-* TODO: Change to load all the game state values & apply them
-*/
+ * Use localStorage to load game state
+ * TODO: Change to load all the game state values & apply them
+ */
 function loadGameState(address) {
     // Check browser support
-    if (typeof(Storage) !== "undefined") {
+    if (typeof (Storage) !== "undefined") {
         var value = localStorage.getItem(address);
         // Retrieve
         console.log("Retrieved: " + value);
-    }
-    else {
+    } else {
         alert("Sorry, your browser does not support Web Storage...");
     }
 }
@@ -147,61 +168,62 @@ function extraGuiRect() {
     ctx = myGameArea.context;
     ctx.globalAlpha = 0.5;
     ctx.fillStyle = "cyan";
-    ctx.fillRect(0,0,120,90);
+    ctx.fillRect(0, 0, 120, 90);
     ctx.globalAlpha = 1.0;
 }
 
 function showTime() {
     ctx = myGameArea.context;
-    ctx.font =  "bold 20px Serif";
+    ctx.font = "bold 20px Serif";
     ctx.fillStyle = "black";
-    ctx.fillText("Timer : " + Math.round(time/1000), 5, 20);
+    ctx.fillText("Timer : " + Math.round(time / 1000), 5, 20);
 }
 
 // Init FPS and time
-var start,before,now,time,fps;
-start=Date.now();
-before=Date.now();
-fps=0;    
+var start, before, now, time, fps;
+start = Date.now();
+before = Date.now();
+fps = 0;
 
 /**
-* Timer
-*/
-function timer() {    
-    this.init = function(delta) {
+ * Timer
+ */
+function timer() {
+    this.init = function (delta) {
         this.start = Date.now();
         this.delta = delta;
     }
-    this.check = function() {
+    this.check = function () {
         if (this.delta != undefined) {
             if (Date.now() - this.start >= this.delta) {
                 this.delta = undefined;
                 return true;
-            }
-            else return false;
+            } else return false;
         }
-    }  
+    }
 }
 
 function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds) {
+            break;
+        }
     }
-  }
 }
 
 function updateFPS() {
-    now=Date.now();
-    time=now-start;
-    if (myGameArea.frameNo == 1 || everyinterval(30)) {fps=Math.round(1000/(now-before)); }
-    before=now;
+    now = Date.now();
+    time = now - start;
+    if (myGameArea.frameNo == 1 || everyinterval(30)) {
+        fps = Math.round(1000 / (now - before));
+    }
+    before = now;
 }
 
 function showFPS() {
     ctx = myGameArea.context;
-    ctx.font =  "bold 20px Serif";
+    ctx.font = "bold 20px Serif";
     ctx.fillStyle = "black";
     ctx.fillText("FPS : " + fps, 5, 40);
 }
@@ -210,7 +232,7 @@ function showPosition(target) {
     ctx = myGameArea.context;
     ctx.fillStyle = "black";
     ctx.fillText("x:" + (target.x + target.offset_x) + ", y:" + (target.y + target.offset_y), 5, 60);
-    ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x)/maps.data[maps.currentMap].tileset.spriteWidth) + ", " + Math.floor((target.y + target.offset_y)/maps.data[maps.currentMap].tileset.spriteHeight) + "]", 5, 80);
+    ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x) / maps.data[maps.currentMap].tileset.spriteWidth) + ", " + Math.floor((target.y + target.offset_y) / maps.data[maps.currentMap].tileset.spriteHeight) + "]", 5, 80);
 }
 
 // Button functions
@@ -221,8 +243,7 @@ function debugButton() {
     if (myGameArea.debug) {
         document.getElementById("debugButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("debugButton").innerHTML = "Debug On";
-    }
-    else {
+    } else {
         document.getElementById("debugButton").setAttribute("class", "w3-button w3-red");
         document.getElementById("debugButton").innerHTML = "Debug Off";
     }
@@ -233,8 +254,7 @@ function guiButton() {
     if (myGameArea.showExtra) {
         document.getElementById("guiButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("guiButton").innerHTML = "GUI On";
-    }
-    else {
+    } else {
         document.getElementById("guiButton").setAttribute("class", "w3-button w3-red");
         document.getElementById("guiButton").innerHTML = "GUI Off";
     }
@@ -271,7 +291,7 @@ function layerButton(i) {
         document.getElementById("layerCButton").setAttribute("class", "w3-button w3-green");
         if (!myGameArea.debug) debugButton();
     }
-    
+
 }
 
 function drawButton() {
@@ -279,8 +299,7 @@ function drawButton() {
     if (myGameArea.drawingOn) {
         document.getElementById("drawButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("drawButton").innerHTML = "Drawing On";
-    }
-    else {
+    } else {
         document.getElementById("drawButton").setAttribute("class", "w3-button w3-red");
         document.getElementById("drawButton").innerHTML = "Drawing Off";
     }

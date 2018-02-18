@@ -22,7 +22,7 @@ var myGameArea = {
     drawingOn: false,
     // The data of the game: When creating new spritesheets/maps/components it will be saved as a string
     // If you start the engine again and feed it this data it will be the same game data as before
-    data : "",
+    data: "",
     // Init
     init: function () {
         // Game canvas
@@ -184,15 +184,14 @@ var myGameArea = {
         // INITIALIZE USER INPUT
         // Customize context menu on right click if canvas
         window.addEventListener('contextmenu', function (e) {
-            console.log('context menu');
 
             if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
-                console.log("Default prevent");
+                console.log("Default context menu prevent");
                 e.preventDefault();
                 //toggleMenuOn();
                 //positionMenu(e);
             } else {
-                console.log("Deafault");
+                console.log("Default context menu");
                 //taskItemInContext = null;
                 //toggleMenuOff();
             }
@@ -406,9 +405,10 @@ function update() {
 
     // In a myGameArea.gameSequence there will be no movement (i.e. activate myGameArea.gameSequence when opening a menu)
     if (!myGameArea.gameSequence) {
-        // Character has to be able to interacted
-        if (character.actor)
-            for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++) character.updateInteraction(maps.data[maps.currentMap].objects[i]);
+        // For components that can start an interacted
+        for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
+            if ( maps.data[maps.currentMap].objects[i].actor)
+                for (var j = 0; j < maps.data[maps.currentMap].objects.length; j++)  maps.data[maps.currentMap].objects[i].updateInteraction(maps.data[maps.currentMap].objects[j]);
         // Update the movement of all Components in maps_objects[maps.currentMap] (this includes mapCollision resolving)
         if (!myGameArea.transition)
             for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++) maps.data[maps.currentMap].objects[i].updateMovement();

@@ -13,9 +13,9 @@ addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snow_jukebox.p
 addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castledoor_1.png", 1, 4, 47, 48);
 // Setup Maps
 addMap("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/sunset1.png", 0, 80, 60);
-addMap(undefined, 1, 80, 60);
-addMap(undefined, 2, 42, 40);
-addMap(undefined, 3, 42, 60);
+addMap(null, 1, 80, 60);
+addMap(null, 2, 42, 40);
+addMap(null, 3, 42, 60);
 
 // Setup Audio
 addAudio("https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/banana-phone.m4a");
@@ -27,75 +27,67 @@ addAudio("https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/dog.m4a");
 */
 
 // Setup Character
-var character = new Component(240, 280)
-    .sprite(spritesheets.data[4])
+var character = new Component(240, 280, spritesheets.data[4])
     .velocity(2)
+    .collision(4, 16, 16, 16)
     .control(constants.KEY_W, constants.KEY_S, constants.KEY_A, constants.KEY_D)
     .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
-    .collision(4, 16, 16, 16)
     .interactive();
 
 // Setup Girl
-var girl = new Component(370, 210)
-    .sprite(spritesheets.data[5])
+var girl = new Component(370, 210, spritesheets.data[5])
     .velocity(2)
+    .collision(4, 16, 16, 16)
     .control(constants.KEY_UP, constants.KEY_DOWN, constants.KEY_LEFT, constants.KEY_RIGHT)
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
-    .collision(4, 16, 16, 16);
+    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 
 // ## Mountainforest
 
 // Setup Cat
-var cat = new Component(160, 390)
+var cat = new Component(160, 390, spritesheets.data[6])
     .velocity(1)
-    .sprite(spritesheets.data[6])
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
-    .collision(4, 16, 16, 16);
+    .collision(4, 16, 16, 16)
+    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 
 // ## Snowforest
 
 // Setup Dog
-var dog = new Component(100, 100)
+var dog = new Component(100, 100, spritesheets.data[7])
     .velocity(1)
-    .sprite(spritesheets.data[7])
     .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
     .collision(4, 16, 16, 16);
 
 // Setup Jukebox
-var jukebox = new Component(260, 120)
+var jukebox = new Component(260, 120, spritesheets.data[8])
     .velocity(0)
-    .sprite(spritesheets.data[8])
     .collision(0, 16, 24, 16);
 
 // ## Castle front
 
 // Setup Castledoor
-var castledoor = new Component(144, 62)
-    .sprite(spritesheets.data[9])
+var castledoor = new Component(144, 62, spritesheets.data[9])
     .collision(0, 0, 47, 48)
     .animation().specialAnimation(20, [0, 1, 2, 3]);
 
 // Teleport to town
 for (var i = 1650; i <= 1667; i++) {
-    maps.data[2].tiles[i].onStepEvent = function () {
+    maps.data[2].tiles[i].onStepEvent = function (obj) {
+        componentMapSwitch(null, -8, 3, obj);
         maps.currentMap = 3;
-        character.y = -8;
-        myGameArea.transition = true;
     }
 }
 // Teleport to castle
 for (var i = 12; i <= 29; i++) {
-    maps.data[3].tiles[i].onStepEvent = function () {
+    maps.data[3].tiles[i].onStepEvent = function (obj) {
+        componentMapSwitch(null, 280, 2, obj);
         maps.currentMap = 2;
-        character.y = 280;
-        myGameArea.transition = true;
     }
 }
 
 maps.data[0].addObject([character, girl, cat]);
-maps.data[1].addObject([character, girl, jukebox, dog]);
-maps.data[2].addObject([character, girl, castledoor]);
-maps.data[3].addObject([character]);
+maps.data[1].addObject([jukebox, dog]);
+maps.data[2].addObject([castledoor]);
+maps.data[3].addObject([]);
 
 // Set Camera
 var cameraTarget = character;
@@ -105,36 +97,49 @@ var girldialog = new dialog();
 girldialog.setDialog(["Hello!", "Choose a map!", "#choice", "#entered"], null, ["Grass", "Snow", "Castletown"]);
 girldialog.event = function (choice) {
     if (choice == 0) {
-        maps.currentMap = 0;
-        if (maps.shownMap != maps.currentMap) {
+        if (maps.currentMap != 0) {
+            componentMapSwitch(380, 208, 0, character);
+            componentMapSwitch(364, 208, 0, girl);
+            maps.currentMap = 0;
+            /*
             myGameArea.transition = true;
             // New Position
             character.x = 372;
             character.y = 210;
             girl.x = 356;
             girl.y = 210;
+            */
         }
     }
     if (choice == 1) {
-        maps.currentMap = 1;
-        if (maps.shownMap != maps.currentMap) {
+        if (maps.currentMap != 1) {
+            componentMapSwitch(192, 360, 1, character);
+            componentMapSwitch(176, 360, 1, girl);
+            maps.currentMap = 1;
+            /*
             myGameArea.transition = true;
             // New Position
             character.x = 192;
             character.y = 360;
             girl.x = 176;
             girl.y = 360;
+            */
         }
     }
     if (choice == 2) {
-        maps.currentMap = 2;
-        if (maps.shownMap != maps.currentMap) {
+
+        if (maps.currentMap != 2) {
+            componentMapSwitch(166, 210, 2, character);
+            componentMapSwitch(150, 210, 2, girl);
+            maps.currentMap = 2;
+            /*
             myGameArea.transition = true;
             // New Position
             character.x = 166;
             character.y = 210;
             girl.x = 150;
             girl.y = 210;
+            */
         }
     }
 }
