@@ -1,36 +1,44 @@
 # HTML-JAVASCRIPT
 
-Prototype Engine for a top-down rpg
+An Engine + Editor for a top-down rpg
+
+## Implemented
+
+Maps, spritesheets, objects
+
+Map collision and component-component-collision
+
+Gamedata 'saving' for maps and spritesheets (see myGameArea.data)
+
+Click/touch interaction with objects, for "main" charcter enter interaction
+
+Simple model for dialog, map switching and events 
 
 ## TODO:
 
 # Engine
 
-Refine storing of game data
-
-Refine Events + Dialogs
-
-Implement Click/Touch-Interaction with Objects
+Implement storing of game data for object, 
 
 Implement/Refine Touch Control
 
-Implement Save & Load Gamestate (localStorage)
+Implement saving and loading of the gamedata into localStorage
 
-Implement proper Audio Select/Play System
+Implement saving and loading of the gamestate into localStorage
 
-Implement proper GUI + Gamemenu (i.e. it opens by pressing "Esc")
+Implement proper audio select/play/pause system
+
+Implement proper GUI + Gamemenu (i.e. it opens by pressing "Esc" or Right click)
 
 (Implement Custom Keybinding)
 
-Implement Battle System (Realtime and/or Roundbased) + Stats (Health, Mana, Strength, etc.)
+(Implement Battle System (Realtime/Roundbased) + Stats (Health, Mana, Strength, etc.))
 
 ### Editor
 
-Map Editor: You can change the maps layers tile per tile
+Refine map editing
 
-Refine Map Editing
-
-Implement adding & editing objects
+Implement adding and editing of objects / events
 
 ## DEMO
 
