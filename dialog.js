@@ -12,7 +12,7 @@ function dialog(text, img, choices) {
     this.text = text;
 
     this.started = false;
-    this.enterPush = false;
+    this.next = false;
     this.keyPush = false;
 
     this.y = 0;
@@ -37,7 +37,7 @@ function dialog(text, img, choices) {
         this.width = Math.min(maps.data[maps.currentMap].width, myGameArea.canvas.width);
         this.y = Math.min(maps.data[maps.currentMap].height, myGameArea.canvas.height) - 50; //40 => two lines á 30px serif
 
-        this.enter();
+        this.nextText();
         if (this.chatCounter >= this.text.length) {
             myGameArea.gameSequence = false;
             this.started = false;
@@ -98,17 +98,17 @@ function dialog(text, img, choices) {
         else this.selected = this.selected % this.choices.length;
     }
 
-    this.enter = function () {
+    this.nextText = function () {
         if (myGameArea.keys) {
-            // Enter key down
-            if (myGameArea.keys[constants.KEY_ENTER]) {
-                if (this.enterPush) {
+            // Enter key down / click / touch
+            if (myGameArea.keys[constants.KEY_ENTER] || myGameArea.mousedown || myGameArea.touchdown) {
+                if (this.next) {
                     this.chatCounter++;
-                    this.enterPush = false;
+                    this.next = false;
                 }
             }
             // Enter key up: Enable next enter push
-            else this.enterPush = true;
+            else this.next = true;
         }
     }
 }

@@ -69,8 +69,15 @@ var castledoor = new Component(144, 62, spritesheets.data[9])
     .collision(0, 0, 47, 48)
     .animation().specialAnimation(20, [0, 1, 2, 3]);
 
-character.addClickEvent(function() {
-   console.log("Character clicked!"); 
+character.addClickEvent(function () {
+    console.log("Character clicked!");
+});
+
+girl.addClickEvent(function () {
+    if (character.distance(girl) <= Math.min(girl.width, girl.height) && character.facing(girl)) {
+        myGameArea.gameSequence = true;
+        currentDialog = girldialog;
+    }
 });
 
 // Add Objects to map
