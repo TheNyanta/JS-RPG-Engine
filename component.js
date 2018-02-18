@@ -334,15 +334,17 @@ function Component(x, y) {
                 return false;
 
             // Check if the tile has an onStepEvent
-            if (d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent();
-            else if (d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent();
-            else if (d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent();
-            else if (d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent();
-            else if (d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent();
-            else if (d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent();
-            else if (d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent();
-            else if (d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent();
-            else if (d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent();
+            if (this.actor) {
+                if (d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent();
+                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent();
+                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent();
+                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent();
+                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent();
+                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent();
+                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent();
+                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent();
+                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent();
+            }
 
             return (d.tiles[xy2i(x1, y1, d.mapWidth)].collision &&
                 d.tiles[xy2i(x1, y2, d.mapWidth)].collision &&
@@ -471,38 +473,16 @@ function Component(x, y) {
 
     /**
      * Add Interactions
-     * Interactions are started if the Component stands in front of another Component
+     * Interactions can be started if the distance between two components is short enough
+     * and the initiator (=controlled character) is facing the other component
      * that has an event if for i.e. the "enter"-key is pressed (or it's clicked/touched).
      * @param Enable enter interaction
      */
     this.interactive = function (enter) {
-        // The front of the Component
-        this.front = new Component().rectangle(8, 8, "black", false, "white", true).collision(0, 0, 8, 8);
-
-        // Update fronts position based on the direction of this Component
-        this.updateFront = function () {
-            if (this.direction == constants.DIR_N) {
-                this.front.x = this.x + this.offset_x + 4;
-                this.front.y = this.y + this.offset_y - 8;
-            }
-            if (this.direction == constants.DIR_S) {
-                this.front.x = this.x + this.offset_x + 4;
-                this.front.y = this.y + this.offset_y + 16;
-            }
-            if (this.direction == constants.DIR_W) {
-                this.front.x = this.x + this.offset_x - 8;
-                this.front.y = this.y + this.offset_y + 4;
-            }
-            if (this.direction == constants.DIR_E) {
-                this.front.x = this.x + this.offset_x + 16;
-                this.front.y = this.y + this.offset_y + 4;
-            }
-        }
-
-        // Interaction available if this front is overlapping with another object
+        this.actor = true;
         // Press enter to start
         this.updateInteraction = function (otherobj) {
-            if (this.distance(otherobj) <= Math.max(Math.abs(this.mid()[0]-otherobj.mid()[0]), Math.abs(this.mid()[1]-otherobj.mid()[1])) + 2 && this.facing(otherobj)) {
+            if (this.distance(otherobj) <= Math.min(otherobj.width, otherobj.height) && this.facing(otherobj)) {
                 if (myGameArea.keys) {
                     // Enter key down
                     if (myGameArea.keys[constants.KEY_ENTER]) {

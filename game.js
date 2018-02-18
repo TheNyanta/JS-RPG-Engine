@@ -407,7 +407,7 @@ function update() {
     // In a myGameArea.gameSequence there will be no movement (i.e. activate myGameArea.gameSequence when opening a menu)
     if (!myGameArea.gameSequence) {
         // Character has to be able to interacted
-        if (character.front != undefined)
+        if (character.actor)
             for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++) character.updateInteraction(maps.data[maps.currentMap].objects[i]);
         // Update the movement of all Components in maps_objects[maps.currentMap] (this includes mapCollision resolving)
         if (!myGameArea.transition)
