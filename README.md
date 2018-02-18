@@ -18,9 +18,11 @@ Simple model for dialog, map switching and events
 
 ### Engine
 
-Implement storing of game data for object, 
+Implement storing of game data for object + events
 
-Implement/Refine Touch Control
+Implement (/ refine: astar) click + touch control
+
+Refine dialog: Selecting choice with click / touch
 
 Implement saving and loading of the gamedata into localStorage
 
