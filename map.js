@@ -9,11 +9,17 @@ var maps = {
 
 /**
  * For adding a new map
- * @param {Map} 'new Map(...)' object
+ * @param a background panorama
+ * @param id of the spritesheet
+ * @param the maps number of tiles in x direction
+ * @param the maps number of tiles in y direction
+ * @param give the map a name
  */
-function addMap(map) {
-    map.id = maps.data.length;
-    maps.data.push(map);
+function addMap(image, spritesheetId, mapWidth, mapHeight) {
+    maps.data.push(new Map(image, spritesheets.data[spritesheetId], mapWidth, mapHeight, name));
+    maps.data[maps.data.length - 1].id = maps.data.length - 1;
+    // Datastring
+    myGameArea.data += "addMap(" + image + ", spritesheets.data[" + spritesheetId + "], " + mapWidth + ", " + mapHeight + ");\n";
 }
 
 /**
@@ -42,14 +48,20 @@ function Tile(spritesheet, x, y) {
         if (this.layer1 - 1 >= 0) drawSprite(ctx1, this.spritesheet, this.layer1 - 1, this.x, this.y);
         if (this.layer2 - 1 >= 0) drawSprite(ctx1, this.spritesheet, this.layer2 - 1, this.x, this.y);
         if (this.layer3 - 1 >= 0) drawSprite(ctx2, this.spritesheet, this.layer3 - 1, this.x, this.y);
-        // Debug information: Show collision layer
+        // Debug information
         if (myGameArea.debug) {
+            // Show collision layer
             myGameArea.cgx3.globalAlpha = 0.3;
             if (this.collision) myGameArea.cgx3.fillStyle = "blue";
             else myGameArea.cgx3.fillStyle = "red";
             myGameArea.cgx3.fillRect(this.x, this.y, this.width, this.height);
             myGameArea.cgx3.globalAlpha = 1.0;
-
+            // Show stepOnEvent
+            if (this.onStepEvent != undefined) {
+                myGameArea.cgx3.font = "bold 8px Serif";
+                myGameArea.cgx3.fillStyle = "black";
+                myGameArea.cgx3.fillText("E", this.x + 1, this.y + 7);
+            }
         }
     }
 }
@@ -60,9 +72,8 @@ function Tile(spritesheet, x, y) {
  * @param {Spritesheet} a spritesheet with the tiles for the map
  * @param the maps number of tiles in x direction
  * @param the maps number of tiles in y direction
- * @param give the map a name
  */
-function Map(image, tileset, mapWidth, mapHeight, name) {
+function Map(image, tileset, mapWidth, mapHeight) {
 
     // Panorama Image
     if (image != undefined) {
@@ -86,8 +97,8 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
     this.width = this.mapWidth * tileset.spriteWidth;
     this.height = this.mapHeight * tileset.spriteHeight;
 
-    if (name != undefined) this.name = name;
-    else this.name = tileset.name.match(/[\w]+/)[0];
+    // The name is the filename
+    this.name = tileset.name.match(/[\w]+/)[0];
 
     // Contains all the tiles
     // A tile is a component which contains the layers and the collision
@@ -242,10 +253,10 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
     /**
      * print layers as string to console
      */
-    this.printLayers = function (name) {
+    this.printLayers = function () {
         var output = "";
         // Layer 1
-        output += "var " + name + "_layer1 = [";
+        output += "var " + this.name + "_layer1 = [";
         for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
             output += this.tiles[i].layer1;
             if (i < this.mapWidth * this.mapHeight - 1)
@@ -253,7 +264,7 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
         }
         output += "];\n";
         // Layer 2
-        output += "var " + name + "_layer2 = [";
+        output += "var " + this.name + "_layer2 = [";
         for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
             output += this.tiles[i].layer2;
             if (i < this.mapWidth * this.mapHeight - 1)
@@ -261,7 +272,7 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
         }
         output += "];\n";
         // Layer 3
-        output += "var " + name + "_layer3 = [";
+        output += "var " + this.name + "_layer3 = [";
         for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
             output += this.tiles[i].layer3;
             if (i < this.mapWidth * this.mapHeight - 1)
@@ -269,7 +280,7 @@ function Map(image, tileset, mapWidth, mapHeight, name) {
         }
         output += "];\n";
         // Collision Layer
-        output += "var " + name + "_layerC = [";
+        output += "var " + this.name + "_layerC = [";
         for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
             output += this.tiles[i].collision;
             if (i < this.mapWidth * this.mapHeight - 1)
@@ -296,10 +307,10 @@ function loadImage(img) {
     }
     if (tmp == undefined) {
         console.log("created new spritesheet")
-        addSpritesheet(new Spritesheet(img, 60, 32, 8, 8));
+        addSprite(img, 60, 32, 8, 8);
         tmp = spritesheets.data[spritesheets.data.length - 1];
     }
-    //maps.data[maps.currentMap].image.src = img;
+    //maps.data[maps.currentMap].image.src = img; //maps background image
     maps.data[maps.currentMap].tileset = tmp;
     maps.data[maps.currentMap].switchTileset();
 

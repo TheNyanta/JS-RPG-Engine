@@ -4,16 +4,10 @@
  * @param x-position
  * @param y-position
  */
-function Component(x, y, width, height) {
+function Component(x, y) {
     // Standard Properties of any Component
     this.x = x;
     this.y = y;
-
-    if (width != undefined && height != undefined) {
-        this.width = width;
-        this.height = height;
-        this.draw = function () {};
-    }
 
     //this.lastx = x;
     //this.lasty = y;    
@@ -232,13 +226,12 @@ function Component(x, y, width, height) {
          * For 4-direction movement (for more than four directions add more cases)
          */
         this.updateAnimation = function () {
-            this.sequence = 0; // Default
-            // Special animation
-            if (this.specialAnimationTime != undefined) {
-                if (this.specialTimer.check()) this.specialOn = false;
-            }
             if (this.specialOn) {
                 this.sequence = this.special;
+                if (this.animationIndexCounter == this.special.length - 1) {
+                    this.specialOn = false;
+                    this.sequence = this.special[this.special.length - 1];
+                }
             }
             // Idle (Animation or Still)
             else if (!this.moving || myGameArea.gameSequence) {
@@ -333,59 +326,23 @@ function Component(x, y, width, height) {
 
             var d = maps.data[maps.currentMap];
 
-            /*
-            // Debugging Map Collision: Shows on which tiles the object is standing and map collisions
-            if (myGameArea.debug) {
-                this.rects = [];
-                for (i = 0; i < 9; i++) this.rects[i] = new Component().rectangle(8, 8, "black", false, "blue", true);
-
-                this.rects[0].x = x1 * 8;
-                this.rects[0].y = y1 * 8;
-                this.rects[1].x = x1 * 8;
-                this.rects[1].y = y2 * 8;
-                this.rects[2].x = x1 * 8;
-                this.rects[2].y = y3 * 8;
-                this.rects[3].x = x2 * 8;
-                this.rects[3].y = y1 * 8;
-                this.rects[4].x = x2 * 8;
-                this.rects[4].y = y2 * 8;
-                this.rects[5].x = x2 * 8;
-                this.rects[5].y = y3 * 8;
-                this.rects[6].x = x3 * 8;
-                this.rects[6].y = y1 * 8;
-                this.rects[7].x = x3 * 8;
-                this.rects[7].y = y2 * 8;
-                this.rects[8].x = x3 * 8;
-                this.rects[8].y = y3 * 8;
-
-
-                if (d.tiles[xy2i(x1, y1, d.mapWidth)].collision) this.rects[0].outlineColor = "blue";
-                else this.rects[0].outlineColor = "red";
-                if (d.tiles[xy2i(x1, y2, d.mapWidth)].collision) this.rects[1].outlineColor = "blue";
-                else this.rects[1].outlineColor = "red";
-                if (d.tiles[xy2i(x1, y3, d.mapWidth)].collision) this.rects[2].outlineColor = "blue";
-                else this.rects[2].outlineColor = "red";
-                if (d.tiles[xy2i(x2, y1, d.mapWidth)].collision) this.rects[3].outlineColor = "blue";
-                else this.rects[3].outlineColor = "red";
-                if (d.tiles[xy2i(x2, y2, d.mapWidth)].collision) this.rects[4].outlineColor = "blue";
-                else this.rects[4].outlineColor = "red";
-                if (d.tiles[xy2i(x2, y3, d.mapWidth)].collision) this.rects[5].outlineColor = "blue";
-                else this.rects[5].outlineColor = "red";
-                if (d.tiles[xy2i(x3, y1, d.mapWidth)].collision) this.rects[6].outlineColor = "blue";
-                else this.rects[6].outlineColor = "red";
-                if (d.tiles[xy2i(x3, y2, d.mapWidth)].collision) this.rects[7].outlineColor = "blue";
-                else this.rects[7].outlineColor = "red";
-                if (d.tiles[xy2i(x3, y3, d.mapWidth)].collision) this.rects[8].outlineColor = "blue";
-                else this.rects[8].outlineColor = "red";
-            }
-            */
-
             // Check map borders
             if (this.x + this.offset_x + this.speedX < 0 ||
                 this.y + this.offset_y + this.speedY < 0 ||
                 this.x + this.offset_x + this.speedX + this.offset_width > d.width ||
                 this.y + this.offset_y + this.speedY + this.offset_height > d.height)
                 return false;
+
+            // Check if the tile has an onStepEvent
+            if (d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent();
+            else if (d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent();
+            else if (d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent();
+            else if (d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent();
+            else if (d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent();
+            else if (d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent();
+            else if (d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent();
+            else if (d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent();
+            else if (d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent();
 
             return (d.tiles[xy2i(x1, y1, d.mapWidth)].collision &&
                 d.tiles[xy2i(x1, y2, d.mapWidth)].collision &&
@@ -504,6 +461,14 @@ function Component(x, y, width, height) {
         return true;
     }
 
+    this.mid = function () {
+        return [this.x + this.offset_x + this.offset_width / 2, this.y + this.offset_y + this.offset_height / 2];
+    }
+
+    this.distance = function (other) {
+        return Math.sqrt(Math.pow(this.mid()[0] - other.mid()[0], 2) + Math.pow(this.mid()[1] - other.mid()[1], 2));
+    }
+
     /**
      * Add Interactions
      * Interactions are started if the Component stands in front of another Component
@@ -537,12 +502,12 @@ function Component(x, y, width, height) {
         // Interaction available if this front is overlapping with another object
         // Press enter to start
         this.updateInteraction = function (otherobj) {
-            if (this.front.rectangleOverlap(otherobj)) {
+            if (this.distance(otherobj) <= Math.max(Math.abs(this.mid()[0]-otherobj.mid()[0]), Math.abs(this.mid()[1]-otherobj.mid()[1])) + 2 && this.facing(otherobj)) {
                 if (myGameArea.keys) {
                     // Enter key down
                     if (myGameArea.keys[constants.KEY_ENTER]) {
                         if (otherobj.enterEvent) {
-                            if (otherobj.faceOnInteraction) this.turntoface(otherobj);
+                            if (otherobj.faceOnInteraction) this.face(otherobj);
                             if (otherobj.onEnterEvent != undefined) otherobj.onEnterEvent();
                             otherobj.enterEvent = false;
                         }
@@ -551,18 +516,13 @@ function Component(x, y, width, height) {
                     else otherobj.enterEvent = true;
                 }
             } else otherobj.enterEvent = false;
-
-            // onStepOn: i.E. map switch teleport
-            if (this.rectangleOverlap(otherobj)) {
-                if (otherobj.onStepEvent != undefined) otherobj.onStepEvent();
-            }
         }
 
         /**
          * Turn other object if interaction
          * If you talk to a other person you expect them to turn to face you
          */
-        this.turntoface = function (otherobj) {
+        this.face = function (otherobj) {
             // Stop running animation if Enter is pressed while moving
             this.updateAnimation();
             // Turn otherobj to face this
@@ -571,6 +531,24 @@ function Component(x, y, width, height) {
             if (this.direction == constants.DIR_E) otherobj.direction = constants.DIR_W;
             if (this.direction == constants.DIR_W) otherobj.direction = constants.DIR_E;
             otherobj.updateAnimation();
+        }
+
+        /**
+         * Check if the component is looking at the other object
+         */
+        this.facing = function (otherobj) {
+            // Left or Right
+            if (Math.abs(this.mid()[0] - otherobj.mid()[0]) > Math.abs(this.mid()[1] - otherobj.mid()[1])) {
+                if (this.x > otherobj.x) return (this.direction == constants.DIR_W);
+                else return (this.direction == constants.DIR_E);
+            }
+            // Up or Below
+            else {
+                if (this.y > otherobj.y) return (this.direction == constants.DIR_N);
+                else return (this.direction == constants.DIR_S);
+            }
+
+            return false;
         }
 
         return this;

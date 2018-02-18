@@ -1,59 +1,30 @@
-addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/forest.png", 60, 32, 8, 8));
-addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snowforest.png", 60, 32, 8, 8));
-addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castle.png", 60, 32, 8, 8));
-addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castletown.png", 60, 32, 8, 8));
+// Setup Spirtesheets
+// Maps
+addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/forest.png", 60, 32, 8, 8);
+addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snowforest.png", 60, 32, 8, 8);
+addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castle.png", 60, 32, 8, 8);
+addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castletown.png", 60, 32, 8, 8);
+// Objects
+addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/character.png", 12, 8, 24, 32);
+addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/girl.png", 12, 8, 24, 32);
+addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/cat.png", 12, 8, 24, 32);
+addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/animal.png", 12, 8, 24, 32);
+addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snow_jukebox.png", 12, 8, 24, 32);
+addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castledoor_1.png", 1, 4, 47, 48);
+// Setup Maps
+addMap("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/sunset1.png", 0, 80, 60);
+addMap(undefined, 1, 80, 60);
+addMap(undefined, 2, 42, 40);
+addMap(undefined, 3, 42, 60);
 
-addMap(new Map("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/sunset1.png", spritesheets.data[0], 80, 60, 8, 8, 60, 32));
-addMap(new Map(undefined, spritesheets.data[1], 80, 60, 8, 8, 60, 32));
-addMap(new Map(undefined, spritesheets.data[2], 42, 40, 8, 8, 60, 32));
-addMap(new Map(undefined, spritesheets.data[3], 42, 60, 8, 8, 60, 32));
-
-// Setup Objects Spritesheets
-addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/character.png", 12, 8, 24, 32));
-addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/girl.png", 12, 8, 24, 32));
-addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/cat.png", 12, 8, 24, 32));
-addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/animal.png", 12, 8, 24, 32));
-addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snow_jukebox.png", 12, 8, 24, 32));
-addSpritesheet(new Spritesheet("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castledoor_1.png", 1, 4, 47, 48));
-
-// Music
-var audio1 = new Audio('https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/banana-phone.m4a');
-
-// Sounds
-var catsound = new Audio('https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/cat.m4a');
-var dogsound = new Audio('https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/dog.m4a');
+// Setup Audio
+addAudio("https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/banana-phone.m4a");
+addAudio("https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/cat.m4a");
+addAudio("https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/dog.m4a");
 
 /*
 // local
-addSpritesheet(new Spritesheet("Assets/Image/forest.png", 60, 32, 8, 8));
-addSpritesheet(new Spritesheet("Assets/Image/snowforest.png", 60, 32, 8, 8));
-addSpritesheet(new Spritesheet("Assets/Image/castle.png", 60, 32, 8, 8));
-addSpritesheet(new Spritesheet("Assets/Image/castletown.png", 60, 32, 8, 8));
-
-addMap(new Map("Assets/Image/sunset1.png", spritesheets.data[0], 80, 60, 8, 8, 60, 32));
-addMap(new Map(undefined, spritesheets.data[1], 80, 60, 8, 8, 60, 32));
-addMap(new Map(undefined, spritesheets.data[2], 42, 40, 8, 8, 60, 32));
-addMap(new Map(undefined, spritesheets.data[3], 42, 60, 8, 8, 60, 32));
-
-// Setup Objects Spritesheets
-addSpritesheet(new Spritesheet("Assets/Image/character.png", 12, 8, 24, 32));
-addSpritesheet(new Spritesheet("Assets/Image/girl.png", 12, 8, 24, 32));
-addSpritesheet(new Spritesheet("Assets/Image/cat.png", 12, 8, 24, 32));
-addSpritesheet(new Spritesheet("Assets/Image/animal.png", 12, 8, 24, 32));
-addSpritesheet(new Spritesheet("Assets/Image/snow_jukebox.png", 12, 8, 24, 32));
-addSpritesheet(new Spritesheet("Assets/Image/castledoor_1.png", 1, 4, 47, 48));
-
-// Music
-var audio1 = new Audio('Assets/Audio/banana-phone.m4a');
-
-// Sounds
-var catsound = new Audio('Assets/Audio/cat.m4a');
-var dogsound = new Audio('Assets/Audio/dog.m4a');
 */
-
-audio1.volume = 0.2;
-catsound.volume = 0.2;
-dogsound.volume = 0.2;
 
 // Setup Character
 var character = new Component(240, 280)
@@ -101,44 +72,30 @@ var jukebox = new Component(260, 120)
 // Setup Castledoor
 var castledoor = new Component(144, 62)
     .sprite(spritesheets.data[9])
+    .collision(0, 0, 47, 48)
     .animation().specialAnimation(20, [0, 1, 2, 3]);
 
-// Setup Stone
-var stone = new Component(162, 188, 14, 10);
-
-// Setup Telport 1
-var gotoTown = new Component(0, 319, 300, 1);
-gotoTown.onStepEvent = function () {
-    maps.currentMap = 3;
-    character.y = -12;
-    myGameArea.transition = true;
+// Teleport to town
+for (var i = 1650; i <= 1667; i++) {
+    maps.data[2].tiles[i].onStepEvent = function () {
+        maps.currentMap = 3;
+        character.y = -8;
+        myGameArea.transition = true;
+    }
 }
-// ## Castle town
-
-// Setup Teleport
-var gotoCastle = new Component(0, 0, 300, 1);
-gotoCastle.onStepEvent = function () {
-    maps.currentMap = 2;
-    character.y = 284;
-    myGameArea.transition = true;
+// Teleport to castle
+for (var i = 12; i <= 29; i++) {
+    maps.data[3].tiles[i].onStepEvent = function () {
+        maps.currentMap = 2;
+        character.y = 280;
+        myGameArea.transition = true;
+    }
 }
-
-var maps_objects = [];
-var map0_obj = [];
-var map1_obj = [];
-var map2_obj = [];
-var map3_obj = [];
 
 maps.data[0].addObject([character, girl, cat]);
 maps.data[1].addObject([character, girl, jukebox, dog]);
-maps.data[2].addObject([character, girl, castledoor, stone, gotoTown]);
-maps.data[3].addObject([character, gotoCastle]);
-
-map0_obj.push(character, girl, cat);
-map1_obj.push(character, girl, jukebox, dog);
-map2_obj.push(character, girl, castledoor, stone, gotoTown);
-map3_obj.push(character, gotoCastle);
-maps_objects.push(map0_obj, map1_obj, map2_obj, map3_obj);
+maps.data[2].addObject([character, girl, castledoor]);
+maps.data[3].addObject([character]);
 
 // Set Camera
 var cameraTarget = character;
@@ -186,24 +143,21 @@ var musicdialog = new dialog();
 musicdialog.setDialog(["This is jukebox!", "Wanna here some music?", "#choice", "#entered"], null, ["Yes", "No"]);
 musicdialog.event = function (choice) {
     if (choice == 0)
-        audio1.play();
+        audio.data[0].play();
     if (choice == 1)
-        audio1.pause();
+        audio.data[0].pause();
 }
 
 var catdialog = new dialog();
 catdialog.setDialog(["Meow!", "Want meow to meow?", "#choice", "#entered"], null, ["Yes", "No"]);
 catdialog.event = function (choice) {
     if (choice == 0)
-        catsound.play();
+        audio.data[1].play();
     if (choice == 1) {}
 }
 
 var doordialog = new dialog();
 doordialog.setDialog(["The door is locked!"]);
-
-var stonedialog = new dialog();
-stonedialog.setDialog(["A very old stone!"]);
 
 girl.faceOnInteraction = true;
 girl.onEnterEvent = function () {
@@ -222,7 +176,7 @@ cat.onEnterEvent = function () {
 
 dog.faceOnInteraction = true;
 dog.onEnterEvent = function () {
-    dogsound.play();
+    audio.data[2].play();
 }
 
 jukebox.onEnterEvent = function () {
@@ -231,14 +185,9 @@ jukebox.onEnterEvent = function () {
 }
 
 castledoor.onEnterEvent = function () {
-    //castledoor.startSpecial();
+    //castledoor.startSpecial(); // Opening Animation
     myGameArea.gameSequence = true;
     currentDialog = doordialog;
-}
-
-stone.onEnterEvent = function () {
-    myGameArea.gameSequence = true;
-    currentDialog = stonedialog;
 }
 
 // Cat walk

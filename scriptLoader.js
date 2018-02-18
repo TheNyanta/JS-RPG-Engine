@@ -9,6 +9,7 @@ var scriptsToLoad = [
     'component.js',
     'map.js',
     'dialog.js',
+    'audio.js',
     'data.js'];
 scriptsToLoad.forEach(function (src) {
     var script = document.createElement('script');

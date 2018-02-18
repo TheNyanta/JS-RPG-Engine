@@ -7,11 +7,12 @@ var spritesheets = {
 
 /**
  * For adding a new spritesheet
- * @param {Spritesheet} 'new Spritesheet(...)' object
  */
-function addSpritesheet(spritesheet) {
-    spritesheet.id = spritesheets.data.length;
-    spritesheets.data.push(spritesheet);
+function addSprite(src, spritesX, spritesY, spriteWidth, spriteHeight, name) {
+    spritesheets.data.push(new Spritesheet(src, spritesX, spritesY, spriteWidth, spriteHeight, name));
+    spritesheets.data[spritesheets.data.length - 1].id = spritesheets.data.length - 1;
+    // Datastring
+    myGameArea.data += "addSprite(" + src + ", " + spritesX + ", " + spritesY + ", " + spriteWidth + ", " + spriteHeight + ", " + name + ");\n";
 }
 
 

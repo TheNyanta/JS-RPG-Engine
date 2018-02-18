@@ -20,6 +20,9 @@ var myGameArea = {
     tiletype: undefined,
     currentLayer: 1,
     drawingOn: false,
+    // The data of the game: When creating new spritesheets/maps/components it will be saved as a string
+    // If you start the engine again and feed it this data it will be the same game data as before
+    data : "",
     // Init
     init: function () {
         // Game canvas
@@ -405,10 +408,10 @@ function update() {
     if (!myGameArea.gameSequence) {
         // Character has to be able to interacted
         if (character.front != undefined)
-            for (var i = 0; i < maps_objects[maps.currentMap].length; i++) character.updateInteraction(maps_objects[maps.currentMap][i]);
+            for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++) character.updateInteraction(maps.data[maps.currentMap].objects[i]);
         // Update the movement of all Components in maps_objects[maps.currentMap] (this includes mapCollision resolving)
         if (!myGameArea.transition)
-            for (var i = 0; i < maps_objects[maps.currentMap].length; i++) maps_objects[maps.currentMap][i].updateMovement();
+            for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++) maps.data[maps.currentMap].objects[i].updateMovement();
         // Check each combination pair of Components in maps_objects[maps.currentMap] for Component-Component-collision
         for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
             for (var j = i + 1; j < maps.data[maps.currentMap].objects.length; j++)
