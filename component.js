@@ -27,8 +27,6 @@ function Component(x, y, spritesheet) {
         if (myGameArea.debug) {
             // Draw Standing tiles
             if (this.rects != undefined) this.showStandingOnTiles();
-            // Draw Front
-            if (this.front != undefined) this.front.draw(myGameArea.context);
             // Draw Collision Box
             ctx.strokeStyle = "black";
             ctx.strokeRect(this.x + this.offset_x - myGameArea.gameCamera.x, this.y + this.offset_y - myGameArea.gameCamera.y, this.offset_width, this.offset_height);
@@ -85,9 +83,9 @@ function Component(x, y, spritesheet) {
          * Key Control: Setup keys with the control function
          * move the Component up/down/left/right if the key is pressed
          */
-        this.keyControl = function () {
+        this.controlEvent = function () {
             // Check if it key control is allowed
-            if (!this.disableControls /*&& !this.finishMove*/ ) {
+            if (!this.disableControls) {
                 // Listen to keys: "Else if" to limit movement in only one direction at the same time (no diagonal moving)
                 if (myGameArea.keys) {
                     if (myGameArea.keys[this.up])
@@ -154,8 +152,7 @@ function Component(x, y, spritesheet) {
 
         /**
          * Update the facing direction based on the speed
-         * This is used for drawing the right animation sequence and
-         * to determinate the front of the Component for interactions
+         * This is used for drawing the right animation sequence
          * For 4-direction movement (for more than four directions add more cases)
          */
         this.updateDirection = function () {
@@ -481,55 +478,44 @@ function Component(x, y, spritesheet) {
     /**
      * Adds Clicking
      * A onclick-Event can be defined that will be fired on click
+     * @param the function that will be called on a click
      */
-    this.clickable = function () {
-        this.click = false;
-        this.clickEvent = true;
+    this.addClickEvent = function (fnc) {
+        this.fireClickEvent = true;
+        this.onClickEvent = fnc;
 
         /**
-         * Updates the click state of the Component and fires one onclick-Event if defined
+         * Updates the click state of the Component and fires one onclick-Event
          */
         this.updateClick = function () {
-            this.click = false;
-            this.clicked();
-
-            if (this.click)
-                if (this.clickEvent) {
-                    if (this.onClickEvent != undefined) this.onClickEvent();
-                    this.clickEvent = false;
+            if (this.isClicked()) {
+                if (this.fireClickEvent) {
+                    this.onClickEvent();
+                    this.fireClickEvent = false;
                 }
+            }
         }
 
         /**
          * Tells if the Component is clicked on
-         * If it's not clicked an on-click Event can be fired again
+         * If it's not clicked an onClickEvent can be fired again
          */
-        this.clicked = function () {
-            var myleft = this.x;
-            var myright = this.x + (this.width);
-            var mytop = this.y;
-            var mybottom = this.y + (this.height);
-
-            // The game canvas by default
-            if (activeCanvas == undefined) {
-                var clickX = myGameArea.clickdownX + myGameArea.gameCamera.x;
-                var clickY = myGameArea.clickdownY + myGameArea.gameCamera.y;
+        this.isClicked = function () {
+            // Mouse / Touchdown
+            if (myGameArea.mousedown || myGameArea.touchdown) {
+                // Not clicked (on sprite)
+                if ((this.x > myGameArea.clickdownX + myGameArea.gameCamera.x) ||
+                    (this.x + this.width < myGameArea.clickdownX + myGameArea.gameCamera.x) ||
+                    (this.y > myGameArea.clickdownY + myGameArea.gameCamera.y) ||
+                    (this.y + this.height < myGameArea.clickdownY + myGameArea.gameCamera.y)) return false;
+                // Clicked
+                else return true;
             }
-            // The game canvas can move so you have to add the myGameArea.gameCameras x and y  
-            else if (activeCanvas == 0) {
-                var clickX = myGameArea.clickdownX + myGameArea.gameCamera.x;
-                var clickY = myGameArea.clickdownY + myGameArea.gameCamera.y;
+            // Click / Touch ended: enable Click Event again
+            else {
+                this.fireClickEvent = true;
+                return false;
             }
-            // The tileset canvas will be always full drawn
-            else if (activeCanvas == 1) {
-                var clickX = myGameArea.clickdownX;
-                var clickY = myGameArea.clickdownY;
-            }
-
-            if (myGameArea.mousedown || myGameArea.touchdown) this.click = true;
-            else this.clickEvent = true; // Enable Click Event again
-
-            if ((mybottom < clickY) || (mytop > clickY) || (myright < clickX) || (myleft > clickX)) this.click = false;
         }
 
         return this;
@@ -542,14 +528,13 @@ function Component(x, y, spritesheet) {
      * - Third step: Is the resolved collision ok with the map collision? If not speedX/Y of all colliding comps = 0.
      */
 
-
     /**
      * Update the Components movement (based on speedX/Y values)
      * Movement can change through user control, movement events (and TODO: moveable interaction)
      */
     this.updateMovement = function () {
-        // If the Component has a key control
-        if (this.keyControl != undefined) this.keyControl();
+        // If the Component has a control event
+        if (this.controlEvent != undefined) this.controlEvent();
 
         // If the Component has an movement event it will be called here
         if (this.movementEvent != undefined) this.movementEvent();
@@ -574,10 +559,6 @@ function Component(x, y, spritesheet) {
         this.x += this.speedX;
         this.y += this.speedY;
 
-        // Update Front
-        if (this.front != undefined)
-            this.updateFront();
-
         // Check if moving
         this.isMoving()
 
@@ -585,46 +566,6 @@ function Component(x, y, spritesheet) {
         this.speedX = 0;
         this.speedY = 0;
 
-        // Stop only on tiles: Causes problems with Component-Component-collision if both step on the same tile!
-        //this.moveFinisher();
-
         return this;
     }
-
-    /*
-    this.updateEvent = function() {
-        // If the Component has a repeating Event it will be called here: it has to be defined extra
-        if (this.repeatingEvent != undefined) this.repeatingEvent();
-        // Character stands infront of the Component and presses enter
-        if (this.interactionEvent != undefined) this.interactionEvent();
-    }*/
-
-    /**
-     * Always stop on a whole tile
-     */
-    /*
-    this.moveFinisher = function() {
-        var x1 = Math.floor((this.x+this.offset_x)/16);
-        var y1 = Math.floor((this.y+this.offset_y)/16);
-        var xFin = (Math.abs(x1-(this.x+this.offset_x)/16) >= 0.1);
-        var yFin = (Math.abs(y1-(this.y+this.offset_y)/16) >= 0.1);
-        // Prevents other movements through control
-        this.finishMove = true;
-        // Finish moving in x-direction
-        if (xFin) {
-            console.log("x");
-            if (this.direction == constants.DIR_W) this.speedX = -this.speed;
-            else if (this.direction == constants.DIR_E) this.speedX = this.speed;
-        }
-        // Finish moving in y-direction
-        if (yFin) {
-            console.log("y");
-            if (this.direction == constants.DIR_N) this.speedY = -this.speed;
-            else if (this.direction == constants.DIR_S) this.speedY = this.speed;
-        }
-        if (!xFin && !yFin) {
-            console.log("end");
-            this.finishMove = false;
-        }        
-    }*/
 }

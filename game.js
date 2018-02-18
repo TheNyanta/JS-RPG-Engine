@@ -212,7 +212,6 @@ var myGameArea = {
                 if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
                     myGameArea.clickdownX = Math.floor(e.clientX - myGameArea.canvas.getBoundingClientRect().x);
                     myGameArea.clickdownY = Math.floor(e.clientY - myGameArea.canvas.getBoundingClientRect().y);
-                    myGameArea.clicked = true;
                     maps.data[maps.currentMap].clickedTile(myGameArea.clickdownX, myGameArea.clickdownY);
                 } else if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.tileset)) {
                     myGameArea.clickdownX = Math.floor(e.clientX - myGameArea.tileset.getBoundingClientRect().x);
@@ -269,7 +268,6 @@ var myGameArea = {
                 if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
                     myGameArea.clickdownX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
                     myGameArea.clickdownY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
-                    myGameArea.clicked = true;
                 } else if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.tileset)) {
                     myGameArea.clickdownX = e.clientX - myGameArea.tileset.getBoundingClientRect().x;
                     myGameArea.clickdownY = e.clientY - myGameArea.tileset.getBoundingClientRect().y;
@@ -320,7 +318,6 @@ var myGameArea = {
                 if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
                     myGameArea.clickdownX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
                     myGameArea.clickdownY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
-                    myGameArea.clicked = true;
                 }
             })
             // Mouse up
@@ -347,7 +344,6 @@ var myGameArea = {
                 if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
                     myGameArea.clickdownX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
                     myGameArea.clickdownY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
-                    myGameArea.clicked = true;
                 }
             })
             // Touch end

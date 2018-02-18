@@ -69,25 +69,32 @@ var castledoor = new Component(144, 62, spritesheets.data[9])
     .collision(0, 0, 47, 48)
     .animation().specialAnimation(20, [0, 1, 2, 3]);
 
-// Teleport to town
+character.addClickEvent(function() {
+   console.log("Character clicked!"); 
+});
+
+// Add Objects to map
+// TODO: add on create, no "var character = ..."
+maps.data[0].addObject([character, girl, cat]);
+maps.data[1].addObject([jukebox, dog]);
+maps.data[2].addObject([castledoor]);
+maps.data[3].addObject([]);
+
+// Teleports
+// Castle to town
 for (var i = 1650; i <= 1667; i++) {
     maps.data[2].tiles[i].onStepEvent = function (obj) {
         componentMapSwitch(null, -8, 3, obj);
         maps.currentMap = 3;
     }
 }
-// Teleport to castle
+// Town to castle
 for (var i = 12; i <= 29; i++) {
     maps.data[3].tiles[i].onStepEvent = function (obj) {
         componentMapSwitch(null, 280, 2, obj);
         maps.currentMap = 2;
     }
 }
-
-maps.data[0].addObject([character, girl, cat]);
-maps.data[1].addObject([jukebox, dog]);
-maps.data[2].addObject([castledoor]);
-maps.data[3].addObject([]);
 
 // Set Camera
 var cameraTarget = character;
@@ -101,14 +108,6 @@ girldialog.event = function (choice) {
             componentMapSwitch(380, 208, 0, character);
             componentMapSwitch(364, 208, 0, girl);
             maps.currentMap = 0;
-            /*
-            myGameArea.transition = true;
-            // New Position
-            character.x = 372;
-            character.y = 210;
-            girl.x = 356;
-            girl.y = 210;
-            */
         }
     }
     if (choice == 1) {
@@ -116,14 +115,6 @@ girldialog.event = function (choice) {
             componentMapSwitch(192, 360, 1, character);
             componentMapSwitch(176, 360, 1, girl);
             maps.currentMap = 1;
-            /*
-            myGameArea.transition = true;
-            // New Position
-            character.x = 192;
-            character.y = 360;
-            girl.x = 176;
-            girl.y = 360;
-            */
         }
     }
     if (choice == 2) {
@@ -132,14 +123,6 @@ girldialog.event = function (choice) {
             componentMapSwitch(166, 210, 2, character);
             componentMapSwitch(150, 210, 2, girl);
             maps.currentMap = 2;
-            /*
-            myGameArea.transition = true;
-            // New Position
-            character.x = 166;
-            character.y = 210;
-            girl.x = 150;
-            girl.y = 210;
-            */
         }
     }
 }
