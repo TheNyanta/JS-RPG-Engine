@@ -152,15 +152,13 @@ var myGameArea = {
             var myGameButtons =
                 '<div class="w3-container w3-padding-64">' +
                 '<button class="w3-button w3-green" onclick="enterFullscreen()">Fullscreen</button>' +
-                '<button class="w3-button w3-green" onclick="{character.x = 120; character.y = 150;}">Unstuck</button>' +
                 '<button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug Off</button>' +
                 '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +
+                '<button class="w3-button w3-orange" onclick="audio.data[0].play()">Play a sound</button>' +
                 '<br>' +
                 '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(character)">Camera on Character</button>' +
                 '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(cat)">Camera on Cat</button>' +
                 '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(girl)">Camera on Girl</button>' +
-                '<br>' +
-                '<a>Talk to the girl or the cat by pressing enter in front of them.</a>' +
                 '</div>';
         }
 
@@ -449,12 +447,16 @@ function update() {
 
 /**
  * Draws the canvas
+ * Zero it clears the canvas
  * First it draws the background
  * Second it draws the objects
  * Third it draws the foreground
  * Four it draws the gui
  */
 function draw() {
+    // Clear the canvas
+    myGameArea.context.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
+    
     // Draw Background
     maps.data[maps.currentMap].drawBackground();
 
@@ -484,7 +486,7 @@ function draw() {
  */
 function updateGameArea() {
     myGameArea.frameNo += 1;
-    myGameArea.context.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
+    
     // Redraw caches' on map change + map switch transition
     if (maps.shownMap != maps.currentMap) {
         maps.shownMap = maps.currentMap;
