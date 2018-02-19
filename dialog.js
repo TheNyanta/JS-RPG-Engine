@@ -34,8 +34,10 @@ function dialog(text, img, choices) {
     this.update = function () {
 
         // TODO: Get a good position for the dialog on every map
-        this.width = Math.min(maps.data[maps.currentMap].width, myGameArea.canvas.width);
-        this.y = Math.min(maps.data[maps.currentMap].height, myGameArea.canvas.height) - 50; //40 => two lines á 30px serif
+        //this.width = Math.min(maps.data[maps.currentMap].width, myGameArea.canvas.width);
+        this.width = myGameArea.canvas.width;
+        //this.y = Math.min(maps.data[maps.currentMap].height, myGameArea.canvas.height) - 50; //40 => two lines á 30px serif
+        this.y = myGameArea.canvas.height - 50;
 
         this.nextText();
         if (this.chatCounter >= this.text.length) {
@@ -82,17 +84,18 @@ function dialog(text, img, choices) {
 
     this.selectChoice = function () {
         if (myGameArea.gameSequence) {
-            if (myGameArea.keys) {
-                if (myGameArea.keys[constants.KEY_W] || myGameArea.keys[constants.KEY_S]) {
-                    if (this.keyPush) {
-                        if (myGameArea.keys[constants.KEY_W]) currentDialog.selected--;
-                        else if (myGameArea.keys[constants.KEY_S]) currentDialog.selected++;
-                        this.keyPush = false;
-                    }
-                } else this.keyPush = true;
-            }
-            // TODO: Select with Mouseover / Touching 
-            else {}
+            if (myGameArea.keys[constants.KEY_W] || myGameArea.keys[constants.KEY_S]) {
+                if (this.keyPush) {
+                    if (myGameArea.keys[constants.KEY_W]) currentDialog.selected--;
+                    else if (myGameArea.keys[constants.KEY_S]) currentDialog.selected++;
+                    this.keyPush = false;
+                }
+            } else this.keyPush = true;
+            // TODO: Refine select with Mouseover / Touching
+            if (myGameArea.x > 30 && myGameArea.x < 140 && myGameArea.y > 345 && myGameArea.y < 370) currentDialog.selected = 0;
+            else if (myGameArea.x > 30 && myGameArea.x < 140 && myGameArea.y > 370 && myGameArea.y < 395) currentDialog.selected = 1;
+            else if (myGameArea.x > 190 && myGameArea.x < 350 && myGameArea.y > 345 && myGameArea.y < 370) currentDialog.selected = 2;
+            else if (myGameArea.x > 190 && myGameArea.x < 350 && myGameArea.y > 370 && myGameArea.y < 395) currentDialog.selected = 3;
         }
 
         // Changing choices needs a delay or single press checker if you don't use a different key to select each choice: i.E. only up/down
@@ -101,16 +104,15 @@ function dialog(text, img, choices) {
     }
 
     this.nextText = function () {
-        if (myGameArea.keys) {
-            // Enter key down / click / touch
-            if (myGameArea.keys[constants.KEY_ENTER] || myGameArea.mousedown || myGameArea.touchdown) {
-                if (this.next) {
-                    this.chatCounter++;
-                    this.next = false;
-                }
+        // Enter key down / click / touch
+        if (myGameArea.keys[constants.KEY_ENTER] || myGameArea.mousedown || myGameArea.touchdown) {
+
+            if (this.next) {
+                this.chatCounter++;
+                this.next = false;
             }
-            // Enter key up: Enable next enter push
-            else this.next = true;
         }
+        // Enter key up: Enable next enter push
+        else this.next = true;
     }
 }

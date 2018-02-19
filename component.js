@@ -68,12 +68,13 @@ function Component(x, y, spritesheet) {
      * add key control
      * make Component listen to key inputs
      */
-    this.control = function (up, down, left, right) {
+    this.control = function (up, down, left, right, mouse) {
         // Key Control Properties
         this.up = up;
         this.down = down;
         this.left = left;
         this.right = right;
+        if (mouse != undefined) this.mouse = mouse
 
         this.disableControls = false;
 
@@ -85,15 +86,36 @@ function Component(x, y, spritesheet) {
             // Check if it key control is allowed
             if (!this.disableControls) {
                 // Listen to keys: "Else if" to limit movement in only one direction at the same time (no diagonal moving)
-                if (myGameArea.keys) {
-                    if (myGameArea.keys[this.up])
-                        this.speedY = -this.speed;
-                    else if (myGameArea.keys[this.down])
-                        this.speedY = this.speed;
-                    else if (myGameArea.keys[this.left])
-                        this.speedX = -this.speed;
-                    else if (myGameArea.keys[this.right])
-                        this.speedX = this.speed;
+                if (myGameArea.keys[this.up])
+                    this.speedY = -this.speed;
+                else if (myGameArea.keys[this.down])
+                    this.speedY = this.speed;
+                else if (myGameArea.keys[this.left])
+                    this.speedX = -this.speed;
+                else if (myGameArea.keys[this.right])
+                    this.speedX = this.speed;
+                else if (mouse) {
+                    if (myGameArea.mousedown || myGameArea.touchdown) {
+                        if (Math.abs(myGameArea.x + myGameArea.gameCamera.x - this.x - this.offset_x) >= Math.abs(myGameArea.y + myGameArea.gameCamera.y - this.y - this.offset_y)) {
+                            if (this.x + this.offset_x < myGameArea.x + myGameArea.gameCamera.x - 4) this.speedX += this.speed;
+                            else if (this.x + this.offset_x > myGameArea.x + myGameArea.gameCamera.x + 4) this.speedX -= this.speed;
+                        } else {
+                            if (this.y + this.offset_y < myGameArea.y + myGameArea.gameCamera.y - 4) this.speedY += this.speed;
+                            else if (this.y + this.offset_y > myGameArea.y + myGameArea.gameCamera.y + 4) this.speedY -= this.speed;
+                        }
+                        /*
+                        if (Math.abs(myGameArea.x - myGameArea.clickdownX) > Math.abs(myGameArea.y - myGameArea.clickdownY)) {
+                            if (myGameArea.x < myGameArea.clickdownX - 4)
+                                this.speedX -= this.speed;
+                            else if (myGameArea.x > myGameArea.clickdownX + 4)
+                                this.speedX += this.speed;
+                        } else {
+                            if (myGameArea.y < myGameArea.clickdownY - 4)
+                                this.speedY -= this.speed;
+                            else if (myGameArea.y > myGameArea.clickdownY + 4)
+                                this.speedY += this.speed;
+                        }*/
+                    }
                 }
             }
         }
@@ -309,7 +331,7 @@ function Component(x, y, spritesheet) {
                 for (var i = 0, l = tile.collision.length; i < l; i++) {
                     // RESTRICTED: UP
                     if (tile.collision[i] == 0) {
-                        if (this.y + this.offset_y > tile.y /*+ tile.height*/)
+                        if (this.y + this.offset_y > tile.y /*+ tile.height*/ )
                             if (this.speedY < 0) this.speedY = 0;
                     }
                     // RESTRICTED: DOWN 
@@ -319,7 +341,7 @@ function Component(x, y, spritesheet) {
                     }
                     // RESTRICTED: LEFT
                     else if (tile.collision[i] == 2) {
-                        if (this.x + this.offset_x > tile.x /*+ tile.width*/)
+                        if (this.x + this.offset_x > tile.x /*+ tile.width*/ )
                             if (this.speedX < 0) this.speedX = 0;
                     }
                     // RESTRICTED: RIGHT
@@ -449,18 +471,16 @@ function Component(x, y, spritesheet) {
         // Press enter to start
         this.updateInteraction = function (otherobj) {
             if (this.distance(otherobj) <= Math.min(otherobj.width, otherobj.height) && this.facing(otherobj)) {
-                if (myGameArea.keys) {
-                    // Enter key down
-                    if (myGameArea.keys[constants.KEY_ENTER]) {
-                        if (otherobj.fireEvent) {
-                            if (otherobj.faceOnInteraction) this.face(otherobj);
-                            if (otherobj.enterEvent != undefined) otherobj.enterEvent();
-                            otherobj.fireEvent = false;
-                        }
+                // Enter key down
+                if (myGameArea.keys[constants.KEY_ENTER]) {
+                    if (otherobj.fireEvent) {
+                        if (otherobj.faceOnInteraction) this.face(otherobj);
+                        if (otherobj.enterEvent != undefined) otherobj.enterEvent();
+                        otherobj.fireEvent = false;
                     }
-                    // Enter key up: Enable enter event
-                    else otherobj.fireEvent = true;
                 }
+                // Enter key up: Enable enter event
+                else otherobj.fireEvent = true;
             } else otherobj.fireEvent = false;
         }
 

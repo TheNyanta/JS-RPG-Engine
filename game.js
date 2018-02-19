@@ -52,6 +52,8 @@ var myGameArea = {
 
         this.frameNo = 0;
         this.gameSequence = false;
+        
+        this.keys = [];
         // To only fire a single event on enter / mousedown / touchdown
         this.eventReady = true;
         this.enter = false;
@@ -197,7 +199,6 @@ var myGameArea = {
         // INITIALIZE USER INPUT
         // Customize context menu on right click if canvas
         window.addEventListener('contextmenu', function (e) {
-
             if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
                 console.log("Default context menu prevent");
                 e.preventDefault();
@@ -230,11 +231,12 @@ var myGameArea = {
                 if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
                     myGameArea.clickdownX = Math.floor(e.clientX - myGameArea.canvas.getBoundingClientRect().x);
                     myGameArea.clickdownY = Math.floor(e.clientY - myGameArea.canvas.getBoundingClientRect().y);
+                    e.preventDefault();
                     maps.data[maps.currentMap].clickedTile(myGameArea.clickdownX, myGameArea.clickdownY);
                 } else if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.tileset)) {
                     myGameArea.clickdownX = Math.floor(e.clientX - myGameArea.tileset.getBoundingClientRect().x);
                     myGameArea.clickdownY = Math.floor(e.clientY - myGameArea.tileset.getBoundingClientRect().y);
-
+                    e.preventDefault();
                     maps.data[maps.currentMap].clickedTile(myGameArea.clickdownX, myGameArea.clickdownY);
                 } else {
                     myGameArea.clickdownX = undefined;
@@ -336,6 +338,7 @@ var myGameArea = {
                 if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
                     myGameArea.clickdownX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
                     myGameArea.clickdownY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
+                    e.preventDefault();
                 }
             })
             // Mouse up
@@ -481,6 +484,7 @@ function draw() {
  */
 function updateGameArea() {
     myGameArea.frameNo += 1;
+    myGameArea.context.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
     // Redraw caches' on map change + map switch transition
     if (maps.shownMap != maps.currentMap) {
         maps.shownMap = maps.currentMap;

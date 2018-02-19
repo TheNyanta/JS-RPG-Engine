@@ -61,7 +61,7 @@ addAudio("Assets/Audio/dog.m4a");
 var character = new Component(240, 280, spritesheets.data[4])
     .velocity(2)
     .collision(4, 16, 16, 16)
-    .control(constants.KEY_W, constants.KEY_S, constants.KEY_A, constants.KEY_D)
+    .control(constants.KEY_W, constants.KEY_S, constants.KEY_A, constants.KEY_D, true)
     .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
     .interactive();
 
@@ -115,6 +115,35 @@ girl.addClickEvent(function () {
     }
 });
 
+cat.addClickEvent(function () {
+    if (character.distance(cat) <= Math.min(cat.width, cat.height) && character.facing(cat)) {
+        if (cat.faceOnInteraction) character.face(cat);
+        myGameArea.gameSequence = true;
+        currentDialog = catdialog;
+    }
+});
+
+jukebox.addClickEvent(function () {
+    if (character.distance(jukebox) <= Math.min(jukebox.width, jukebox.height) && character.facing(jukebox)) {
+        myGameArea.gameSequence = true;
+        currentDialog = musicdialog;
+    }
+});
+
+dog.addClickEvent(function () {
+    if (character.distance(dog) <= Math.min(dog.width, dog.height) && character.facing(dog)) {
+        if (dog.faceOnInteraction) character.face(dog);
+        audio.data[9].play();
+    }
+});
+
+castledoor.addClickEvent(function () {
+    if (character.distance(castledoor) <= Math.min(castledoor.width, castledoor.height) && character.facing(castledoor)) {
+        myGameArea.gameSequence = true;
+        currentDialog = doordialog;
+    }
+});
+
 // Add Objects to map
 // TODO: add on create, no "var character = ..."
 maps.data[0].addObject([character, girl, cat]);
@@ -125,20 +154,18 @@ maps.data[3].addObject([]);
 // Dialog on enter / click / touch on character in front of stone when facing it (direction: North)
 for (var i = 1070; i <= 1071; i++) {
     maps.data[2].tiles[i].enterEvent = function (obj) {
-        if (myGameArea.keys) {
-            // Enter key down / click / touch
-            if (myGameArea.keys[constants.KEY_ENTER] || ((myGameArea.mousedown || myGameArea.touchdown) && !obj.fireClickEvent)) {
-                if (maps.data[2].tiles[i].fireEvent) {
-                    if (obj.direction == constants.DIR_N) {
-                        myGameArea.gameSequence = true;
-                        currentDialog = stonedialog;
-                        maps.data[2].tiles[i].fireEvent = false;
-                    }
+        // Enter key down / click / touch
+        if (myGameArea.keys[constants.KEY_ENTER] || ((myGameArea.mousedown || myGameArea.touchdown) && !obj.fireClickEvent)) {
+            if (maps.data[2].tiles[i].fireEvent) {
+                if (obj.direction == constants.DIR_N) {
+                    myGameArea.gameSequence = true;
+                    currentDialog = stonedialog;
+                    maps.data[2].tiles[i].fireEvent = false;
                 }
             }
-            // Enter key up: Enable next enter push
-            else maps.data[2].tiles[i].fireEvent = true;
         }
+        // Enter key up: Enable next enter push
+        else maps.data[2].tiles[i].fireEvent = true;
     }
 }
 
