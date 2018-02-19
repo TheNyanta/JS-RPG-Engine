@@ -29,6 +29,51 @@ function componentMapSwitch(x, y, map, obj) {
     // Add the component to the new map
     maps.data[map].objects.push(obj);
 }
+// audio.data[0-7].play();
+var randomSound = (function () {
+    var note = 0;
+    var playing = false;
+
+    function change() {
+        note = Math.round(Math.random() * 7);
+        //if (note < 0) note = 0;
+        //if (note > 7) note = 7;
+    }
+    return {
+        currentNote: function () {
+            return note;
+        },
+        newNote: function () {
+            change();
+            audio.data[note].volume = 0.3;
+            return note;
+        },
+        isPlaying: function () {
+            return playing;
+        },
+        play: function () {
+            playing = true;
+        },
+        stop: function () {
+            playing = false;
+        },
+        init: function () {
+            for (var i = 0; i < 8; i++) {
+                audio.data[i].volume = 0;
+                audio.data[i].play();
+            }
+        }
+    };
+})();
+
+function playHarp() {
+    if (randomSound.isPlaying()) {
+        if (audio.data[randomSound.currentNote()].ended) {
+            audio.data[randomSound.newNote()].play();
+        }
+        
+    }
+}
 
 //convert listmap to a grid
 function getGrid(maplayer, width, height) {

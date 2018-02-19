@@ -497,4 +497,6 @@ function updateGameArea() {
 
     // Draw dialog
     if (myGameArea.gameSequence && currentDialog != undefined) currentDialog.update();
+    
+    playHarp();
 }
