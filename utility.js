@@ -289,6 +289,36 @@ function layerButton(i) {
         document.getElementById("layerCButton").setAttribute("class", "w3-button w3-green");
         if (!myGameArea.debug) debugButton();
     }
+    if (!myGameArea.drawingOn) drawButton();
+}
+
+function collisionButton(i) {
+    if (!myGameArea.debug) debugButton();
+    layerButton(3);
+    if (!myGameArea.drawingOn) drawButton();
+    myGameArea.tileCollisions[i] = toggle(myGameArea.tileCollisions[i]);
+    if (myGameArea.tileCollisions[0]) document.getElementById("collisionUpButton").setAttribute("class", "w3-button w3-green");
+    else document.getElementById("collisionUpButton").setAttribute("class", "w3-button w3-red");
+    if (myGameArea.tileCollisions[1]) document.getElementById("collisionDownButton").setAttribute("class", "w3-button w3-green");
+    else document.getElementById("collisionDownButton").setAttribute("class", "w3-button w3-red");
+    if (myGameArea.tileCollisions[2]) document.getElementById("collisionLeftButton").setAttribute("class", "w3-button w3-green");
+    else document.getElementById("collisionLeftButton").setAttribute("class", "w3-button w3-red");
+    if (myGameArea.tileCollisions[3]) document.getElementById("collisionRightButton").setAttribute("class", "w3-button w3-green");
+    else document.getElementById("collisionRightButton").setAttribute("class", "w3-button w3-red");
+
+    // Update tileCollisionType
+    if (myGameArea.tileCollisions[0] && myGameArea.tileCollisions[1] && myGameArea.tileCollisions[2] && myGameArea.tileCollisions[3])
+        myGameArea.tileCollisionType = 1;
+    else if (!myGameArea.tileCollisions[0] && !myGameArea.tileCollisions[1] && !myGameArea.tileCollisions[2] && !myGameArea.tileCollisions[3])
+        myGameArea.tileCollisionType = 0;
+    else {
+        var collision = [];
+        if (myGameArea.tileCollisions[0]) collision.push(0);
+        if (myGameArea.tileCollisions[1]) collision.push(1);
+        if (myGameArea.tileCollisions[2]) collision.push(2);
+        if (myGameArea.tileCollisions[3]) collision.push(3);
+        myGameArea.tileCollisionType = collision;
+    }
 
 }
 

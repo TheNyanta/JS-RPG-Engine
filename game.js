@@ -17,8 +17,9 @@ var myGameArea = {
     showExtra: false,
     // Map Editor Variables
     activeCanvas: undefined,
-    tiletype: undefined,
-    currentLayer: 1,
+    tiletype: 1,
+    tileCollisionType: 0,
+    currentLayer: 0,
     drawingOn: false,
     // The data of the game: When creating new spritesheets/maps/components it will be saved as a string
     // If you start the engine again and feed it this data it will be the same game data as before
@@ -98,7 +99,7 @@ var myGameArea = {
         this.gameCamera.setTarget(cameraTarget);
 
         // Initalize Maps
-        for (i = 0; i < maps.data.length; i++) {
+        for (i = 0, l = maps.data.length; i < l; i++) {
             maps.data[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);
             //this.minWidth = Math.min(this.minWidth, maps.data[i].mapWidth * maps.data[i].tileset.spriteWidth);
             //this.minHeight = Math.min(this.minHeight, maps.data[i].mapHeight * maps.data[i].tileset.spriteHeight);
@@ -113,7 +114,10 @@ var myGameArea = {
         if (myGameArea.editor) {
             // Draw Tileset
             maps.data[maps.currentMap].drawTileset();
-
+            
+            // Collision setup
+            myGameArea.tileCollisions = [false, false, false, false];
+            
             // Editor Mode Buttons
             var myGameButtons =
                 '<div class="w3-container w3-padding-64">' +
@@ -132,8 +136,14 @@ var myGameArea = {
                 '<br>' +
                 '<span class="w3-button w3-yellow">Selected Tile</span>' +
                 '<span class="w3-button w3-yellow" id="selectedTile"></span>' +
-                '<span class="w3-button w3-pink">Clicked</span>' +
+                '<span class="w3-button w3-pink">Clicked Tile</span>' +
                 '<span class="w3-button w3-pink" id="clickedXY"></span>' +
+                '<br>' +
+                '<span class="w3-button w3-orange">Selected Collision</span>' +
+                '<span class="w3-button w3-red" id="collisionUpButton" onclick="collisionButton(0)">Up</span>' +
+                '<span class="w3-button w3-red" id="collisionDownButton" onclick="collisionButton(1)">Down</span>' +
+                '<span class="w3-button w3-red" id="collisionLeftButton" onclick="collisionButton(2)">Left</span>' +
+                '<span class="w3-button w3-red" id="collisionRightButton" onclick="collisionButton(3)">Right</span>' +
                 '</div>';
         } else {
             // Game Mode Buttons
@@ -401,36 +411,33 @@ function everyinterval(n) {
 }
 
 /**
- * Updates the current map with all it's Components
+ * Updates the current map with all it's components
+ * TODO: Clean up - structure; for-loop length as var in the loop BUT care it must not change will the loop runs EVENTS that change map / delete objects
  */
 function update() {
     // Check enter / mousedown / touchdown
-    if (!myGameArea.enter && !myGameArea.mousedown && !myGameArea.touchdown) {
-        myGameArea.eventReady = true;
-    }
+    if (!myGameArea.enter && !myGameArea.mousedown && !myGameArea.touchdown) myGameArea.eventReady = true;
 
-    // In a myGameArea.gameSequence there will be no movement (i.e. activate myGameArea.gameSequence when opening a menu)
+    // In a myGameArea.gameSequence there will be no movement (i.e. activate myGameArea.gameSequence when opening a menu or a dialog)
     if (!myGameArea.gameSequence) {
         // For components that can start an interacted
         for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
-            if ( maps.data[maps.currentMap].objects[i].actor)
-                for (var j = 0; j < maps.data[maps.currentMap].objects.length; j++)  maps.data[maps.currentMap].objects[i].updateInteraction(maps.data[maps.currentMap].objects[j]);
+            if (maps.data[maps.currentMap].objects[i].actor)
+                for (var j = 0; j < maps.data[maps.currentMap].objects.length; j++) maps.data[maps.currentMap].objects[i].updateInteraction(maps.data[maps.currentMap].objects[j]);
+
         // Update the movement of all Components in maps_objects[maps.currentMap] (this includes mapCollision resolving)
         if (!myGameArea.transition)
             for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++) maps.data[maps.currentMap].objects[i].updateMovement();
+
         // Check each combination pair of Components in maps_objects[maps.currentMap] for Component-Component-collision
         for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
             for (var j = i + 1; j < maps.data[maps.currentMap].objects.length; j++)
                 if (maps.data[maps.currentMap].objects[i].componentCollision != undefined)
                     maps.data[maps.currentMap].objects[i].componentCollision(maps.data[maps.currentMap].objects[j]);
-        // Update the position of all "moveable" Components in maps_objects[maps.currentMap]
-        for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
-            if (maps.data[maps.currentMap].objects[i].speed != undefined) maps.data[maps.currentMap].objects[i].updatePosition();
 
+        // Update the position of all components in maps.data[maps.currentMap].objects
+        for (var i = 0, l = maps.data[maps.currentMap].objects.length; i < l; i++) maps.data[maps.currentMap].objects[i].updatePosition();
     }
-
-    // Update Events
-    //for (var i = 0; i < maps_objects[maps.currentMap].length; i++) maps_objects[maps.currentMap][i].updateEvent();
 
     myGameArea.gameCamera.update();
 }
@@ -451,7 +458,7 @@ function draw() {
         return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);
     });
     // Draw Objects of the current map
-    for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++) maps.data[maps.currentMap].objects[i].draw(myGameArea.context);
+    for (var i = 0, l = maps.data[maps.currentMap].objects.length; i < l; i++) maps.data[maps.currentMap].objects[i].draw(myGameArea.context);
 
     // Draw Foreground
     maps.data[maps.currentMap].drawForeground();

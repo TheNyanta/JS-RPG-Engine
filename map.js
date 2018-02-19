@@ -37,8 +37,9 @@ function Tile(spritesheet, x, y) {
     this.layer1 = 0;
     this.layer2 = 0;
     this.layer3 = 0;
-    // Collision (TODO: Advanced -> Direction depended collision)
-    this.collision = true;
+    // Collision
+    this.collision = 0;
+
     // To fire only a single event on enter / mousedown / touchdown
     this.fireEvent = true
 
@@ -52,14 +53,20 @@ function Tile(spritesheet, x, y) {
         if (this.layer3 - 1 >= 0) drawSprite(ctx2, this.spritesheet, this.layer3 - 1, this.x, this.y);
         // Debug information
         if (myGameArea.debug) {
-            // Show collision layer
+            // Show collision layer: TODO: Visualize direction restrictions
             myGameArea.cgx3.globalAlpha = 0.3;
-            if (this.collision) myGameArea.cgx3.fillStyle = "blue";
-            else myGameArea.cgx3.fillStyle = "red";
+            if (this.collision === 0) myGameArea.cgx3.fillStyle = "blue";
+            else if (this.collision === 1) myGameArea.cgx3.fillStyle = "red";
+            else {
+                if (this.collision[0] == 0) myGameArea.cgx3.fillStyle = "purple";
+                if (this.collision[0] == 1) myGameArea.cgx3.fillStyle = "cyan";
+                if (this.collision[0] == 2) myGameArea.cgx3.fillStyle = "yellow";
+                if (this.collision[0] == 3) myGameArea.cgx3.fillStyle = "black";
+            }
             myGameArea.cgx3.fillRect(this.x, this.y, this.width, this.height);
             myGameArea.cgx3.globalAlpha = 1.0;
             // Show event
-            if (this.onStepEvent != undefined || this.onEnterEvent != undefined) {
+            if (this.stepOnEvent != undefined || this.enterEvent != undefined) {
                 myGameArea.cgx3.font = "bold 8px Serif";
                 myGameArea.cgx3.fillStyle = "black";
                 myGameArea.cgx3.fillText("E", this.x + 1, this.y + 7);
@@ -105,7 +112,7 @@ function Map(image, tileset, mapWidth, mapHeight) {
     // Contains all the tiles
     // A tile is a component which contains the layers and the collision
     this.tiles = [];
-    for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+    for (var i = 0, l = this.mapWidth * this.mapHeight; i < l; i++) {
         var res = i2xy(i, this.mapWidth);
         this.tiles.push(new Tile(this.tileset, res[0] * this.tileset.spriteWidth, res[1] * this.tileset.spriteHeight));
     }
@@ -114,7 +121,7 @@ function Map(image, tileset, mapWidth, mapHeight) {
 
     this.addObject = function (object) {
         if (object.length != undefined)
-            for (var i = 0; i < object.length; i++) this.objects.push(object[i]);
+            for (var i = 0, l = object.length; i < l; i++) this.objects.push(object[i]);
         else this.objects.push(object);
     }
 
@@ -126,7 +133,7 @@ function Map(image, tileset, mapWidth, mapHeight) {
      * @param collision layer
      */
     this.loadLayers = function (l1, l2, l3, lc) {
-        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+        for (var i = 0, l = this.mapWidth * this.mapHeight; i < l; i++) {
             this.tiles[i].layer1 = l1[i];
             this.tiles[i].layer2 = l2[i];
             this.tiles[i].layer3 = l3[i];
@@ -157,7 +164,7 @@ function Map(image, tileset, mapWidth, mapHeight) {
         // ...  and repaint!
         if (this.image != undefined) myGameArea.cgx1.drawImage(this.image, this.x, this.y, myGameArea.panorama.width, myGameArea.panorama.height);
 
-        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) this.tiles[i].draw(myGameArea.cgx2, myGameArea.cgx3);
+        for (var i = 0, l = this.mapWidth * this.mapHeight; i < l; i++) this.tiles[i].draw(myGameArea.cgx2, myGameArea.cgx3);
     }
 
     // ####################################
@@ -191,20 +198,24 @@ function Map(image, tileset, mapWidth, mapHeight) {
 
     }
 
-    // Map editing: get tiles from tileset and place them on the map
+    /**
+     * Map editing
+     * Get tile by clicking on the tileset
+     * Get collision with buttons
+     * Set tile + collision by clicking on the game
+     */
     this.clickedTile = function (param_x, param_y) {
-        var x;
-        var y;
-
         // Click on Map
         if (myGameArea.activeCanvas == 0) {
-            x = Math.floor((param_x + myGameArea.gameCamera.x) / this.tileset.spriteWidth);
-            y = Math.floor((param_y + myGameArea.gameCamera.y) / this.tileset.spriteHeight);
+            var x = Math.floor((param_x + myGameArea.gameCamera.x) / this.tileset.spriteWidth);
+            var y = Math.floor((param_y + myGameArea.gameCamera.y) / this.tileset.spriteHeight);
+            var d = maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)];
+            // Clicked Tile console.log(xy2i(x, y, this.mapWidth));
             if (myGameArea.drawingOn) {
-                if (myGameArea.currentLayer == 0) maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].layer1 = myGameArea.tiletype;
-                if (myGameArea.currentLayer == 1) maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].layer2 = myGameArea.tiletype;
-                if (myGameArea.currentLayer == 2) maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].layer3 = myGameArea.tiletype;
-                if (myGameArea.currentLayer == 3) maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].collision = toggle(maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].collision);
+                if (myGameArea.currentLayer == 0) d.layer1 = myGameArea.tiletype;
+                if (myGameArea.currentLayer == 1) d.layer2 = myGameArea.tiletype;
+                if (myGameArea.currentLayer == 2) d.layer3 = myGameArea.tiletype;
+                if (myGameArea.currentLayer == 3) d.collision = myGameArea.tileCollisionType;
 
                 maps.data[maps.currentMap].drawCache();
             }
@@ -212,8 +223,8 @@ function Map(image, tileset, mapWidth, mapHeight) {
         }
         // Click on Tileset
         if (myGameArea.activeCanvas == 1) {
-            x = Math.floor(param_x / this.tileset.spriteWidth);
-            y = Math.floor(param_y / this.tileset.spriteHeight);
+            var x = Math.floor(param_x / this.tileset.spriteWidth);
+            var y = Math.floor(param_y / this.tileset.spriteHeight);
             myGameArea.tiletype = xy2i(x, y, this.tileset.spritesX) + 1;
             document.getElementById("selectedTile").innerHTML = myGameArea.tiletype;
             document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
@@ -231,8 +242,8 @@ function Map(image, tileset, mapWidth, mapHeight) {
 
         var mapIndex = 0;
         var tile_w, tile_h;
-        for (var h = 0; h < this.tileset.spritesY; h++) {
-            for (var w = 0; w < this.tileset.spritesX; w++, mapIndex++) {
+        for (var h = 0, m = this.tileset.spritesY; h < m; h++) {
+            for (var w = 0, n = this.tileset.spritesX; w < n; w++, mapIndex++) {
                 tile_w = w * this.tileset.spriteWidth;
                 tile_h = h * this.tileset.spriteHeight;
                 //(ctx, spritesheet, number, x, y)
@@ -259,7 +270,7 @@ function Map(image, tileset, mapWidth, mapHeight) {
         var output = "";
         // Layer 1
         output += "var " + this.name + "_layer1 = [";
-        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+        for (var i = 0, j = this.mapWidth * this.mapHeight; i < j; i++) {
             output += this.tiles[i].layer1;
             if (i < this.mapWidth * this.mapHeight - 1)
                 output += ", ";
@@ -267,7 +278,7 @@ function Map(image, tileset, mapWidth, mapHeight) {
         output += "];\n";
         // Layer 2
         output += "var " + this.name + "_layer2 = [";
-        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+        for (var i = 0, j = this.mapWidth * this.mapHeight; i < j; i++) {
             output += this.tiles[i].layer2;
             if (i < this.mapWidth * this.mapHeight - 1)
                 output += ", ";
@@ -275,7 +286,7 @@ function Map(image, tileset, mapWidth, mapHeight) {
         output += "];\n";
         // Layer 3
         output += "var " + this.name + "_layer3 = [";
-        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
+        for (var i = 0, j = this.mapWidth * this.mapHeight; i < j; i++) {
             output += this.tiles[i].layer3;
             if (i < this.mapWidth * this.mapHeight - 1)
                 output += ", ";
@@ -283,8 +294,9 @@ function Map(image, tileset, mapWidth, mapHeight) {
         output += "];\n";
         // Collision Layer
         output += "var " + this.name + "_layerC = [";
-        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) {
-            output += this.tiles[i].collision;
+        for (var i = 0, j = this.mapWidth * this.mapHeight; i < j; i++) {
+            if (this.tiles[i].collision instanceof Array) output += "[" + this.tiles[i].collision + "]";
+            else output += this.tiles[i].collision;
             if (i < this.mapWidth * this.mapHeight - 1)
                 output += ", ";
         }
@@ -295,13 +307,13 @@ function Map(image, tileset, mapWidth, mapHeight) {
 
     // After the maps tileset was changed, change the tileset of the tiles
     this.switchTileset = function () {
-        for (var i = 0; i < this.mapWidth * this.mapHeight; i++) this.tiles[i].spritesheet = this.tileset;
+        for (var i = 0, j = this.mapWidth * this.mapHeight; i < j; i++) this.tiles[i].spritesheet = this.tileset;
     }
 }
 
 function loadImage(img) {
     var tmp;
-    for (var i = 0; i < spritesheets.data.length; i++) {
+    for (var i = 0, l = spritesheets.data.length; i < l; i++) {
         if (spritesheets.data[i].img.src.match(/[\w]+\.[A-Za-z]{3}$/)[0] == img.match(/[\w]+\.[A-Za-z]{3}$/)[0]) {
             console.log("spritesheet already exists: taking existing one");
             tmp = spritesheets.data[i];

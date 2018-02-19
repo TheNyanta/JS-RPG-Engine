@@ -25,8 +25,6 @@ function Component(x, y, spritesheet) {
     this.draw = function (ctx) {
         // Debug information
         if (myGameArea.debug) {
-            // Draw Standing tiles
-            if (this.rects != undefined) this.showStandingOnTiles();
             // Draw Collision Box
             ctx.strokeStyle = "black";
             ctx.strokeRect(this.x + this.offset_x - myGameArea.gameCamera.x, this.y + this.offset_y - myGameArea.gameCamera.y, this.offset_width, this.offset_height);
@@ -222,37 +220,26 @@ function Component(x, y, spritesheet) {
         /**
          * Prevents map collision
          * [TODO: Check if there is no collision between the old and the new position
-         * (only happens if moving really fast!)]
+         * (Can happen if either moving really fast or realtime moving <big delta * speed>)]
          */
         this.mapCollision = function () {
-            var tmp = this.speedY;
-
-            // X Collision
-            this.speedY = 0;
-            if (!this.isMapWalkable()) {
-                if (this.direction != undefined) this.updateDirection();
-                this.speedX = 0;
-                this.xCollisionMap = true;
-            } else this.xCollisionMap = false;
-
-            // Y Collision
-            this.speedY = tmp;
-            if (!this.isMapWalkable()) {
-                if (this.direction != undefined) this.updateDirection();
-                this.speedY = 0;
-                this.yCollisionMap = true;
-            } else this.yCollisionMap = false;
+            this.mapWalking();
+            if (this.direction != undefined) this.updateDirection();
         }
 
         /**
          * Calculates the new position and checks if it's walkable by using the maps collision layer
-         * "may TODO": Adept for all sizes
+         *  8x8 tiles - "may TODO": Adept for all sizes
          */
+        this.mapWalking = function () {
 
-        // 8x8 tiles
-        this.isMapWalkable = function () {
-            if (!this.collidable) return true;
-            if (this.speed == undefined || this.speed == 0) return true; // Something that can't move has no map collision
+            var d = maps.data[maps.currentMap];
+
+            // Check map borders
+            if (this.x + this.offset_x + this.speedX < 0) this.speedX = 0;
+            else if (this.y + this.offset_y + this.speedY < 0) this.speedY = 0;
+            else if (this.x + this.offset_x + this.speedX + this.offset_width > d.width) this.speedX = 0;
+            else if (this.y + this.offset_y + this.speedY + this.offset_height > d.height) this.speedY = 0;
 
             // Converts the cartesian to grid coordiantes
             var x1 = Math.floor((this.x + this.offset_x + this.speedX) / 8);
@@ -265,16 +252,20 @@ function Component(x, y, spritesheet) {
             if (Math.abs(x3 - (this.x + this.offset_x + this.offset_width + this.speedX) / 8) < 0.1) x3 = x2;
             if (Math.abs(y3 - (this.y + this.offset_y + this.offset_height + this.speedY) / 8) < 0.1) y3 = y2;
 
-            var d = maps.data[maps.currentMap];
+            if (this.collidable) {
+                // Apply the movement restriction of the tiles the component is standing on to it
+                this.tileRestriction(d.tiles[xy2i(x1, y1, d.mapWidth)]);
+                this.tileRestriction(d.tiles[xy2i(x1, y2, d.mapWidth)]);
+                this.tileRestriction(d.tiles[xy2i(x1, y3, d.mapWidth)]);
+                this.tileRestriction(d.tiles[xy2i(x2, y1, d.mapWidth)]);
+                this.tileRestriction(d.tiles[xy2i(x2, y2, d.mapWidth)]);
+                this.tileRestriction(d.tiles[xy2i(x2, y3, d.mapWidth)]);
+                this.tileRestriction(d.tiles[xy2i(x3, y1, d.mapWidth)]);
+                this.tileRestriction(d.tiles[xy2i(x3, y2, d.mapWidth)]);
+                this.tileRestriction(d.tiles[xy2i(x3, y3, d.mapWidth)]);
+            }
 
-            // Check map borders
-            if (this.x + this.offset_x + this.speedX < 0 ||
-                this.y + this.offset_y + this.speedY < 0 ||
-                this.x + this.offset_x + this.speedX + this.offset_width > d.width ||
-                this.y + this.offset_y + this.speedY + this.offset_height > d.height)
-                return false;
-
-            // Check if the tile has an event 
+            // Checks if the component can trigger tile events
             if (this.actor) {
                 // stepOnEvent
                 if (d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEvent(this);
@@ -297,16 +288,47 @@ function Component(x, y, spritesheet) {
                 else if (d.tiles[xy2i(x3, y2, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x3, y2, d.mapWidth)].enterEvent(this);
                 else if (d.tiles[xy2i(x3, y3, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x3, y3, d.mapWidth)].enterEvent(this);
             }
+        }
 
-            return (d.tiles[xy2i(x1, y1, d.mapWidth)].collision &&
-                d.tiles[xy2i(x1, y2, d.mapWidth)].collision &&
-                d.tiles[xy2i(x1, y3, d.mapWidth)].collision &&
-                d.tiles[xy2i(x2, y1, d.mapWidth)].collision &&
-                d.tiles[xy2i(x2, y2, d.mapWidth)].collision &&
-                d.tiles[xy2i(x2, y3, d.mapWidth)].collision &&
-                d.tiles[xy2i(x3, y1, d.mapWidth)].collision &&
-                d.tiles[xy2i(x3, y2, d.mapWidth)].collision &&
-                d.tiles[xy2i(x3, y3, d.mapWidth)].collision);
+        /**
+         * Set movement based on the tiles collision restricting certain directions
+         * ?TODO? uncomment when setting collision box = tile size
+         * @param the tile
+         */
+        this.tileRestriction = function (tile) {
+            // NO RESTRICTION (equal without typecheck: 0 == [0] => true, equal with typecheck:: 0 === [0] => false)
+            if (tile.collision === 0) {}
+            // FULL RESTRICTION
+            else if (tile.collision === 1) {
+                this.speedX = 0;
+                this.speedY = 0;
+            }
+            // DIRECTION RESTRICTIONS (assume collision is an array i.e. [0] / [1,2] / [0,2,3] / ... )
+            // 0: UP, 1: DOWN, 2: LEFT, 3: RIGHT
+            else {
+                for (var i = 0, l = tile.collision.length; i < l; i++) {
+                    // RESTRICTED: UP
+                    if (tile.collision[i] == 0) {
+                        if (this.y + this.offset_y > tile.y /*+ tile.height*/)
+                            if (this.speedY < 0) this.speedY = 0;
+                    }
+                    // RESTRICTED: DOWN 
+                    else if (tile.collision[i] == 1) {
+                        if (this.y + this.offset_y /*+ this.offset_height*/ < tile.y)
+                            if (this.speedY > 0) this.speedY = 0;
+                    }
+                    // RESTRICTED: LEFT
+                    else if (tile.collision[i] == 2) {
+                        if (this.x + this.offset_x > tile.x /*+ tile.width*/)
+                            if (this.speedX < 0) this.speedX = 0;
+                    }
+                    // RESTRICTED: RIGHT
+                    else if (tile.collision[i] == 3) {
+                        if (this.x + this.offset_x /*+ this.offset_width*/ < tile.x)
+                            if (this.speedX > 0) this.speedX = 0;
+                    }
+                }
+            }
         }
 
         /**
@@ -389,14 +411,6 @@ function Component(x, y, spritesheet) {
                 }
             }
 
-        }
-
-        /**
-         * For debug: Shows the tiles the Component is standing (blue rectangles)
-         */
-        this.showStandingOnTiles = function () {
-            for (i = 0; i < this.rects.length; i++)
-                this.rects[i].draw(myGameArea.context);
         }
 
         return this;
@@ -542,20 +556,20 @@ function Component(x, y, spritesheet) {
      */
 
     /**
-     * Update the Components movement (based on speedX/Y values)
+     * Update the components movement (based on speedX/Y values)
      * Movement can change through user control, movement events (and TODO: moveable interaction)
      */
     this.updateMovement = function () {
-        // If the Component has a control event
+        // If the component has a control event
         if (this.controlEvent != undefined) this.controlEvent();
 
-        // If the Component has an movement event it will be called here
+        // If the component has an movement event it will be called here
         if (this.movementEvent != undefined) this.movementEvent();
 
-        // If the Component has an onClick event this will check if it is clicked
+        // If the component has an onClick event this will check if it is clicked
         if (this.clickEvent != undefined) this.updateClick();
 
-        // The direction the Component is facing can be updated after the speedX/Y is set
+        // The direction the component is facing can be updated after the speedX/Y is set
         if (this.direction != undefined) this.updateDirection();
 
         // Checks if there is a collision with the map and adjust movement if needed
@@ -565,14 +579,14 @@ function Component(x, y, spritesheet) {
     }
 
     /**
-     * Update the Components position after all collision checks are done
+     * Update the components position after all collision checks are done
      */
     this.updatePosition = function () {
         // Update Position
         this.x += this.speedX;
         this.y += this.speedY;
 
-        // Check if moving
+        // Check if moving (for animation)
         this.isMoving()
 
         // Reset Movement

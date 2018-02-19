@@ -59,7 +59,7 @@ function dialog(text, img, choices) {
 
                 this.selectChoice();
 
-                for (i = 0; i < this.choices.length; i++) {
+                for (var i = 0, l = this.choices.length; i < l; i++) {
                     if (i == this.selected)
                         ctx.fillStyle = 'white';
                     else ctx.fillStyle = 'gray';
