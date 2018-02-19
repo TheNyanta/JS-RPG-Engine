@@ -55,8 +55,6 @@ addAudio("Assets/Audio/harp_71H.m4a");
 addAudio("Assets/Audio/harp_72C.m4a");
 addAudio("Assets/Audio/cat.m4a");
 addAudio("Assets/Audio/dog.m4a");
-
-randomSound.init();
 /**/
 
 // Setup Character
@@ -202,8 +200,8 @@ girldialog2.setDialog(["We are on this map!"]);
 var musicdialog = new dialog();
 musicdialog.setDialog(["This is jukebox!", "Wanna here some music?", "#choice", "#entered"], null, ["Yes", "No"]);
 musicdialog.event = function (choice) {
-    if (choice == 0) randomSound.play();
-    if (choice == 1) randomSound.stop();
+    if (choice == 0) myHarp.startPlaying();
+    if (choice == 1) myHarp.stopPlaying();
 }
 
 var catdialog = new dialog();

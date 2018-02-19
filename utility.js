@@ -29,51 +29,44 @@ function componentMapSwitch(x, y, map, obj) {
     // Add the component to the new map
     maps.data[map].objects.push(obj);
 }
-// audio.data[0-7].play();
-var randomSound = (function () {
+// Harp: audio.data[0-7].play();
+var myHarp = (function () {
     var note = 0;
+    var melody = [0,4,6,7,6,4,1,2,5,4,0,3,2,1,0,2,3,1,0,7,6,4,3,2,5,7,6,4];
+    var melodyIndex = 0;
     var playing = false;
 
-    function change() {
-        note = Math.round(Math.random() * 7);
-        //if (note < 0) note = 0;
-        //if (note > 7) note = 7;
+    function change(mode) {
+        // Random note
+        if (mode == 0) note = Math.round(Math.random() * 7);
+        // Melody note
+        if (mode == 1) {
+            melodyIndex++;
+            if (melodyIndex == melody.length) melodyIndex = 0;
+            note = melody[melodyIndex];
+        }
     }
     return {
         currentNote: function () {
             return note;
         },
-        newNote: function () {
-            change();
-            audio.data[note].volume = 0.3;
-            return note;
-        },
         isPlaying: function () {
             return playing;
         },
-        play: function () {
+        startPlaying: function () {
             playing = true;
         },
-        stop: function () {
+        stopPlaying: function () {
             playing = false;
         },
-        init: function () {
-            for (var i = 0; i < 8; i++) {
-                audio.data[i].volume = 0;
-                audio.data[i].play();
+        play: function (mode) {
+            if (playing) {
+                if (audio.data[note].ended) change(mode);
+                audio.data[note].play();
             }
         }
     };
 })();
-
-function playHarp() {
-    if (randomSound.isPlaying()) {
-        if (audio.data[randomSound.currentNote()].ended) {
-            audio.data[randomSound.newNote()].play();
-        }
-        
-    }
-}
 
 //convert listmap to a grid
 function getGrid(maplayer, width, height) {
