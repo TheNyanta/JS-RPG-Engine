@@ -114,10 +114,10 @@ var myGameArea = {
         if (myGameArea.editor) {
             // Draw Tileset
             maps.data[maps.currentMap].drawTileset();
-            
+
             // Collision setup
             myGameArea.tileCollisions = [false, false, false, false];
-            
+
             // Editor Mode Buttons
             var myGameButtons =
                 '<div class="w3-container w3-padding-64">' +
@@ -215,6 +215,8 @@ var myGameArea = {
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
             // Enter key
             if (e.keyCode == constants.KEY_ENTER) myGameArea.enter = true;
+            // no scrolling on arrow keys
+            if ([37, 38, 39, 40].indexOf(e.keyCode) > -1) e.preventDefault();
         })
         // Keyup
         window.addEventListener('keyup', function (e) {
@@ -497,6 +499,6 @@ function updateGameArea() {
 
     // Draw dialog
     if (myGameArea.gameSequence && currentDialog != undefined) currentDialog.update();
-    
+
     myHarp.play(Math.round(Math.random()));
 }
