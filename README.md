@@ -6,7 +6,7 @@ An Engine + Editor for a top-down rpg
 
 Maps, spritesheets, objects
 
-Map collision with four-way direction restrictions
+Map collision with direction restrictions
 
 Component-component-collision
 
