@@ -45,7 +45,14 @@ addMap(null, 2, 42, 40);
 addMap(null, 3, 42, 60);
 
 // Setup Audio
-addAudio("Assets/Audio/banana-phone.m4a");
+addAudio("Assets/Audio/harp_60C.m4a");
+addAudio("Assets/Audio/harp_62D.m4a");
+addAudio("Assets/Audio/harp_64E.m4a");
+addAudio("Assets/Audio/harp_65F.m4a");
+addAudio("Assets/Audio/harp_67G.m4a");
+addAudio("Assets/Audio/harp_69A.m4a");
+addAudio("Assets/Audio/harp_71H.m4a");
+addAudio("Assets/Audio/harp_72C.m4a");
 addAudio("Assets/Audio/cat.m4a");
 addAudio("Assets/Audio/dog.m4a");
 /**/
@@ -203,7 +210,7 @@ var catdialog = new dialog();
 catdialog.setDialog(["Meow!", "Want meow to meow?", "#choice", "#entered"], null, ["Yes", "No"]);
 catdialog.event = function (choice) {
     if (choice == 0)
-        audio.data[1].play();
+        audio.data[8].play();
 }
 
 var doordialog = new dialog();
@@ -226,7 +233,7 @@ cat.enterEvent = function () {
 
 dog.faceOnInteraction = true;
 dog.enterEvent = function () {
-    audio.data[2].play();
+    audio.data[9].play();
 }
 
 jukebox.enterEvent = function () {
