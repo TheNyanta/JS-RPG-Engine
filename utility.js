@@ -25,11 +25,9 @@ function componentMapSwitch(x, y, map, obj) {
     // Find the component on the current map and remove it
     for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
         if (maps.data[maps.currentMap].objects[i] == obj) maps.data[maps.currentMap].objects.splice(i, 1);
-    
+
     // Add the component to the new map
     maps.data[map].objects.push(obj);
-    // Activate a map transition
-    myGameArea.transition = true;
 }
 
 //convert listmap to a grid

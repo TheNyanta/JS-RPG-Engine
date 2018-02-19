@@ -51,6 +51,9 @@ var myGameArea = {
 
         this.frameNo = 0;
         this.gameSequence = false;
+        // To only fire a single event on enter / mousedown / touchdown
+        this.eventReady = true;
+        this.enter = false;
 
         //this.canvas.style.cursor = "none"; //hide the original cursor
 
@@ -200,10 +203,13 @@ var myGameArea = {
         window.addEventListener('keydown', function (e) {
             myGameArea.keys = (myGameArea.keys || []);
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
+            // Enter key
+            if (e.keyCode == constants.KEY_ENTER) myGameArea.enter = true;
         })
         // Keyup
         window.addEventListener('keyup', function (e) {
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
+            if (e.keyCode == constants.KEY_ENTER) myGameArea.enter = false;
         })
         if (myGameArea.editor) {
             // Mouse down
@@ -398,6 +404,10 @@ function everyinterval(n) {
  * Updates the current map with all it's Components
  */
 function update() {
+    // Check enter / mousedown / touchdown
+    if (!myGameArea.enter && !myGameArea.mousedown && !myGameArea.touchdown) {
+        myGameArea.eventReady = true;
+    }
 
     // In a myGameArea.gameSequence there will be no movement (i.e. activate myGameArea.gameSequence when opening a menu)
     if (!myGameArea.gameSequence) {

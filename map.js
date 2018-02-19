@@ -39,6 +39,8 @@ function Tile(spritesheet, x, y) {
     this.layer3 = 0;
     // Collision (TODO: Advanced -> Direction depended collision)
     this.collision = true;
+    // To fire only a single event on enter / mousedown / touchdown
+    this.fireEvent = true
 
     /** This draws the tile on the cached canvas'
      * @param Cached canvas context for layer 1 & 2 (Background)
@@ -56,8 +58,8 @@ function Tile(spritesheet, x, y) {
             else myGameArea.cgx3.fillStyle = "red";
             myGameArea.cgx3.fillRect(this.x, this.y, this.width, this.height);
             myGameArea.cgx3.globalAlpha = 1.0;
-            // Show stepOnEvent
-            if (this.onStepEvent != undefined) {
+            // Show event
+            if (this.onStepEvent != undefined || this.onEnterEvent != undefined) {
                 myGameArea.cgx3.font = "bold 8px Serif";
                 myGameArea.cgx3.fillStyle = "black";
                 myGameArea.cgx3.fillText("E", this.x + 1, this.y + 7);
@@ -190,14 +192,14 @@ function Map(image, tileset, mapWidth, mapHeight) {
     }
 
     // Map editing: get tiles from tileset and place them on the map
-    this.clickedTile = function (x, y) {
+    this.clickedTile = function (param_x, param_y) {
         var x;
         var y;
 
         // Click on Map
         if (myGameArea.activeCanvas == 0) {
-            x = Math.floor((x + myGameArea.gameCamera.x) / this.tileset.spriteWidth);
-            y = Math.floor((y + myGameArea.gameCamera.y) / this.tileset.spriteHeight);
+            x = Math.floor((param_x + myGameArea.gameCamera.x) / this.tileset.spriteWidth);
+            y = Math.floor((param_y + myGameArea.gameCamera.y) / this.tileset.spriteHeight);
             if (myGameArea.drawingOn) {
                 if (myGameArea.currentLayer == 0) maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].layer1 = myGameArea.tiletype;
                 if (myGameArea.currentLayer == 1) maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)].layer2 = myGameArea.tiletype;
@@ -210,8 +212,8 @@ function Map(image, tileset, mapWidth, mapHeight) {
         }
         // Click on Tileset
         if (myGameArea.activeCanvas == 1) {
-            x = Math.floor(x / this.tileset.spriteWidth);
-            y = Math.floor(y / this.tileset.spriteHeight);
+            x = Math.floor(param_x / this.tileset.spriteWidth);
+            y = Math.floor(param_y / this.tileset.spriteHeight);
             myGameArea.tiletype = xy2i(x, y, this.tileset.spritesX) + 1;
             document.getElementById("selectedTile").innerHTML = myGameArea.tiletype;
             document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";

@@ -1,3 +1,4 @@
+/*
 // Setup Spirtesheets
 // Maps
 addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/forest.png", 60, 32, 8, 8);
@@ -22,9 +23,32 @@ addAudio("https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/banana-phone.m4
 addAudio("https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/cat.m4a");
 addAudio("https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/dog.m4a");
 
-/*
-// local
 */
+// local
+// Setup Spirtesheets
+// Maps
+addSprite("Assets/Image/forest.png", 60, 32, 8, 8);
+addSprite("Assets/Image/snowforest.png", 60, 32, 8, 8);
+addSprite("Assets/Image/castle.png", 60, 32, 8, 8);
+addSprite("Assets/Image/castletown.png", 60, 32, 8, 8);
+// Objects
+addSprite("Assets/Image/character.png", 12, 8, 24, 32);
+addSprite("Assets/Image/girl.png", 12, 8, 24, 32);
+addSprite("Assets/Image/cat.png", 12, 8, 24, 32);
+addSprite("Assets/Image/animal.png", 12, 8, 24, 32);
+addSprite("Assets/Image/snow_jukebox.png", 12, 8, 24, 32);
+addSprite("Assets/Image/castledoor_1.png", 1, 4, 47, 48);
+// Setup Maps
+addMap("Assets/Image/sunset1.png", 0, 80, 60);
+addMap(null, 1, 80, 60);
+addMap(null, 2, 42, 40);
+addMap(null, 3, 42, 60);
+
+// Setup Audio
+addAudio("Assets/Audio/banana-phone.m4a");
+addAudio("Assets/Audio/cat.m4a");
+addAudio("Assets/Audio/dog.m4a");
+/**/
 
 // Setup Character
 var character = new Component(240, 280, spritesheets.data[4])
@@ -69,9 +93,11 @@ var castledoor = new Component(144, 62, spritesheets.data[9])
     .collision(0, 0, 47, 48)
     .animation().specialAnimation(20, [0, 1, 2, 3]);
 
+/*
 character.addClickEvent(function () {
     console.log("Character clicked!");
 });
+*/
 
 girl.addClickEvent(function () {
     if (character.distance(girl) <= Math.min(girl.width, girl.height) && character.facing(girl)) {
@@ -87,19 +113,41 @@ maps.data[1].addObject([jukebox, dog]);
 maps.data[2].addObject([castledoor]);
 maps.data[3].addObject([]);
 
+// Dialog on enter / click / touch on character in front of stone when facing it (direction: North)
+for (var i = 1070; i <= 1071; i++) {
+    maps.data[2].tiles[i].enterEvent = function (obj) {
+        if (myGameArea.keys) {
+            // Enter key down / click / touch
+            if (myGameArea.keys[constants.KEY_ENTER] || ((myGameArea.mousedown || myGameArea.touchdown) && !obj.fireClickEvent)) {
+                if (maps.data[2].tiles[i].fireEvent) {
+                    if (obj.direction == constants.DIR_N) {
+                        myGameArea.gameSequence = true;
+                        currentDialog = stonedialog;
+                        maps.data[2].tiles[i].fireEvent = false;
+                    }
+                }
+            }
+            // Enter key up: Enable next enter push
+            else maps.data[2].tiles[i].fireEvent = true;
+        }
+    }
+}
+
 // Teleports
 // Castle to town
 for (var i = 1650; i <= 1667; i++) {
-    maps.data[2].tiles[i].onStepEvent = function (obj) {
+    maps.data[2].tiles[i].stepOnEvent = function (obj) {
         componentMapSwitch(null, -8, 3, obj);
         maps.currentMap = 3;
+        myGameArea.transition = true;
     }
 }
 // Town to castle
 for (var i = 12; i <= 29; i++) {
-    maps.data[3].tiles[i].onStepEvent = function (obj) {
+    maps.data[3].tiles[i].stepOnEvent = function (obj) {
         componentMapSwitch(null, 280, 2, obj);
         maps.currentMap = 2;
+        myGameArea.transition = true;
     }
 }
 
@@ -107,32 +155,38 @@ for (var i = 12; i <= 29; i++) {
 var cameraTarget = character;
 
 // Dialogs
+var stonedialog = new dialog();
+stonedialog.setDialog(["What a old stone.", "Can't read it's text..."]);
+
 var girldialog = new dialog();
 girldialog.setDialog(["Hello!", "Choose a map!", "#choice", "#entered"], null, ["Grass", "Snow", "Castletown"]);
 girldialog.event = function (choice) {
-    if (choice == 0) {
-        if (maps.currentMap != 0) {
+    if (choice == maps.currentMap) {
+        // You can chain choice dialogs like this
+        this.chatCounter = 0;
+        currentDialog = girldialog2;
+    } else {
+        if (choice == 0) {
             componentMapSwitch(380, 208, 0, character);
             componentMapSwitch(364, 208, 0, girl);
             maps.currentMap = 0;
-        }
-    }
-    if (choice == 1) {
-        if (maps.currentMap != 1) {
+            myGameArea.transition = true;
+        } else if (choice == 1) {
             componentMapSwitch(192, 360, 1, character);
             componentMapSwitch(176, 360, 1, girl);
             maps.currentMap = 1;
-        }
-    }
-    if (choice == 2) {
-
-        if (maps.currentMap != 2) {
+            myGameArea.transition = true;
+        } else if (choice == 2) {
             componentMapSwitch(166, 210, 2, character);
             componentMapSwitch(150, 210, 2, girl);
             maps.currentMap = 2;
+            myGameArea.transition = true;
         }
     }
 }
+
+var girldialog2 = new dialog();
+girldialog2.setDialog(["We are on this map!"]);
 
 var musicdialog = new dialog();
 musicdialog.setDialog(["This is jukebox!", "Wanna here some music?", "#choice", "#entered"], null, ["Yes", "No"]);
@@ -148,20 +202,19 @@ catdialog.setDialog(["Meow!", "Want meow to meow?", "#choice", "#entered"], null
 catdialog.event = function (choice) {
     if (choice == 0)
         audio.data[1].play();
-    if (choice == 1) {}
 }
 
 var doordialog = new dialog();
 doordialog.setDialog(["The door is locked!"]);
 
 girl.faceOnInteraction = true;
-girl.onEnterEvent = function () {
+girl.enterEvent = function () {
     myGameArea.gameSequence = true;
     currentDialog = girldialog;
 }
 
 cat.faceOnInteraction = true;
-cat.onEnterEvent = function () {
+cat.enterEvent = function () {
     myGameArea.gameSequence = true;
     currentDialog = catdialog;
     if (cat.routeForward) cat.routeIndex--;
@@ -170,16 +223,16 @@ cat.onEnterEvent = function () {
 }
 
 dog.faceOnInteraction = true;
-dog.onEnterEvent = function () {
+dog.enterEvent = function () {
     audio.data[2].play();
 }
 
-jukebox.onEnterEvent = function () {
+jukebox.enterEvent = function () {
     myGameArea.gameSequence = true;
     currentDialog = musicdialog;
 }
 
-castledoor.onEnterEvent = function () {
+castledoor.enterEvent = function () {
     //castledoor.startSpecial(); // Opening Animation
     myGameArea.gameSequence = true;
     currentDialog = doordialog;

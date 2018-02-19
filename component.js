@@ -274,17 +274,28 @@ function Component(x, y, spritesheet) {
                 this.y + this.offset_y + this.speedY + this.offset_height > d.height)
                 return false;
 
-            // Check if the tile has an onStepEvent
+            // Check if the tile has an event 
             if (this.actor) {
-                if (d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y1, d.mapWidth)].onStepEvent(this);
-                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y2, d.mapWidth)].onStepEvent(this);
-                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x1, y3, d.mapWidth)].onStepEvent(this);
-                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y1, d.mapWidth)].onStepEvent(this);
-                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y2, d.mapWidth)].onStepEvent(this);
-                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x2, y3, d.mapWidth)].onStepEvent(this);
-                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y1, d.mapWidth)].onStepEvent(this);
-                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y2, d.mapWidth)].onStepEvent(this);
-                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent != undefined) d.tiles[xy2i(x3, y3, d.mapWidth)].onStepEvent(this);
+                // stepOnEvent
+                if (d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEvent(this);
+                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEvent(this);
+                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEvent(this);
+                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEvent(this);
+                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEvent(this);
+                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEvent(this);
+                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEvent(this);
+                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEvent(this);
+                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEvent(this);
+                // onEnterEvent
+                if (d.tiles[xy2i(x1, y1, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x1, y1, d.mapWidth)].enterEvent(this);
+                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x1, y2, d.mapWidth)].enterEvent(this);
+                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x1, y3, d.mapWidth)].enterEvent(this);
+                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x2, y1, d.mapWidth)].enterEvent(this);
+                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x2, y2, d.mapWidth)].enterEvent(this);
+                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x2, y3, d.mapWidth)].enterEvent(this);
+                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x3, y1, d.mapWidth)].enterEvent(this);
+                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x3, y2, d.mapWidth)].enterEvent(this);
+                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x3, y3, d.mapWidth)].enterEvent(this);
             }
 
             return (d.tiles[xy2i(x1, y1, d.mapWidth)].collision &&
@@ -427,16 +438,16 @@ function Component(x, y, spritesheet) {
                 if (myGameArea.keys) {
                     // Enter key down
                     if (myGameArea.keys[constants.KEY_ENTER]) {
-                        if (otherobj.enterEvent) {
+                        if (otherobj.fireEvent) {
                             if (otherobj.faceOnInteraction) this.face(otherobj);
-                            if (otherobj.onEnterEvent != undefined) otherobj.onEnterEvent();
-                            otherobj.enterEvent = false;
+                            if (otherobj.enterEvent != undefined) otherobj.enterEvent();
+                            otherobj.fireEvent = false;
                         }
                     }
                     // Enter key up: Enable enter event
-                    else otherobj.enterEvent = true;
+                    else otherobj.fireEvent = true;
                 }
-            } else otherobj.enterEvent = false;
+            } else otherobj.fireEvent = false;
         }
 
         /**
@@ -482,7 +493,7 @@ function Component(x, y, spritesheet) {
      */
     this.addClickEvent = function (fnc) {
         this.fireClickEvent = true;
-        this.onClickEvent = fnc;
+        this.clickEvent = fnc;
 
         /**
          * Updates the click state of the Component and fires one onclick-Event
@@ -490,7 +501,7 @@ function Component(x, y, spritesheet) {
         this.updateClick = function () {
             if (this.isClicked()) {
                 if (this.fireClickEvent) {
-                    this.onClickEvent();
+                    this.clickEvent();
                     this.fireClickEvent = false;
                 }
             }
@@ -498,18 +509,20 @@ function Component(x, y, spritesheet) {
 
         /**
          * Tells if the Component is clicked on
-         * If it's not clicked an onClickEvent can be fired again
+         * If it's not clicked a clickEvent can be fired again
          */
         this.isClicked = function () {
             // Mouse / Touchdown
             if (myGameArea.mousedown || myGameArea.touchdown) {
-                // Not clicked (on sprite)
-                if ((this.x > myGameArea.clickdownX + myGameArea.gameCamera.x) ||
-                    (this.x + this.width < myGameArea.clickdownX + myGameArea.gameCamera.x) ||
-                    (this.y > myGameArea.clickdownY + myGameArea.gameCamera.y) ||
-                    (this.y + this.height < myGameArea.clickdownY + myGameArea.gameCamera.y)) return false;
-                // Clicked
-                else return true;
+                if (myGameArea.clickdownX != undefined && myGameArea.clickdownY != undefined) {
+                    // Not clicked (on sprite)
+                    if ((this.x > myGameArea.clickdownX + myGameArea.gameCamera.x) ||
+                        (this.x + this.width < myGameArea.clickdownX + myGameArea.gameCamera.x) ||
+                        (this.y > myGameArea.clickdownY + myGameArea.gameCamera.y) ||
+                        (this.y + this.height < myGameArea.clickdownY + myGameArea.gameCamera.y)) return false;
+                    // Clicked
+                    else return true;
+                }
             }
             // Click / Touch ended: enable Click Event again
             else {
@@ -540,7 +553,7 @@ function Component(x, y, spritesheet) {
         if (this.movementEvent != undefined) this.movementEvent();
 
         // If the Component has an onClick event this will check if it is clicked
-        if (this.onClickEvent != undefined) this.updateClick();
+        if (this.clickEvent != undefined) this.updateClick();
 
         // The direction the Component is facing can be updated after the speedX/Y is set
         if (this.direction != undefined) this.updateDirection();

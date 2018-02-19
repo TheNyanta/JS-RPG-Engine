@@ -12,8 +12,8 @@ function dialog(text, img, choices) {
     this.text = text;
 
     this.started = false;
-    this.next = false;
     this.keyPush = false;
+    this.next = false;
 
     this.y = 0;
     this.width;
@@ -91,6 +91,8 @@ function dialog(text, img, choices) {
                     }
                 } else this.keyPush = true;
             }
+            // TODO: Select with Mouseover / Touching 
+            else {}
         }
 
         // Changing choices needs a delay or single press checker if you don't use a different key to select each choice: i.E. only up/down
