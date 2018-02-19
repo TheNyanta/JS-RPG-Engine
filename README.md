@@ -6,7 +6,9 @@ An Engine + Editor for a top-down rpg
 
 Maps, spritesheets, objects
 
-Map collision and component-component-collision
+Map collision with four-way direction restrictions
+
+Component-component-collision
 
 Gamedata 'saving' for maps and spritesheets (see myGameArea.data)
 
