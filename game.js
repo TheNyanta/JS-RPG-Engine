@@ -286,9 +286,11 @@ var myGameArea = {
                 if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
                     myGameArea.clickdownX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
                     myGameArea.clickdownY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
+                    e.preventDefault();
                 } else if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.tileset)) {
                     myGameArea.clickdownX = e.clientX - myGameArea.tileset.getBoundingClientRect().x;
                     myGameArea.clickdownY = e.clientY - myGameArea.tileset.getBoundingClientRect().y;
+                    e.preventDefault();
                 } else {
                     activeCanvas = undefined;
                     myGameArea.clickdownX = undefined;
@@ -316,6 +318,7 @@ var myGameArea = {
                     activeCanvas = 0;
                     myGameArea.x1 = Math.floor(e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().x);
                     myGameArea.y1 = Math.floor(e.touches[0].clientY - myGameArea.tileset.getBoundingClientRect().y);
+                    e.preventDefault();
                 } else {
                     myGameArea.x1 = undefined;
                     myGameArea.y1 = undefined;
@@ -324,6 +327,7 @@ var myGameArea = {
                     activeCanvas = 1;
                     myGameArea.x2 = Math.floor(e.touches[0].clientX - myGameArea.tileset.getBoundingClientRect().x);
                     myGameArea.y2 = Math.floor(e.touches[0].clientY - myGameArea.tileset.getBoundingClientRect().y);
+                    e.preventDefault();
                 } else {
                     myGameArea.x2 = undefined;
                     myGameArea.y2 = undefined;
@@ -363,6 +367,7 @@ var myGameArea = {
                 if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
                     myGameArea.clickdownX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
                     myGameArea.clickdownY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
+                    e.preventDefault();
                 }
             })
             // Touch end
@@ -378,6 +383,7 @@ var myGameArea = {
                 if (myGameArea.onCanvas(e.touches[0].clientX, e.touches[0].clientY, myGameArea.canvas)) {
                     myGameArea.x = Math.floor(e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().x);
                     myGameArea.y = Math.floor(e.touches[0].clientY - myGameArea.tileset.getBoundingClientRect().y);
+                    e.preventDefault();
                 } else {
                     myGameArea.x = undefined;
                     myGameArea.y = undefined;
