@@ -101,6 +101,7 @@ character.addClickEvent(function () {
 
 girl.addClickEvent(function () {
     if (character.distance(girl) <= Math.min(girl.width, girl.height) && character.facing(girl)) {
+        if (girl.faceOnInteraction) character.face(girl);
         myGameArea.gameSequence = true;
         currentDialog = girldialog;
     }
