@@ -14,6 +14,8 @@ Gamedata 'saving' for maps and spritesheets (see myGameArea.data)
 
 Click/touch interaction with objects, for "main" charcter enter interaction
 
+Simple Mousedown / Touchdown moving
+
 Simple model for dialog, map switching and events 
 
 ## TODO:
