@@ -28,35 +28,35 @@ function distance(xy1, xy2) {
 }
 
 /**
- * Check if an array contains a certain object
+ * Check if an array contains a certain componentID
  * If it contains it return it's index else return false
  * @param the array (i.e. dialogs.data)
  * @param the object (i.e. dialogs.data[4])
  */
-function containsObject(data, obj) {
+function containsObject(data, componentID) {
     for (var i = 0, l = data.length; i < l; i++)
-        if (data[i] === obj) return i;
+        if (data[i] == componentID) return i;
     return false;
 }
 
 /**
- * Removes an object from an array if it contains it
+ * Removes an componentID from an array if it contains it
  * @param the array
- * @param the object
+ * @param the componentID
  */
-function removeObject(data, obj) {
-    var index = containsObject(data, obj);
+function removeComponentID(data, componentID) {
+    var index = containsObject(data, componentID);
     if (index !== false) data.splice(index, 1);
 }
 
 /**
  * Add an object to an array if it doesn't already contains it
  * @param the array
- * @param the object
+ * @param the componentID
  */
-function addObject(data, obj) {
-    var index = containsObject(data, obj);
-    if (!index) data.push(obj);
+function addComponentID(data, componentID) {
+    var index = containsObject(data, componentID);
+    if (!index) data.push(componentID);
 }
 
 /** 
@@ -67,20 +67,19 @@ function addObject(data, obj) {
  * @param the component
  * @param {bool} change map?
  */
-function componentMapSwitch(x, y, nextMap, component, changeMap) {
+function componentMapSwitch(x, y, nextMap, componentID, changeMap) {
     // Change the position of the component
-    if (x != null) component.x = x;
-    if (y != null) component.y = y;
+    if (x != null) components.data[componentID].x = x;
+    if (y != null) components.data[componentID].y = y;
     // Removes the component from the current map
-    removeObject(maps.data[maps.currentMap].components, component);
+    removeComponentID(maps.data[maps.currentMap].components, componentID);
     // Adds the component to the new map
-    addObject(maps.data[nextMap].components, component);
+    addComponentID(maps.data[nextMap].components, componentID);
     if (changeMap) {
         maps.nextMap = nextMap;
         myGameArea.transition = true;
     }
 }
-
 
 // Harp: audio.data[0-7].play();
 var myHarp = (function () {

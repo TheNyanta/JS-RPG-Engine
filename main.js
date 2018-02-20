@@ -148,7 +148,7 @@ var myGameArea = {
         }
 
         // Init Camera Target
-        this.gameCamera.setTarget(character);
+        this.gameCamera.setTarget(components.data[0]);
         // Disable Mouse Control in Editor Mode
         if (myGameArea.editor) myGameArea.gameCamera.disableMouse = true;
 
@@ -207,8 +207,8 @@ var myGameArea = {
                 '<button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug Off</button>' +
                 '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +
                 '<br>' +
-                '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(character)">Control Boy</button>' +
-                '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(girl)">Control Girl</button>' +
+                '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(components.data[0])">Control Boy</button>' +
+                '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(components.data[1])">Control Girl</button>' +
                 '</div>';
         }
 
@@ -473,21 +473,28 @@ function update() {
         // For components that can start an interacted
         for (var i = 0; i < maps.data[maps.currentMap].components.length; i++)
             // The controlled component can acted with other component
-            if (maps.data[maps.currentMap].components[i] == myGameArea.gameCamera.target)
-                for (var j = 0; j < maps.data[maps.currentMap].components.length; j++) maps.data[maps.currentMap].components[i].updateInteraction(maps.data[maps.currentMap].components[j]);
+            if (components.data[maps.data[maps.currentMap].components[i]] == myGameArea.gameCamera.target)
+                for (var j = 0; j < maps.data[maps.currentMap].components.length; j++) {
+                    var c1 = components.data[maps.data[maps.currentMap].components[i]];
+                    var c2 = components.data[maps.data[maps.currentMap].components[j]];
+                    c1.updateInteraction(c2);
+                }
 
         // Update the movement of all components on the current map (this also resolves tileCollision)
         if (!myGameArea.transition)
-            for (var i = 0; i < maps.data[maps.currentMap].components.length; i++) maps.data[maps.currentMap].components[i].updateMovement();
+            for (var i = 0; i < maps.data[maps.currentMap].components.length; i++)
+                components.data[maps.data[maps.currentMap].components[i]].updateMovement();
 
         // Check each combination pair of components on the current map for component-component-collision
         for (var i = 0; i < maps.data[maps.currentMap].components.length; i++)
-            for (var j = i + 1; j < maps.data[maps.currentMap].components.length; j++)
-                if (maps.data[maps.currentMap].components[i].componentCollision != undefined)
-                    maps.data[maps.currentMap].components[i].componentCollision(maps.data[maps.currentMap].components[j]);
+            for (var j = i + 1; j < maps.data[maps.currentMap].components.length; j++) {
+                var c1 = components.data[maps.data[maps.currentMap].components[i]];
+                var c2 = components.data[maps.data[maps.currentMap].components[j]];
+                c1.componentCollision(c2);
+            }
 
         // Update the position of all components on the current map
-        for (var i = 0, l = maps.data[maps.currentMap].components.length; i < l; i++) maps.data[maps.currentMap].components[i].updatePosition();
+        for (var i = 0, l = maps.data[maps.currentMap].components.length; i < l; i++) components.data[maps.data[maps.currentMap].components[i]].updatePosition();
     }
 }
 
@@ -510,10 +517,10 @@ function draw() {
         maps.data[maps.currentMap].drawBackground();
         // Sorts the array after it's y value so that components with bigger y are drawn later
         maps.data[maps.currentMap].components.sort(function (a, b) {
-            return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);
+            return (components.data[a].y > components.data[b].y) ? 1 : ((components.data[b].y > components.data[a].y) ? -1 : 0);
         });
         // Draw Objects of the current map
-        for (var i = 0, l = maps.data[maps.currentMap].components.length; i < l; i++) maps.data[maps.currentMap].components[i].draw(myGameArea.context);
+        for (var i = 0, l = maps.data[maps.currentMap].components.length; i < l; i++) components.data[maps.data[maps.currentMap].components[i]].draw(myGameArea.context);
         // Draw Foreground
         maps.data[maps.currentMap].drawForeground();
     }
@@ -523,7 +530,7 @@ function draw() {
         showTime();
         updateFPS();
         showFPS();
-        showPosition(character);
+        if (myGameArea.gameCamera.target != undefined) showPosition(myGameArea.gameCamera.target);
     }
 }
 

@@ -421,6 +421,29 @@ function loadImage(img) {
 // COMPONENTS ----------------------------------------------------------------
 
 /**
+ * Contains all components of the game
+ */
+var components = {
+    data: [] // Contains the components
+}
+
+/**
+ * For adding a new component
+ */
+function addComponent(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID, mapID) {
+    if (interactEventID != undefined)
+        components.data.push(new Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID));
+    else components.data.push(new Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight));
+    components.data[components.data.length - 1].id = components.data.length - 1;
+    // Datastring
+    myGameArea.data += "addComponent(" + spritesheetID + ", " + x + ", " + y + ", " + offsetX + ", " + offsetY + ", " + offsetWidth + ", " + offsetHeight;
+    if (interactEventID != undefined) myGameArea.data += ", " + interactEventID + ");\n";
+    else myGameArea.data += ");\n";
+    // Add ID to map
+    maps.data[mapID].components.push(components.data.length - 1);
+}
+
+/**
  * Component constructor
  * @param spritesheetID
  * @param x-position
@@ -429,8 +452,9 @@ function loadImage(img) {
  * @param offsetY
  * @param offsetWidth
  * @param offsetHeight
+ * @param interactEventID
  */
-function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight) {
+function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID) {
 
     this.spritesheetID = spritesheetID;
     this.x = x;
@@ -459,6 +483,9 @@ function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHei
     this.animationDelay = 0;
     this.animationIndexCounter = 0;
     this.direction = 64; // Default Direction
+
+    // Event Properties
+    if (interactEventID != undefined) this.interactEventID = interactEventID;
 
     this.draw = function (ctx) {
         // Sets animations (based on moving and direction)        
@@ -618,42 +645,42 @@ function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHei
         if (this == myGameArea.gameCamera.target) {
             // stepOnEvent
             if (d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID](this);
+                events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID](this.id);
             else if (d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEventID](this);
+                events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEventID](this.id);
             else if (d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEventID](this);
+                events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEventID](this.id);
             else if (d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEventID](this);
+                events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEventID](this.id);
             else if (d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEventID](this);
+                events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEventID](this.id);
             else if (d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEventID](this);
+                events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEventID](this.id);
             else if (d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEventID](this);
+                events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEventID](this.id);
             else if (d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEventID](this);
+                events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEventID](this.id);
             else if (d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEventID](this);
+                events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEventID](this.id);
             // onEnterEvent
             if (d.tiles[xy2i(x1, y1, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].enterEventID](this);
+                events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].enterEventID](this.id);
             else if (d.tiles[xy2i(x1, y2, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].enterEventID](this);
+                events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].enterEventID](this.id);
             else if (d.tiles[xy2i(x1, y3, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].enterEventID](this);
+                events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].enterEventID](this.id);
             else if (d.tiles[xy2i(x2, y1, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].enterEventID](this);
+                events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].enterEventID](this.id);
             else if (d.tiles[xy2i(x2, y2, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].enterEventID](this);
+                events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].enterEventID](this.id);
             else if (d.tiles[xy2i(x2, y3, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].enterEventID](this);
+                events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].enterEventID](this.id);
             else if (d.tiles[xy2i(x3, y1, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].enterEventID](this);
+                events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].enterEventID](this.id);
             else if (d.tiles[xy2i(x3, y2, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].enterEventID](this);
+                events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].enterEventID](this.id);
             else if (d.tiles[xy2i(x3, y3, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].enterEventID](this);
+                events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].enterEventID](this.id);
         }
     }
 
@@ -777,7 +804,7 @@ function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHei
                 if (myGameArea.enter || myGameArea.mousedown || myGameArea.touchdown) {
                     if (myGameArea.eventReady) {
                         if (other.faceOnInteraction) this.face(other);
-                        if (other.enterEvent != undefined) other.enterEvent();
+                        if (other.interactEventID != undefined) events.data[other.interactEventID]();
                         myGameArea.eventReady = false;
                     }
                 } else myGameArea.eventReady = true;

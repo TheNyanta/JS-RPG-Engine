@@ -30,11 +30,11 @@ addAudio("Assets/Audio/dog.m4a");
 // ######
 // Events
 // ######
-addEvent(function (obj) {
+addEvent(function (componentID) {
     // Enter key down / click / touch
     if (myGameArea.enter || myGameArea.mousedown || myGameArea.touchdown) {
         if (maps.data[2].tiles[i].fireEvent) {
-            if (obj.direction == 4) {
+            if (components.data[componentID].direction == 4) {
                 dialogs.currentDialog = dialogs.data[0];;
                 maps.data[2].tiles[i].fireEvent = false;
             }
@@ -43,11 +43,11 @@ addEvent(function (obj) {
     // Enter key up / click up / touch relase: Enable next enter push
     else maps.data[2].tiles[i].fireEvent = true;
 });
-addEvent(function (obj) {
-    componentMapSwitch(null, -8, 3, obj, true);
+addEvent(function (componentID) {
+    componentMapSwitch(null, -8, 3, componentID, true);
 });
-addEvent(function (obj) {
-    componentMapSwitch(null, 280, 2, obj, true);
+addEvent(function (componentID) {
+    componentMapSwitch(null, 280, 2, componentID, true);
 });
 addEvent(function (choice) {
     if (choice == 0) myHarp.startPlaying();
@@ -59,18 +59,18 @@ addEvent(function (choice) {
         dialogs.currentDialog = dialogs.data[2];
     } else {
         if (choice == 0) {
-            componentMapSwitch(380, 208, 0, character);
-            componentMapSwitch(364, 208, 0, girl);
+            componentMapSwitch(380, 208, 0, 0);
+            componentMapSwitch(364, 208, 0, 1);
             maps.nextMap = 0;
             myGameArea.transition = true;
         } else if (choice == 1) {
-            componentMapSwitch(192, 360, 1, character);
-            componentMapSwitch(176, 360, 1, girl);
+            componentMapSwitch(192, 360, 1, 0);
+            componentMapSwitch(176, 360, 1, 1);
             maps.nextMap = 1;
             myGameArea.transition = true;
         } else if (choice == 2) {
-            componentMapSwitch(166, 210, 2, character);
-            componentMapSwitch(150, 210, 2, girl);
+            componentMapSwitch(166, 210, 2, 0);
+            componentMapSwitch(150, 210, 2, 1);
             maps.nextMap = 2;
             myGameArea.transition = true;
         }
@@ -78,7 +78,7 @@ addEvent(function (choice) {
 });
 addEvent(function (choice) {
     if (choice == 0) {
-        castledoor.startSpecial(); // Opening Animation
+        components.data[5].startSpecial(); // Opening Animation
         dialogs.data[5].setDialog(["The door is opened", "...", "There is no map for the castle."]);
     }
 });
@@ -87,7 +87,7 @@ addEvent(function (choice) {
         audio.data[8].play();
 });
 addEvent(function () {
-    dialogs.currentDialog = dialogs.data[1];;
+    dialogs.currentDialog = dialogs.data[1];
 });
 addEvent(function () {
     audio.data[9].play();
@@ -96,10 +96,10 @@ addEvent(function () {
     dialogs.currentDialog = dialogs.data[3];
 });
 addEvent(function () {
-    dialogs.currentDialog = dialogs.data[4];;
-    if (cat.routeForward) cat.routeIndex--;
-    else cat.routeIndex++;
-    cat.routeForward = toggle(cat.routeForward);
+    dialogs.currentDialog = dialogs.data[4];
+    if (components.data[2].routeForward) components.data[2].routeIndex--;
+    else components.data[2].routeIndex++;
+    components.data[2].routeForward = toggle(components.data[2].routeForward);
 });
 addEvent(function () {
     dialogs.currentDialog = dialogs.data[5];
@@ -123,16 +123,16 @@ addEvent(function () {
 addEvent(function () {
     if (!myGameArea.gameSequence) {
         // x move
-        if (Math.abs(this.x + this.offset_x - girl.x) > Math.abs(this.y + this.offset_y - girl.y)) {
-            if (this.x + this.offset_x != girl.x) {
-                if (this.x + this.offset_x < girl.x) this.speedX = this.speed;
+        if (Math.abs(this.x + this.offset_x - components.data[1].x) > Math.abs(this.y + this.offset_y - components.data[1].y)) {
+            if (this.x + this.offset_x != components.data[1].x) {
+                if (this.x + this.offset_x < components.data[1].x) this.speedX = this.speed;
                 else this.speedX = -this.speed;
             }
         }
         // y move
         else {
-            if (this.y + this.offset_y != girl.y) {
-                if (this.y + this.offset_y < girl.y) this.speedY = this.speed
+            if (this.y + this.offset_y != components.data[1].y) {
+                if (this.y + this.offset_y < components.data[1].y) this.speedY = this.speed
                 else this.speedY = -this.speed;
             }
         }
@@ -149,6 +149,16 @@ addDialog(["This is jukebox!", "Wanna here some music?", ["Yes", "No"]], 3);
 addDialog(["Meow!", "Want meow to meow?", ["Yes", "No"]], 6);
 addDialog(["The door is closed!", ["Yes", "No"]], 5);
 
+// ##########
+// Components
+// ##########
+addComponent(4, 240, 280, 4, 16, 16, 16, 7, 0);
+addComponent(5, 370, 210, 4, 16, 16, 16, 7, 0);
+addComponent(6, 160, 390, 4, 16, 16, 16, 10, 0);
+addComponent(7, 100, 100, 4, 16, 16, 16, 8, 1);
+addComponent(8, 260, 120, 0, 16, 24, 16, 9, 1);
+addComponent(9, 144, 62, 0, 0, 47, 40, 11, 2);
+
 // #################################################################################################
 
 // Dialog on enter / click / touch when controlled character in front of stone when facing it (looking up)
@@ -164,53 +174,21 @@ for (var i = 1650; i <= 1667; i++) {
 for (var i = 12; i <= 29; i++) {
     maps.data[3].tiles[i].stepOnEventID = 2;
 }
-
-// Setup Character
-var character = new Component(4, 240, 280, 4, 16, 16, 16)
-    .idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-
-// Setup Girl
-var girl = new Component(5, 370, 210, 4, 16, 16, 16)
-    .idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-
-// Setup Cat
-var cat = new Component(6, 160, 390, 4, 16, 16, 16)
-    .idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-
-// Setup Dog
-var dog = new Component(7, 100, 100, 4, 16, 16, 16)
-    .idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-
-// Setup Jukebox
-var jukebox = new Component(8, 260, 120, 0, 16, 24, 16);
-
-// Setup Castledoor
-var castledoor = new Component(9, 144, 62, 0, 0, 47, 40).specialAnimation(20, [0, 1, 2, 3]);
-
-// Add Objects to map
-// TODO: add on create, no "var character = ..."
-maps.data[0].addComponent([character, girl, cat]);
-maps.data[1].addComponent([jukebox, dog]);
-maps.data[2].addComponent([castledoor]);
-maps.data[3].addComponent([]);
-
-character.enterEvent = events.data[7];
-girl.enterEvent = events.data[7];
-dog.enterEvent = events.data[8];
-jukebox.enterEvent = events.data[9];
-cat.enterEvent = events.data[10];
-castledoor.enterEvent = events.data[11];
-
+// Add animation sequences
+components.data[0].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+components.data[1].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+components.data[2].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+components.data[3].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+components.data[5].specialAnimation(20, [0, 1, 2, 3]);
 // Cat walk
-cat.route = [[50, 390], [50, 380], [50, 150], [600, 150], [600, 390]];
-cat.routeIndex = 0;
-cat.speed = 5;
-cat.routeForward = true;
+components.data[2].route = [[50, 390], [50, 380], [50, 150], [600, 150], [600, 390]];
+components.data[2].routeIndex = 0;
+components.data[2].speed = 5;
+components.data[2].routeForward = true;
 // You can use this.variable in the function because it will be called in the cat Component
-cat.movementEvent = events.data[12];
-
+components.data[2].movementEvent = events.data[12];
 // Dog walk (simple! will walk against walls)
-dog.movementEvent = events.data[13];
+components.data[3].movementEvent = events.data[13];
 
 // #################################################################################################
 
