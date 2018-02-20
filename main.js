@@ -102,8 +102,9 @@ var myGameArea = {
                         else if (myGameArea.keys[39] || myGameArea.keys[68])
                             this.target.speedX = this.target.speed;
                         else if (!this.disableMouse) {
-                            // Move direction = To current mousemove/touch position
                             if (myGameArea.mousedown || myGameArea.touchdown) {
+                                // Move direction = To current mousemove/touch position
+                                /*
                                 if (Math.abs(myGameArea.x + this.x - this.target.x - this.target.offset_x) >= Math.abs(myGameArea.y + this.y - this.target.y - this.target.offset_y)) {
                                     if (this.target.x + this.target.offset_x < myGameArea.x + this.x - 4)
                                         this.target.speedX += this.target.speed;
@@ -115,19 +116,19 @@ var myGameArea = {
                                     else if (this.target.y + this.target.offset_y > myGameArea.y + this.y + 4)
                                         this.target.speedY -= this.target.speed;
                                 }
-                                /*
+                                */
                                 // Move direction = Difference between clicked and current mousemove/touch position
                                 if (Math.abs(myGameArea.x - myGameArea.clickdownX) > Math.abs(myGameArea.y - myGameArea.clickdownY)) {
                                     if (myGameArea.x < myGameArea.clickdownX - 4)
-                                        this.speedX -= this.speed;
+                                        this.target.speedX -= this.target.speed;
                                     else if (myGameArea.x > myGameArea.clickdownX + 4)
-                                        this.speedX += this.speed;
+                                        this.target.speedX += this.target.speed;
                                 } else {
                                     if (myGameArea.y < myGameArea.clickdownY - 4)
-                                        this.speedY -= this.speed;
+                                        this.target.speedY -= this.target.speed;
                                     else if (myGameArea.y > myGameArea.clickdownY + 4)
-                                        this.speedY += this.speed;
-                                }*/
+                                        this.target.speedY += this.target.speed;
+                                }
 
                             }
                         }
@@ -546,7 +547,7 @@ function updateGameArea() {
     // Update camera
     myGameArea.gameCamera.update();
     // Update game
-    update();    
+    update();
     // Draw game
     draw();
 
