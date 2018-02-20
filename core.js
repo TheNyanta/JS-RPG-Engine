@@ -113,6 +113,8 @@ function Tile(spritesheet, x, y) {
     // Collision
     this.collision = 0;
 
+    this.interactEventID;
+    this.stepOnEventID;
     // To fire only a single event on enter / mousedown / touchdown
     this.fireEvent = true
 
@@ -139,7 +141,7 @@ function Tile(spritesheet, x, y) {
             myGameArea.cgx3.fillRect(this.x, this.y, this.width, this.height);
             myGameArea.cgx3.globalAlpha = 1.0;
             // Show event
-            if (this.stepOnEvent != undefined || this.enterEvent != undefined) {
+            if (this.stepOnEventID != undefined || this.interactEventID != undefined) {
                 myGameArea.cgx3.font = "bold 8px Serif";
                 myGameArea.cgx3.fillStyle = "black";
                 myGameArea.cgx3.fillText("E", this.x + 1, this.y + 7);
@@ -627,25 +629,43 @@ function Component(x, y, spritesheetID) {
             // Checks if the component can trigger tile events: the main character
             if (this == myGameArea.gameCamera.target) {
                 // stepOnEvent
-                if (d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEvent(this);
-                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEvent(this);
-                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEvent(this);
-                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEvent(this);
-                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEvent(this);
-                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEvent(this);
-                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEvent(this);
-                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEvent(this);
-                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEvent != undefined) d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEvent(this);
+                if (d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID != undefined)
+                    events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID](this);
+                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEventID != undefined)
+                    events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEventID](this);
+                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEventID != undefined)
+                    events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEventID](this);
+                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEventID != undefined)
+                    events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEventID](this);
+                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEventID != undefined)
+                    events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEventID](this);
+                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEventID != undefined)
+                    events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEventID](this);
+                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEventID != undefined)
+                    events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEventID](this);
+                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEventID != undefined)
+                    events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEventID](this);
+                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEventID != undefined)
+                    events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEventID](this);
                 // onEnterEvent
-                if (d.tiles[xy2i(x1, y1, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x1, y1, d.mapWidth)].enterEvent(this);
-                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x1, y2, d.mapWidth)].enterEvent(this);
-                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x1, y3, d.mapWidth)].enterEvent(this);
-                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x2, y1, d.mapWidth)].enterEvent(this);
-                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x2, y2, d.mapWidth)].enterEvent(this);
-                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x2, y3, d.mapWidth)].enterEvent(this);
-                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x3, y1, d.mapWidth)].enterEvent(this);
-                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x3, y2, d.mapWidth)].enterEvent(this);
-                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].enterEvent != undefined) d.tiles[xy2i(x3, y3, d.mapWidth)].enterEvent(this);
+                if (d.tiles[xy2i(x1, y1, d.mapWidth)].enterEventID != undefined)
+                    events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].enterEventID](this);
+                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].enterEventID != undefined)
+                    events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].enterEventID](this);
+                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].enterEventID != undefined)
+                    events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].enterEventID](this);
+                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].enterEventID != undefined)
+                    events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].enterEventID](this);
+                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].enterEventID != undefined)
+                    events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].enterEventID](this);
+                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].enterEventID != undefined)
+                    events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].enterEventID](this);
+                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].enterEventID != undefined)
+                    events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].enterEventID](this);
+                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].enterEventID != undefined)
+                    events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].enterEventID](this);
+                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].enterEventID != undefined)
+                    events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].enterEventID](this);
             }
         }
 

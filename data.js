@@ -40,7 +40,7 @@ addEvent(function (obj) {
             }
         }
     }
-    // Enter key up: Enable next enter push
+    // Enter key up / click up / touch relase: Enable next enter push
     else maps.data[2].tiles[i].fireEvent = true;
 });
 addEvent(function (obj) {
@@ -154,16 +154,16 @@ addDialog(["The door is closed!", ["Yes", "No"]], 5);
 // TODO: Add in tiles event id
 // Dialog on enter / click / touch on character in front of stone when facing it (direction: North)
 for (var i = 1070; i <= 1071; i++) {
-    maps.data[2].tiles[i].enterEvent = events.data[0];
+    maps.data[2].tiles[i].enterEventID = 0;
 }
 // Teleports
 // Castle to town
 for (var i = 1650; i <= 1667; i++) {
-    maps.data[2].tiles[i].stepOnEvent = events.data[1];
+    maps.data[2].tiles[i].stepOnEventID = 1;
 }
 // Town to castle
 for (var i = 12; i <= 29; i++) {
-    maps.data[3].tiles[i].stepOnEvent = events.data[2];
+    maps.data[3].tiles[i].stepOnEventID = 2;
 }
 
 // Setup Character
