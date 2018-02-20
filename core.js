@@ -478,6 +478,7 @@ function Component(x, y, spritesheet) {
         if (mouse != undefined) this.mouse = mouse
 
         this.disableControls = false;
+        this.disableMouse = false;
 
         /**
          * Key Control: Setup keys with the control function
@@ -495,7 +496,7 @@ function Component(x, y, spritesheet) {
                     this.speedX = -this.speed;
                 else if (myGameArea.keys[this.right])
                     this.speedX = this.speed;
-                else if (mouse) {
+                else if (mouse && !this.disableMouse) {
                     // Move direction = To current mousemove/touch position
                     if (myGameArea.mousedown || myGameArea.touchdown) {
                         if (Math.abs(myGameArea.x + myGameArea.gameCamera.x - this.x - this.offset_x) >= Math.abs(myGameArea.y + myGameArea.gameCamera.y - this.y - this.offset_y)) {

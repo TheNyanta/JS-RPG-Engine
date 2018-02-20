@@ -102,6 +102,8 @@ var myGameArea = {
         }
         // Init Camera Target
         this.gameCamera.setTarget(character);
+        // Disable Mouse Control in Editor Mode
+        if (myGameArea.editor) character.disableMouse = true;
 
         // Initalize Maps
         for (i = 0, l = maps.data.length; i < l; i++) {
@@ -159,7 +161,6 @@ var myGameArea = {
                 '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +
                 '<br>' +
                 '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(character)">Camera on Character</button>' +
-                '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(cat)">Camera on Cat</button>' +
                 '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(girl)">Camera on Girl</button>' +
                 '</div>';
         }
