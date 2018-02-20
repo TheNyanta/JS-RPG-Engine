@@ -4,7 +4,7 @@ var scriptsToLoad = [
     'game.js',
     'astar.js',
     'utility.js',
-    'gameObjects.js',
+    'core.js',
     'data.js'];
 scriptsToLoad.forEach(function (src) {
     var script = document.createElement('script');
