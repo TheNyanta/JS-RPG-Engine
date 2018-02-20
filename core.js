@@ -423,7 +423,7 @@ function loadImage(img) {
  * @param x-position
  * @param y-position
  */
-function Component(x, y, spritesheet) {
+function Component(x, y, spritesheetID) {
     // Properties
     this.x = x;
     this.y = y;
@@ -432,9 +432,9 @@ function Component(x, y, spritesheet) {
     this.speedX = 0;
     this.speedY = 0;
 
-    this.spritesheet = spritesheet;
-    this.width = this.spritesheet.spriteWidth;
-    this.height = this.spritesheet.spriteHeight;
+    this.spritesheetID = spritesheetID;
+    this.width = spritesheets.data[this.spritesheetID].spriteWidth;
+    this.height = spritesheets.data[this.spritesheetID].spriteHeight;
 
     // Default first sprite image
     this.sequence = 0;
@@ -459,10 +459,10 @@ function Component(x, y, spritesheet) {
                 this.animationIndexCounter++;
                 if (this.animationIndexCounter >= this.sequence.length) this.animationIndexCounter = 0;
             }
-            drawSprite(ctx, this.spritesheet, this.sequence[this.animationIndexCounter], (this.x - myGameArea.gameCamera.x), (this.y - myGameArea.gameCamera.y));
+            drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence[this.animationIndexCounter], (this.x - myGameArea.gameCamera.x), (this.y - myGameArea.gameCamera.y));
         }
         // No Animation: Just sprite image
-        else drawSprite(ctx, this.spritesheet, this.sequence, (this.x - myGameArea.gameCamera.x), (this.y - myGameArea.gameCamera.y));
+        else drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence, (this.x - myGameArea.gameCamera.x), (this.y - myGameArea.gameCamera.y));
     }
 
     /**

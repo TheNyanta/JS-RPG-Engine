@@ -167,32 +167,32 @@ for (var i = 12; i <= 29; i++) {
 }
 
 // Setup Character
-var character = new Component(240, 280, spritesheets.data[4])
+var character = new Component(240, 280, 4)
     .collision(4, 16, 16, 16)
     .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 
 // Setup Girl
-var girl = new Component(370, 210, spritesheets.data[5])
+var girl = new Component(370, 210, 5)
     .collision(4, 16, 16, 16)
     .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 
 // Setup Cat
-var cat = new Component(160, 390, spritesheets.data[6])
+var cat = new Component(160, 390, 6)
     .collision(4, 16, 16, 16)
     .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 
 // Setup Dog
-var dog = new Component(100, 100, spritesheets.data[7])
+var dog = new Component(100, 100, 7)
     .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
     .collision(4, 16, 16, 16);
 
 // Setup Jukebox
-var jukebox = new Component(260, 120, spritesheets.data[8])
+var jukebox = new Component(260, 120, 8)
     .animation()
     .collision(0, 16, 24, 16);
 
 // Setup Castledoor
-var castledoor = new Component(144, 62, spritesheets.data[9])
+var castledoor = new Component(144, 62, 9)
     .collision(0, 0, 47, 40)
     .animation().specialAnimation(20, [0, 1, 2, 3]);
 
