@@ -422,26 +422,43 @@ function loadImage(img) {
 
 /**
  * Component constructor
+ * @param spritesheetID
  * @param x-position
  * @param y-position
+ * @param offsetX
+ * @param offsetY
+ * @param offsetWidth
+ * @param offsetHeight
  */
-function Component(x, y, spritesheetID) {
-    // Properties
+function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight) {
+
+    this.spritesheetID = spritesheetID;
     this.x = x;
     this.y = y;
+    this.width = spritesheets.data[this.spritesheetID].spriteWidth;
+    this.height = spritesheets.data[this.spritesheetID].spriteHeight;
 
+    // Movement Properties
     this.speed = 2;
     this.speedX = 0;
     this.speedY = 0;
 
-    this.spritesheetID = spritesheetID;
-    this.width = spritesheets.data[this.spritesheetID].spriteWidth;
-    this.height = spritesheets.data[this.spritesheetID].spriteHeight;
+    // Collision Properties
+    this.collidable = true;
+    //this.moveable = false; // True if it can be pushed away by other Components. TODO: Implement
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
+    this.offsetWidth = offsetWidth;
+    this.offsetHeight = offsetHeight;
 
-    // Default first sprite image
+    // Animation Properties
     this.sequence = 0;
     this.isMoving = false;
     this.faceOnInteraction = true;
+    this.animationTime = 0;
+    this.animationDelay = 0;
+    this.animationIndexCounter = 0;
+    this.direction = 64; // Default Direction
 
     this.draw = function (ctx) {
         // Sets animations (based on moving and direction)        
@@ -451,7 +468,7 @@ function Component(x, y, spritesheetID) {
         if (myGameArea.debug) {
             // Draw Collision Box
             ctx.strokeStyle = "black";
-            ctx.strokeRect(this.x + this.offset_x - myGameArea.gameCamera.x, this.y + this.offset_y - myGameArea.gameCamera.y, this.offset_width, this.offset_height);
+            ctx.strokeRect(this.x + this.offsetX - myGameArea.gameCamera.x, this.y + this.offsetY - myGameArea.gameCamera.y, this.offsetWidth, this.offsetHeight);
         }
 
         // Animation: Moving / Idle
@@ -467,316 +484,284 @@ function Component(x, y, spritesheetID) {
         else drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence, (this.x - myGameArea.gameCamera.x), (this.y - myGameArea.gameCamera.y));
     }
 
-    /**
-     * add animations
-     * TODO: clean-up, add special onetime animations (i.e. open door, box, ...)
-     */
-    this.animation = function () {
-        this.animationTime = 0;
-        this.animationDelay = 0;
-        this.animationIndexCounter = 0;
-        this.direction = 64; // Default Direction
+    this.idleAnimation = function (idleAnimationTime, idleUp, idleDown, idleLeft, idleRight) {
+        this.idleAnimationTime = idleAnimationTime;
 
-        this.idleAnimation = function (idleAnimationTime, idleUp, idleDown, idleLeft, idleRight) {
-            this.idleAnimationTime = idleAnimationTime;
+        this.idleUp = idleUp;
+        this.idleDown = idleDown;
+        this.idleLeft = idleLeft;
+        this.idleRight = idleRight;
 
-            this.idleUp = idleUp;
-            this.idleDown = idleDown;
-            this.idleLeft = idleLeft;
-            this.idleRight = idleRight;
+        return this;
+    }
 
-            return this;
-        }
+    this.moveAnimation = function (moveAnimationTime, moveUp, moveDown, moveLeft, moveRight) {
+        this.moveAnimationTime = moveAnimationTime;
 
-        this.moveAnimation = function (moveAnimationTime, moveUp, moveDown, moveLeft, moveRight) {
-            this.moveAnimationTime = moveAnimationTime;
+        this.moveUp = moveUp;
+        this.moveDown = moveDown;
+        this.moveLeft = moveLeft;
+        this.moveRight = moveRight;
 
-            this.moveUp = moveUp;
-            this.moveDown = moveDown;
-            this.moveLeft = moveLeft;
-            this.moveRight = moveRight;
+        return this;
+    }
 
-            return this;
-        }
+    this.specialAnimation = function (specialAnimationTime, special) {
+        this.specialAnimationTime = specialAnimationTime;
+        this.special = special;
+        this.specialOn = false;
+        this.specialTimer = new Timer();
 
-        this.specialAnimation = function (specialAnimationTime, special) {
-            this.specialAnimationTime = specialAnimationTime;
-            this.special = special;
-            this.specialOn = false;
-            this.specialTimer = new Timer();
-
-            this.startSpecial = function () {
-                this.specialOn = true;
-                this.animationTime = this.specialAnimationTime;
-                this.specialTimer.init(1000);
-            }
-
-            return this;
-        }
-
-        /**
-         * Update the facing direction based on the speed
-         * This is used for drawing the right animation sequence
-         * For 4-direction movement (for more than four directions add more cases)
-         */
-        this.updateDirection = function () {
-            if (this.speedY < 0) this.direction = 4;
-            if (this.speedY > 0) this.direction = 64;
-            if (this.speedX < 0) this.direction = 16;
-            if (this.speedX > 0) this.direction = 1;
-        }
-
-        /**
-         * Updates the shown animation sequence based on the direction te Component is facing
-         * For 4-direction movement (for more than four directions add more cases)
-         */
-        this.updateAnimation = function () {
-            // Special sequence
-            if (this.specialOn) {
-                this.sequence = this.special;
-                if (this.animationIndexCounter == this.special.length - 1) {
-                    this.specialOn = false;
-                    this.sequence = this.special[this.special.length - 1];
-                }
-            }
-            // Moving sequence
-            else if (this.isMoving && !myGameArea.gameSequence) {
-                if (this.moveAnimationTime != undefined) {
-                    this.animationTime = this.moveAnimationTime;
-                    if (this.direction == 4) this.sequence = this.moveUp;
-                    if (this.direction == 64) this.sequence = this.moveDown;
-                    if (this.direction == 16) this.sequence = this.moveLeft;
-                    if (this.direction == 1) this.sequence = this.moveRight;
-                }
-            }
-            // Idle sequence
-            else {
-                if (this.idleAnimationTime != undefined) {
-                    this.animationTime = this.idleAnimationTime;
-                    if (this.direction == 4) this.sequence = this.idleUp;
-                    if (this.direction == 64) this.sequence = this.idleDown;
-                    if (this.direction == 16) this.sequence = this.idleLeft;
-                    if (this.direction == 1) this.sequence = this.idleRight;
-                }
-            }
-
+        this.startSpecial = function () {
+            this.specialOn = true;
+            this.animationTime = this.specialAnimationTime;
+            this.specialTimer.init(1000);
         }
 
         return this;
     }
 
     /**
-     * Add Collision to the Component
-     * @param x position relative to the sprite image
-     * @param y position relative to the sprite image
-     * @param width
-     * @param height
+     * Update the facing direction based on the speed
+     * This is used for drawing the right animation sequence
+     * For 4-direction movement (for more than four directions add more cases)
      */
-    this.collision = function (x, y, width, height) {
-        // Collision Properties
-        this.collidable = true;
-        this.moveable = false; // True if it can be pushed away by other Components. TODO: Implement
-        this.offset_x = x;
-        this.offset_y = y;
-        this.offset_width = width;
-        this.offset_height = height;
+    this.updateDirection = function () {
+        if (this.speedY < 0) this.direction = 4;
+        if (this.speedY > 0) this.direction = 64;
+        if (this.speedX < 0) this.direction = 16;
+        if (this.speedX > 0) this.direction = 1;
+    }
 
-        // #########################
-        // ## Collision functions ##
-        // #########################
-
-        /**
-         * Prevents tile collision
-         * [TODO: Check if there is no collision between the old and the new position
-         * (Can happen if either moving really fast or realtime moving <big delta * speed>)]
-         * Calculates the new position and checks if it's walkable by using the maps collision layer
-         *  8x8 tiles - "may TODO": Adept for all sizes
-         */
-        this.tileCollision = function () {
-
-            var d = maps.data[maps.currentMap];
-
-            // Check map borders
-            if (this.x + this.offset_x + this.speedX < 0) this.speedX = 0;
-            else if (this.y + this.offset_y + this.speedY < 0) this.speedY = 0;
-            else if (this.x + this.offset_x + this.speedX + this.offset_width > d.width) this.speedX = 0;
-            else if (this.y + this.offset_y + this.speedY + this.offset_height > d.height) this.speedY = 0;
-
-            // Converts the cartesian to grid coordiantes
-            var x1 = Math.floor((this.x + this.offset_x + this.speedX) / 8);
-            var x2 = x1 + 1;
-            var x3 = Math.floor((this.x + this.offset_x + this.speedX + this.offset_width) / 8);
-            var y1 = Math.floor((this.y + this.offset_y + this.speedY) / 8);
-            var y2 = y1 + 1;
-            var y3 = Math.floor((this.y + this.offset_y + this.speedY + this.offset_height) / 8);
-
-            if (Math.abs(x3 - (this.x + this.offset_x + this.offset_width + this.speedX) / 8) < 0.1) x3 = x2;
-            if (Math.abs(y3 - (this.y + this.offset_y + this.offset_height + this.speedY) / 8) < 0.1) y3 = y2;
-
-            if (this.collidable) {
-                // Apply the movement restriction of the tiles the component is standing on to it
-                this.tileRestriction(d.tiles[xy2i(x1, y1, d.mapWidth)]);
-                this.tileRestriction(d.tiles[xy2i(x1, y2, d.mapWidth)]);
-                this.tileRestriction(d.tiles[xy2i(x1, y3, d.mapWidth)]);
-                this.tileRestriction(d.tiles[xy2i(x2, y1, d.mapWidth)]);
-                this.tileRestriction(d.tiles[xy2i(x2, y2, d.mapWidth)]);
-                this.tileRestriction(d.tiles[xy2i(x2, y3, d.mapWidth)]);
-                this.tileRestriction(d.tiles[xy2i(x3, y1, d.mapWidth)]);
-                this.tileRestriction(d.tiles[xy2i(x3, y2, d.mapWidth)]);
-                this.tileRestriction(d.tiles[xy2i(x3, y3, d.mapWidth)]);
+    /**
+     * Updates the shown animation sequence based on the direction te Component is facing
+     * For 4-direction movement (for more than four directions add more cases)
+     */
+    this.updateAnimation = function () {
+        // Special sequence
+        if (this.specialOn) {
+            this.sequence = this.special;
+            if (this.animationIndexCounter == this.special.length - 1) {
+                this.specialOn = false;
+                this.sequence = this.special[this.special.length - 1];
             }
-
-            // Checks if the component can trigger tile events: the main character
-            if (this == myGameArea.gameCamera.target) {
-                // stepOnEvent
-                if (d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID != undefined)
-                    events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID](this);
-                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEventID != undefined)
-                    events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEventID](this);
-                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEventID != undefined)
-                    events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEventID](this);
-                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEventID != undefined)
-                    events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEventID](this);
-                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEventID != undefined)
-                    events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEventID](this);
-                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEventID != undefined)
-                    events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEventID](this);
-                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEventID != undefined)
-                    events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEventID](this);
-                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEventID != undefined)
-                    events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEventID](this);
-                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEventID != undefined)
-                    events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEventID](this);
-                // onEnterEvent
-                if (d.tiles[xy2i(x1, y1, d.mapWidth)].enterEventID != undefined)
-                    events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].enterEventID](this);
-                else if (d.tiles[xy2i(x1, y2, d.mapWidth)].enterEventID != undefined)
-                    events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].enterEventID](this);
-                else if (d.tiles[xy2i(x1, y3, d.mapWidth)].enterEventID != undefined)
-                    events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].enterEventID](this);
-                else if (d.tiles[xy2i(x2, y1, d.mapWidth)].enterEventID != undefined)
-                    events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].enterEventID](this);
-                else if (d.tiles[xy2i(x2, y2, d.mapWidth)].enterEventID != undefined)
-                    events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].enterEventID](this);
-                else if (d.tiles[xy2i(x2, y3, d.mapWidth)].enterEventID != undefined)
-                    events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].enterEventID](this);
-                else if (d.tiles[xy2i(x3, y1, d.mapWidth)].enterEventID != undefined)
-                    events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].enterEventID](this);
-                else if (d.tiles[xy2i(x3, y2, d.mapWidth)].enterEventID != undefined)
-                    events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].enterEventID](this);
-                else if (d.tiles[xy2i(x3, y3, d.mapWidth)].enterEventID != undefined)
-                    events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].enterEventID](this);
+        }
+        // Moving sequence
+        else if (this.isMoving && !myGameArea.gameSequence) {
+            if (this.moveAnimationTime != undefined) {
+                this.animationTime = this.moveAnimationTime;
+                if (this.direction == 4) this.sequence = this.moveUp;
+                if (this.direction == 64) this.sequence = this.moveDown;
+                if (this.direction == 16) this.sequence = this.moveLeft;
+                if (this.direction == 1) this.sequence = this.moveRight;
+            }
+        }
+        // Idle sequence
+        else {
+            if (this.idleAnimationTime != undefined) {
+                this.animationTime = this.idleAnimationTime;
+                if (this.direction == 4) this.sequence = this.idleUp;
+                if (this.direction == 64) this.sequence = this.idleDown;
+                if (this.direction == 16) this.sequence = this.idleLeft;
+                if (this.direction == 1) this.sequence = this.idleRight;
             }
         }
 
-        /**
-         * Set movement based on the tiles collision restricting certain directions
-         * ?TODO? uncomment parts when setting collision box = tile size
-         * @param the tile
-         */
-        this.tileRestriction = function (tile) {
-            // NO RESTRICTION (equal without typecheck: 0 == [0] => true, equal with typecheck:: 0 === [0] => false)
-            if (tile.collision === 0) {}
-            // FULL RESTRICTION
-            else if (tile.collision === 1) {
-                this.speedX = 0;
-                this.speedY = 0;
-            }
-            // DIRECTION RESTRICTIONS (assume collision is an array i.e. [0] / [1,2] / [0,2,3] / ... )
-            // 0: UP, 1: DOWN, 2: LEFT, 3: RIGHT
-            else {
-                for (var i = 0, l = tile.collision.length; i < l; i++) {
-                    // RESTRICTED: UP
-                    if (tile.collision[i] == 0) {
-                        if (this.y + this.offset_y > tile.y /*+ tile.height*/ )
-                            if (this.speedY < 0) this.speedY = 0;
-                    }
-                    // RESTRICTED: DOWN 
-                    else if (tile.collision[i] == 1) {
-                        if (this.y + this.offset_y /*+ this.offset_height*/ < tile.y)
-                            if (this.speedY > 0) this.speedY = 0;
-                    }
-                    // RESTRICTED: LEFT
-                    else if (tile.collision[i] == 2) {
-                        if (this.x + this.offset_x > tile.x /*+ tile.width*/ )
-                            if (this.speedX < 0) this.speedX = 0;
-                    }
-                    // RESTRICTED: RIGHT
-                    else if (tile.collision[i] == 3) {
-                        if (this.x + this.offset_x /*+ this.offset_width*/ < tile.x)
-                            if (this.speedX > 0) this.speedX = 0;
-                    }
-                }
-            }
+    }
+
+    // #########################
+    // ## Collision functions ##
+    // #########################
+
+    /**
+     * Prevents tile collision
+     * [TODO: Check if there is no collision between the old and the new position
+     * (Can happen if either moving really fast or realtime moving <big delta * speed>)]
+     * Calculates the new position and checks if it's walkable by using the maps collision layer
+     *  8x8 tiles - "may TODO": Adept for all sizes
+     */
+    this.tileCollision = function () {
+
+        var d = maps.data[maps.currentMap];
+
+        // Check map borders
+        if (this.x + this.offsetX + this.speedX < 0) this.speedX = 0;
+        else if (this.y + this.offsetY + this.speedY < 0) this.speedY = 0;
+        else if (this.x + this.offsetX + this.speedX + this.offsetWidth > d.width) this.speedX = 0;
+        else if (this.y + this.offsetY + this.speedY + this.offsetHeight > d.height) this.speedY = 0;
+
+        // Converts the cartesian to grid coordiantes
+        var x1 = Math.floor((this.x + this.offsetX + this.speedX) / 8);
+        var x2 = x1 + 1;
+        var x3 = Math.floor((this.x + this.offsetX + this.speedX + this.offsetWidth) / 8);
+        var y1 = Math.floor((this.y + this.offsetY + this.speedY) / 8);
+        var y2 = y1 + 1;
+        var y3 = Math.floor((this.y + this.offsetY + this.speedY + this.offsetHeight) / 8);
+
+        if (Math.abs(x3 - (this.x + this.offsetX + this.offsetWidth + this.speedX) / 8) < 0.1) x3 = x2;
+        if (Math.abs(y3 - (this.y + this.offsetY + this.offsetHeight + this.speedY) / 8) < 0.1) y3 = y2;
+
+        if (this.collidable) {
+            // Apply the movement restriction of the tiles the component is standing on to it
+            this.tileRestriction(d.tiles[xy2i(x1, y1, d.mapWidth)]);
+            this.tileRestriction(d.tiles[xy2i(x1, y2, d.mapWidth)]);
+            this.tileRestriction(d.tiles[xy2i(x1, y3, d.mapWidth)]);
+            this.tileRestriction(d.tiles[xy2i(x2, y1, d.mapWidth)]);
+            this.tileRestriction(d.tiles[xy2i(x2, y2, d.mapWidth)]);
+            this.tileRestriction(d.tiles[xy2i(x2, y3, d.mapWidth)]);
+            this.tileRestriction(d.tiles[xy2i(x3, y1, d.mapWidth)]);
+            this.tileRestriction(d.tiles[xy2i(x3, y2, d.mapWidth)]);
+            this.tileRestriction(d.tiles[xy2i(x3, y3, d.mapWidth)]);
         }
 
-        /**
-         * Prevent collision with other Components
-         * Has to be called in the main loop for all combinations after the control updates of all Components
-         * (TODO: Pushable Components -> if (pushable && otherobj.noMapCollision) => push) 
-         */
-        this.componentCollision = function (otherobj) {
-            if (!this.collidable || !otherobj.collidable) return false;
+        // Checks if the component can trigger tile events: the main character
+        if (this == myGameArea.gameCamera.target) {
+            // stepOnEvent
+            if (d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID != undefined)
+                events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID](this);
+            else if (d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEventID != undefined)
+                events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEventID](this);
+            else if (d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEventID != undefined)
+                events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEventID](this);
+            else if (d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEventID != undefined)
+                events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEventID](this);
+            else if (d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEventID != undefined)
+                events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEventID](this);
+            else if (d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEventID != undefined)
+                events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEventID](this);
+            else if (d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEventID != undefined)
+                events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEventID](this);
+            else if (d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEventID != undefined)
+                events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEventID](this);
+            else if (d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEventID != undefined)
+                events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEventID](this);
+            // onEnterEvent
+            if (d.tiles[xy2i(x1, y1, d.mapWidth)].enterEventID != undefined)
+                events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].enterEventID](this);
+            else if (d.tiles[xy2i(x1, y2, d.mapWidth)].enterEventID != undefined)
+                events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].enterEventID](this);
+            else if (d.tiles[xy2i(x1, y3, d.mapWidth)].enterEventID != undefined)
+                events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].enterEventID](this);
+            else if (d.tiles[xy2i(x2, y1, d.mapWidth)].enterEventID != undefined)
+                events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].enterEventID](this);
+            else if (d.tiles[xy2i(x2, y2, d.mapWidth)].enterEventID != undefined)
+                events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].enterEventID](this);
+            else if (d.tiles[xy2i(x2, y3, d.mapWidth)].enterEventID != undefined)
+                events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].enterEventID](this);
+            else if (d.tiles[xy2i(x3, y1, d.mapWidth)].enterEventID != undefined)
+                events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].enterEventID](this);
+            else if (d.tiles[xy2i(x3, y2, d.mapWidth)].enterEventID != undefined)
+                events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].enterEventID](this);
+            else if (d.tiles[xy2i(x3, y3, d.mapWidth)].enterEventID != undefined)
+                events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].enterEventID](this);
+        }
+    }
 
-            // Saving y-speed
-            var tmp1 = this.speedY;
-            var tmp2 = otherobj.speedY;
-
-            // Checking X Collision
+    /**
+     * Set movement based on the tiles collision restricting certain directions
+     * ?TODO? uncomment parts when setting collision box = tile size
+     * @param the tile
+     */
+    this.tileRestriction = function (tile) {
+        // NO RESTRICTION (equal without typecheck: 0 == [0] => true, equal with typecheck:: 0 === [0] => false)
+        if (tile.collision === 0) {}
+        // FULL RESTRICTION
+        else if (tile.collision === 1) {
+            this.speedX = 0;
             this.speedY = 0;
-            otherobj.speedY = 0;
-
-            if ((this.y + this.offset_y + this.speedY + this.offset_height <= otherobj.y + otherobj.offset_y + otherobj.speedY) ||
-                (this.y + this.offset_y + this.speedY >= otherobj.y + otherobj.offset_y + otherobj.speedY + otherobj.offset_height) ||
-                (this.x + this.offset_x + this.speedX + this.offset_width <= otherobj.x + otherobj.offset_x + otherobj.speedX) ||
-                (this.x + this.offset_x + this.speedX >= otherobj.x + otherobj.offset_x + otherobj.speedX + otherobj.offset_width)) {
-                // No X Collision
-                this.xLeftCollision = false;
-                this.xRightCollision = false;
-            } else {
-                if ((this.x + this.offset_x + this.speedX + this.offset_width > otherobj.x + otherobj.offset_x + otherobj.speedX)) {
-                    // X Right Collision
-                    this.xRightCollision = true;
-                    if (this.speedX <= 0) this.speedX = 0;
-                    if (otherobj.speedX >= 0) otherobj.speedX = 0;
+        }
+        // DIRECTION RESTRICTIONS (assume collision is an array i.e. [0] / [1,2] / [0,2,3] / ... )
+        // 0: UP, 1: DOWN, 2: LEFT, 3: RIGHT
+        else {
+            for (var i = 0, l = tile.collision.length; i < l; i++) {
+                // RESTRICTED: UP
+                if (tile.collision[i] == 0) {
+                    if (this.y + this.offsetY > tile.y /*+ tile.height*/ )
+                        if (this.speedY < 0) this.speedY = 0;
                 }
-                if ((this.x + this.offset_x + this.speedX < otherobj.x + otherobj.offset_x + otherobj.speedX + otherobj.offset_width)) {
-                    // X Left Collision
-                    this.xLeftCollision = true;
-                    if (this.speedX >= 0) this.speedX = 0;
-                    if (otherobj.speedX <= 0) otherobj.speedX = 0;
+                // RESTRICTED: DOWN 
+                else if (tile.collision[i] == 1) {
+                    if (this.y + this.offsetY /*+ this.offsetHeight*/ < tile.y)
+                        if (this.speedY > 0) this.speedY = 0;
                 }
-            }
-
-            // Checking Y Collision
-            this.speedY = tmp1;
-            otherobj.speedY = tmp2;
-
-            if ((this.y + this.offset_y + this.speedY + this.offset_height <= otherobj.y + otherobj.offset_y + otherobj.speedY) ||
-                (this.y + this.offset_y + this.speedY >= otherobj.y + otherobj.offset_y + otherobj.speedY + otherobj.offset_height) ||
-                (this.x + this.offset_x + this.speedX + this.offset_width <= otherobj.x + otherobj.offset_x + otherobj.speedX) ||
-                (this.x + this.offset_x + this.speedX >= otherobj.x + otherobj.offset_x + otherobj.speedX + otherobj.offset_width)) {
-                // NO Y Collision
-                this.yTopCollision = false;
-                this.yBottomCollision = false;
-            } else {
-                if ((this.y + this.offset_y + this.speedY + this.offset_height > otherobj.y + otherobj.offset_y + otherobj.speedY)) {
-                    // Y Top Collision
-                    this.yTopCollision = true;
-                    if (this.speedY >= 0) this.speedY = 0;
-                    if (otherobj.speedY <= 0) otherobj.speedY = 0;
+                // RESTRICTED: LEFT
+                else if (tile.collision[i] == 2) {
+                    if (this.x + this.offsetX > tile.x /*+ tile.width*/ )
+                        if (this.speedX < 0) this.speedX = 0;
                 }
-                if ((this.y + this.offset_y + this.speedY < otherobj.y + otherobj.offset_y + otherobj.speedY + otherobj.offset_height)) {
-                    // Y Bottom Collision
-                    this.yBottomCollision = true;
-                    if (this.speedY >= 0) this.speedY = 0;
-                    if (otherobj.speedY <= 0) otherobj.speedY = 0;
+                // RESTRICTED: RIGHT
+                else if (tile.collision[i] == 3) {
+                    if (this.x + this.offsetX /*+ this.offsetWidth*/ < tile.x)
+                        if (this.speedX > 0) this.speedX = 0;
                 }
             }
+        }
+    }
 
+    /**
+     * Prevent collision with other Components
+     * Has to be called in the main loop for all combinations after the control updates of all Components
+     * (TODO: Pushable Components -> if (pushable && otherobj.noMapCollision) => push) 
+     */
+    this.componentCollision = function (otherobj) {
+        if (!this.collidable || !otherobj.collidable) return false;
+
+        // Saving y-speed
+        var tmp1 = this.speedY;
+        var tmp2 = otherobj.speedY;
+
+        // Checking X Collision
+        this.speedY = 0;
+        otherobj.speedY = 0;
+
+        if ((this.y + this.offsetY + this.speedY + this.offsetHeight <= otherobj.y + otherobj.offsetY + otherobj.speedY) ||
+            (this.y + this.offsetY + this.speedY >= otherobj.y + otherobj.offsetY + otherobj.speedY + otherobj.offsetHeight) ||
+            (this.x + this.offsetX + this.speedX + this.offsetWidth <= otherobj.x + otherobj.offsetX + otherobj.speedX) ||
+            (this.x + this.offsetX + this.speedX >= otherobj.x + otherobj.offsetX + otherobj.speedX + otherobj.offsetWidth)) {
+            // No X Collision
+            this.xLeftCollision = false;
+            this.xRightCollision = false;
+        } else {
+            if ((this.x + this.offsetX + this.speedX + this.offsetWidth > otherobj.x + otherobj.offsetX + otherobj.speedX)) {
+                // X Right Collision
+                this.xRightCollision = true;
+                if (this.speedX <= 0) this.speedX = 0;
+                if (otherobj.speedX >= 0) otherobj.speedX = 0;
+            }
+            if ((this.x + this.offsetX + this.speedX < otherobj.x + otherobj.offsetX + otherobj.speedX + otherobj.offsetWidth)) {
+                // X Left Collision
+                this.xLeftCollision = true;
+                if (this.speedX >= 0) this.speedX = 0;
+                if (otherobj.speedX <= 0) otherobj.speedX = 0;
+            }
         }
 
-        return this;
+        // Checking Y Collision
+        this.speedY = tmp1;
+        otherobj.speedY = tmp2;
+
+        if ((this.y + this.offsetY + this.speedY + this.offsetHeight <= otherobj.y + otherobj.offsetY + otherobj.speedY) ||
+            (this.y + this.offsetY + this.speedY >= otherobj.y + otherobj.offsetY + otherobj.speedY + otherobj.offsetHeight) ||
+            (this.x + this.offsetX + this.speedX + this.offsetWidth <= otherobj.x + otherobj.offsetX + otherobj.speedX) ||
+            (this.x + this.offsetX + this.speedX >= otherobj.x + otherobj.offsetX + otherobj.speedX + otherobj.offsetWidth)) {
+            // NO Y Collision
+            this.yTopCollision = false;
+            this.yBottomCollision = false;
+        } else {
+            if ((this.y + this.offsetY + this.speedY + this.offsetHeight > otherobj.y + otherobj.offsetY + otherobj.speedY)) {
+                // Y Top Collision
+                this.yTopCollision = true;
+                if (this.speedY >= 0) this.speedY = 0;
+                if (otherobj.speedY <= 0) otherobj.speedY = 0;
+            }
+            if ((this.y + this.offsetY + this.speedY < otherobj.y + otherobj.offsetY + otherobj.speedY + otherobj.offsetHeight)) {
+                // Y Bottom Collision
+                this.yBottomCollision = true;
+                if (this.speedY >= 0) this.speedY = 0;
+                if (otherobj.speedY <= 0) otherobj.speedY = 0;
+            }
+        }
+
     }
 
     this.mid = function () {

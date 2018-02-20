@@ -151,8 +151,7 @@ addDialog(["The door is closed!", ["Yes", "No"]], 5);
 
 // #################################################################################################
 
-// TODO: Add in tiles event id
-// Dialog on enter / click / touch on character in front of stone when facing it (direction: North)
+// Dialog on enter / click / touch when controlled character in front of stone when facing it (looking up)
 for (var i = 1070; i <= 1071; i++) {
     maps.data[2].tiles[i].enterEventID = 0;
 }
@@ -167,34 +166,26 @@ for (var i = 12; i <= 29; i++) {
 }
 
 // Setup Character
-var character = new Component(240, 280, 4)
-    .collision(4, 16, 16, 16)
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+var character = new Component(4, 240, 280, 4, 16, 16, 16)
+    .idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 
 // Setup Girl
-var girl = new Component(370, 210, 5)
-    .collision(4, 16, 16, 16)
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+var girl = new Component(5, 370, 210, 4, 16, 16, 16)
+    .idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 
 // Setup Cat
-var cat = new Component(160, 390, 6)
-    .collision(4, 16, 16, 16)
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+var cat = new Component(6, 160, 390, 4, 16, 16, 16)
+    .idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 
 // Setup Dog
-var dog = new Component(100, 100, 7)
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
-    .collision(4, 16, 16, 16);
+var dog = new Component(7, 100, 100, 4, 16, 16, 16)
+    .idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 
 // Setup Jukebox
-var jukebox = new Component(260, 120, 8)
-    .animation()
-    .collision(0, 16, 24, 16);
+var jukebox = new Component(8, 260, 120, 0, 16, 24, 16);
 
 // Setup Castledoor
-var castledoor = new Component(144, 62, 9)
-    .collision(0, 0, 47, 40)
-    .animation().specialAnimation(20, [0, 1, 2, 3]);
+var castledoor = new Component(9, 144, 62, 0, 0, 47, 40).specialAnimation(20, [0, 1, 2, 3]);
 
 // Add Objects to map
 // TODO: add on create, no "var character = ..."
