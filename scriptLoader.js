@@ -1,6 +1,6 @@
 // All script that need to be loaded
 var scriptsToLoad = [
-    'game.js',
+    'main.js',
     'astar.js',
     'utility.js',
     'core.js',
