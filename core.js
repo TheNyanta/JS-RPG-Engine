@@ -466,68 +466,6 @@ function Component(x, y, spritesheet) {
     }
 
     /**
-     * add key control
-     * make Component listen to key inputs
-     */
-    this.control = function (up, down, left, right, mouse) {
-        // Key Control Properties
-        this.up = up;
-        this.down = down;
-        this.left = left;
-        this.right = right;
-        if (mouse != undefined) this.mouse = mouse
-
-        this.disableControls = false;
-        this.disableMouse = false;
-
-        /**
-         * Key Control: Setup keys with the control function
-         * move the Component up/down/left/right if the key is pressed
-         */
-        this.controlEvent = function () {
-            // Check if it key control is allowed
-            if (!this.disableControls) {
-                // Listen to keys: "Else if" to limit movement in only one direction at the same time (no diagonal moving)
-                if (myGameArea.keys[this.up])
-                    this.speedY = -this.speed;
-                else if (myGameArea.keys[this.down])
-                    this.speedY = this.speed;
-                else if (myGameArea.keys[this.left])
-                    this.speedX = -this.speed;
-                else if (myGameArea.keys[this.right])
-                    this.speedX = this.speed;
-                else if (mouse && !this.disableMouse) {
-                    // Move direction = To current mousemove/touch position
-                    if (myGameArea.mousedown || myGameArea.touchdown) {
-                        if (Math.abs(myGameArea.x + myGameArea.gameCamera.x - this.x - this.offset_x) >= Math.abs(myGameArea.y + myGameArea.gameCamera.y - this.y - this.offset_y)) {
-                            if (this.x + this.offset_x < myGameArea.x + myGameArea.gameCamera.x - 4) this.speedX += this.speed;
-                            else if (this.x + this.offset_x > myGameArea.x + myGameArea.gameCamera.x + 4) this.speedX -= this.speed;
-                        } else {
-                            if (this.y + this.offset_y < myGameArea.y + myGameArea.gameCamera.y - 4) this.speedY += this.speed;
-                            else if (this.y + this.offset_y > myGameArea.y + myGameArea.gameCamera.y + 4) this.speedY -= this.speed;
-                        }
-                        /*
-                        // Move direction = Difference between clicked and current mousemove/touch position
-                        if (Math.abs(myGameArea.x - myGameArea.clickdownX) > Math.abs(myGameArea.y - myGameArea.clickdownY)) {
-                            if (myGameArea.x < myGameArea.clickdownX - 4)
-                                this.speedX -= this.speed;
-                            else if (myGameArea.x > myGameArea.clickdownX + 4)
-                                this.speedX += this.speed;
-                        } else {
-                            if (myGameArea.y < myGameArea.clickdownY - 4)
-                                this.speedY -= this.speed;
-                            else if (myGameArea.y > myGameArea.clickdownY + 4)
-                                this.speedY += this.speed;
-                        }*/
-                    }
-                }
-            }
-        }
-
-        return this;
-    }
-
-    /**
      * add animations
      * TODO: clean-up, add special onetime animations (i.e. open door, box, ...)
      */
@@ -1061,10 +999,10 @@ function Dialog(input, eventID) {
     }
 
     this.selectOption = function () {
-        if (myGameArea.keys[87] || myGameArea.keys[83]) {
+        if (myGameArea.keys[87] || myGameArea.keys[83] || myGameArea.keys[38] || myGameArea.keys[40]) {
             if (this.keyPush) {
-                if (myGameArea.keys[87]) this.selectedOption--;
-                else if (myGameArea.keys[83]) this.selectedOption++;
+                if (myGameArea.keys[87] || myGameArea.keys[38]) this.selectedOption--;
+                else if (myGameArea.keys[83] || myGameArea.keys[40]) this.selectedOption++;
                 this.keyPush = false;
             }
         } else this.keyPush = true;

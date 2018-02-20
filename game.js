@@ -78,6 +78,9 @@ var myGameArea = {
             this.x = 0;
             this.y = 0;
 
+            this.disableControls = false;
+            this.disableMouse = false;
+
             this.setTarget = function (target) {
                 this.target = target;
             }
@@ -87,6 +90,48 @@ var myGameArea = {
                 if (this.target != undefined) {
                     this.x = this.target.x - myGameArea.canvas.width / 2;
                     this.y = this.target.y - myGameArea.canvas.height / 2;
+                    // Check if it key control is allowed
+                    if (!this.disableControls && !myGameArea.gameSequence) {
+                        // Listen to keys: "Else if" to limit movement in only one direction at the same time (no diagonal moving)
+                        if (myGameArea.keys[38] || myGameArea.keys[87])
+                            this.target.speedY = -this.target.speed;
+                        else if (myGameArea.keys[40] || myGameArea.keys[83])
+                            this.target.speedY = this.target.speed;
+                        else if (myGameArea.keys[37] || myGameArea.keys[65])
+                            this.target.speedX = -this.target.speed;
+                        else if (myGameArea.keys[39] || myGameArea.keys[68])
+                            this.target.speedX = this.target.speed;
+                        else if (!this.disableMouse) {
+                            // Move direction = To current mousemove/touch position
+                            if (myGameArea.mousedown || myGameArea.touchdown) {
+                                if (Math.abs(myGameArea.x + this.x - this.target.x - this.target.offset_x) >= Math.abs(myGameArea.y + this.y - this.target.y - this.target.offset_y)) {
+                                    if (this.target.x + this.target.offset_x < myGameArea.x + this.x - 4)
+                                        this.target.speedX += this.target.speed;
+                                    else if (this.target.x + this.target.offset_x > myGameArea.x + this.x + 4)
+                                        this.target.speedX -= this.target.speed;
+                                } else {
+                                    if (this.target.y + this.target.offset_y < myGameArea.y + this.y - 4)
+                                        this.target.speedY += this.target.speed;
+                                    else if (this.target.y + this.target.offset_y > myGameArea.y + this.y + 4)
+                                        this.target.speedY -= this.target.speed;
+                                }
+                                /*
+                                // Move direction = Difference between clicked and current mousemove/touch position
+                                if (Math.abs(myGameArea.x - myGameArea.clickdownX) > Math.abs(myGameArea.y - myGameArea.clickdownY)) {
+                                    if (myGameArea.x < myGameArea.clickdownX - 4)
+                                        this.speedX -= this.speed;
+                                    else if (myGameArea.x > myGameArea.clickdownX + 4)
+                                        this.speedX += this.speed;
+                                } else {
+                                    if (myGameArea.y < myGameArea.clickdownY - 4)
+                                        this.speedY -= this.speed;
+                                    else if (myGameArea.y > myGameArea.clickdownY + 4)
+                                        this.speedY += this.speed;
+                                }*/
+
+                            }
+                        }
+                    }
                 }
 
                 // Keep camera view inside the map
@@ -100,10 +145,11 @@ var myGameArea = {
                 if (maps.data[maps.currentMap].height - myGameArea.canvas.height < 0) this.y = 0;
             }
         }
+
         // Init Camera Target
         this.gameCamera.setTarget(character);
         // Disable Mouse Control in Editor Mode
-        if (myGameArea.editor) character.disableMouse = true;
+        if (myGameArea.editor) myGameArea.gameCamera.disableMouse = true;
 
         // Initalize Maps
         for (i = 0, l = maps.data.length; i < l; i++) {
@@ -160,8 +206,8 @@ var myGameArea = {
                 '<button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug Off</button>' +
                 '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +
                 '<br>' +
-                '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(character)">Camera on Character</button>' +
-                '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(girl)">Camera on Girl</button>' +
+                '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(character)">Control Boy</button>' +
+                '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(girl)">Control Girl</button>' +
                 '</div>';
         }
 
@@ -215,6 +261,7 @@ var myGameArea = {
         window.addEventListener('keydown', function (e) {
             myGameArea.keys = (myGameArea.keys || []);
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
+            if (myGameArea.printkeyCode) console.log(e.keyCode);
             // Enter key
             if (e.keyCode == 13) myGameArea.enter = true;
             // no scrolling on arrow keys
@@ -496,10 +543,10 @@ function updateGameArea() {
         }, 400);
     }
 
-    // Update game
-    update();
     // Update camera
     myGameArea.gameCamera.update();
+    // Update game
+    update();    
     // Draw game
     draw();
 

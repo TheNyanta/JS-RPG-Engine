@@ -169,14 +169,12 @@ for (var i = 12; i <= 29; i++) {
 // Setup Character
 var character = new Component(240, 280, spritesheets.data[4])
     .collision(4, 16, 16, 16)
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
-    .control(87, 83, 65, 68, true /*Mouse/Touch-Control*/ );
+    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 
 // Setup Girl
 var girl = new Component(370, 210, spritesheets.data[5])
     .collision(4, 16, 16, 16)
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
-    .control(38, 40, 37, 39);
+    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 
 // Setup Cat
 var cat = new Component(160, 390, spritesheets.data[6])
@@ -205,6 +203,7 @@ maps.data[1].addComponent([jukebox, dog]);
 maps.data[2].addComponent([castledoor]);
 maps.data[3].addComponent([]);
 
+character.enterEvent = events.data[7];
 girl.enterEvent = events.data[7];
 dog.enterEvent = events.data[8];
 jukebox.enterEvent = events.data[9];
