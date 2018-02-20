@@ -40,10 +40,10 @@ var myGameArea = {
 
         // Pause game if not selected
         document.active = true;
-        $(window).focus(function () {
+        window.addEventListener('focus', function (e) {
             document.active = true;
         });
-        $(window).blur(function () {
+        window.addEventListener('blur', function (e) {
             document.active = false;
         });
 

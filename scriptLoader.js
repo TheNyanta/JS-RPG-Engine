@@ -1,6 +1,5 @@
 // All script that need to be loaded
 var scriptsToLoad = [
-    'jquery-3.2.1.js',
     'game.js',
     'astar.js',
     'utility.js',
