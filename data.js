@@ -1,50 +1,21 @@
-/*
-// Setup Spirtesheets
-// Maps
-addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/forest.png", 60, 32, 8, 8);
-addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snowforest.png", 60, 32, 8, 8);
-addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castle.png", 60, 32, 8, 8);
-addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castletown.png", 60, 32, 8, 8);
-// Objects
-addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/character.png", 12, 8, 24, 32);
-addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/girl.png", 12, 8, 24, 32);
-addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/cat.png", 12, 8, 24, 32);
-addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/animal.png", 12, 8, 24, 32);
-addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/snow_jukebox.png", 12, 8, 24, 32);
-addSprite("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/castledoor_1.png", 1, 4, 47, 48);
-// Setup Maps
-addMap("https://thenyanta.github.io/JS-RPG-Engine/Assets/Image/sunset1.png", 0, 80, 60);
-addMap(null, 1, 80, 60);
-addMap(null, 2, 42, 40);
-addMap(null, 3, 42, 60);
-
-// Setup Audio
-addAudio("https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/banana-phone.m4a");
-addAudio("https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/cat.m4a");
-addAudio("https://thenyanta.github.io/JS-RPG-Engine/Assets/Audio/dog.m4a");
-
-*/
-// local
-// Setup Spirtesheets
-// Maps
+// Spritesheet Maps
 addSprite("Assets/Image/forest.png", 60, 32, 8, 8);
 addSprite("Assets/Image/snowforest.png", 60, 32, 8, 8);
 addSprite("Assets/Image/castle.png", 60, 32, 8, 8);
 addSprite("Assets/Image/castletown.png", 60, 32, 8, 8);
-// Objects
+// Spritesheet Objects
 addSprite("Assets/Image/character.png", 12, 8, 24, 32);
 addSprite("Assets/Image/girl.png", 12, 8, 24, 32);
 addSprite("Assets/Image/cat.png", 12, 8, 24, 32);
 addSprite("Assets/Image/animal.png", 12, 8, 24, 32);
 addSprite("Assets/Image/snow_jukebox.png", 12, 8, 24, 32);
 addSprite("Assets/Image/castledoor_1.png", 1, 4, 47, 48);
-// Setup Maps
+// Maps
 addMap("Assets/Image/sunset1.png", 0, 80, 60);
 addMap(null, 1, 80, 60);
 addMap(null, 2, 42, 40);
 addMap(null, 3, 42, 60);
-
-// Setup Audio
+// Audio
 addAudio("Assets/Audio/harp_60C.m4a");
 addAudio("Assets/Audio/harp_62D.m4a");
 addAudio("Assets/Audio/harp_64E.m4a");
@@ -55,234 +26,88 @@ addAudio("Assets/Audio/harp_71H.m4a");
 addAudio("Assets/Audio/harp_72C.m4a");
 addAudio("Assets/Audio/cat.m4a");
 addAudio("Assets/Audio/dog.m4a");
-/**/
 
-// Setup Character
-var character = new Component(240, 280, spritesheets.data[4])
-    .velocity(2)
-    .collision(4, 16, 16, 16)
-    .control(constants.KEY_W, constants.KEY_S, constants.KEY_A, constants.KEY_D, true)
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
-    .interactive();
-
-// Setup Girl
-var girl = new Component(370, 210, spritesheets.data[5])
-    .velocity(2)
-    .collision(4, 16, 16, 16)
-    .control(constants.KEY_UP, constants.KEY_DOWN, constants.KEY_LEFT, constants.KEY_RIGHT)
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-
-// ## Mountainforest
-
-// Setup Cat
-var cat = new Component(160, 390, spritesheets.data[6])
-    .velocity(1)
-    .collision(4, 16, 16, 16)
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-
-// ## Snowforest
-
-// Setup Dog
-var dog = new Component(100, 100, spritesheets.data[7])
-    .velocity(1)
-    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
-    .collision(4, 16, 16, 16);
-
-// Setup Jukebox
-var jukebox = new Component(260, 120, spritesheets.data[8])
-    .velocity(0)
-    .collision(0, 16, 24, 16);
-
-// ## Castle front
-
-// Setup Castledoor
-var castledoor = new Component(144, 62, spritesheets.data[9])
-    .velocity(0)
-    .collision(0, 0, 47, 40)
-    .animation().specialAnimation(20, [0, 1, 2, 3]);
-
-/*
-character.addClickEvent(function () {
-    console.log("Character clicked!");
-});
-*/
-
-girl.addClickEvent(function () {
-    if (character.distance(girl) <= Math.min(girl.width, girl.height) && character.facing(girl)) {
-        if (girl.faceOnInteraction) character.face(girl);
-        myGameArea.gameSequence = true;
-        currentDialog = girldialog;
-    }
-});
-
-cat.addClickEvent(function () {
-    if (character.distance(cat) <= Math.min(cat.width, cat.height) && character.facing(cat)) {
-        if (cat.faceOnInteraction) character.face(cat);
-        myGameArea.gameSequence = true;
-        currentDialog = catdialog;
-    }
-});
-
-jukebox.addClickEvent(function () {
-    if (character.distance(jukebox) <= Math.min(jukebox.width, jukebox.height) && character.facing(jukebox)) {
-        myGameArea.gameSequence = true;
-        currentDialog = musicdialog;
-    }
-});
-
-dog.addClickEvent(function () {
-    if (character.distance(dog) <= Math.min(dog.width, dog.height) && character.facing(dog)) {
-        if (dog.faceOnInteraction) character.face(dog);
-        audio.data[9].play();
-    }
-});
-
-castledoor.addClickEvent(function () {
-    if (character.distance(castledoor) <= Math.min(castledoor.width, castledoor.height) && character.facing(castledoor)) {
-        myGameArea.gameSequence = true;
-        currentDialog = doordialog;
-    }
-});
-
-// Add Objects to map
-// TODO: add on create, no "var character = ..."
-maps.data[0].addObject([character, girl, cat]);
-maps.data[1].addObject([jukebox, dog]);
-maps.data[2].addObject([castledoor]);
-maps.data[3].addObject([]);
-
-// Dialog on enter / click / touch on character in front of stone when facing it (direction: North)
-for (var i = 1070; i <= 1071; i++) {
-    maps.data[2].tiles[i].enterEvent = function (obj) {
-        // Enter key down / click / touch
-        if (myGameArea.keys[constants.KEY_ENTER] || ((myGameArea.mousedown || myGameArea.touchdown) && !obj.fireClickEvent)) {
-            if (maps.data[2].tiles[i].fireEvent) {
-                if (obj.direction == constants.DIR_N) {
-                    myGameArea.gameSequence = true;
-                    currentDialog = stonedialog;
-                    maps.data[2].tiles[i].fireEvent = false;
-                }
+// ######
+// Events
+// ######
+addEvent(function (obj) {
+    // Enter key down / click / touch
+    if (myGameArea.enter || myGameArea.mousedown || myGameArea.touchdown) {
+        if (maps.data[2].tiles[i].fireEvent) {
+            if (obj.direction == 4) {
+                dialogs.currentDialog = dialogs.data[0];;
+                maps.data[2].tiles[i].fireEvent = false;
             }
         }
-        // Enter key up: Enable next enter push
-        else maps.data[2].tiles[i].fireEvent = true;
     }
-}
-
-// Teleports
-// Castle to town
-for (var i = 1650; i <= 1667; i++) {
-    maps.data[2].tiles[i].stepOnEvent = function (obj) {
-        componentMapSwitch(null, -8, 3, obj);
-        maps.currentMap = 3;
-        myGameArea.transition = true;
-    }
-}
-// Town to castle
-for (var i = 12; i <= 29; i++) {
-    maps.data[3].tiles[i].stepOnEvent = function (obj) {
-        componentMapSwitch(null, 280, 2, obj);
-        maps.currentMap = 2;
-        myGameArea.transition = true;
-    }
-}
-
-// Set Camera
-var cameraTarget = character;
-
-// Dialogs
-var stonedialog = new dialog();
-stonedialog.setDialog(["What a old stone.", "Can't read it's text..."]);
-
-var girldialog = new dialog();
-girldialog.setDialog(["Hello!", "Choose a map!", "#choice", "#entered"], null, ["Grass", "Snow", "Castletown"]);
-girldialog.event = function (choice) {
+    // Enter key up: Enable next enter push
+    else maps.data[2].tiles[i].fireEvent = true;
+});
+addEvent(function (obj) {
+    componentMapSwitch(null, -8, 3, obj, true);
+});
+addEvent(function (obj) {
+    componentMapSwitch(null, 280, 2, obj, true);
+});
+addEvent(function (choice) {
+    if (choice == 0) myHarp.startPlaying();
+    if (choice == 1) myHarp.stopPlaying();
+});
+addEvent(function (choice) {
     if (choice == maps.currentMap) {
-        // You can chain choice dialogs like this
-        this.chatCounter = 0;
-        currentDialog = girldialog2;
+        // Chaining dialogs by calling a new in the dialog event function
+        dialogs.currentDialog = dialogs.data[2];
     } else {
         if (choice == 0) {
             componentMapSwitch(380, 208, 0, character);
             componentMapSwitch(364, 208, 0, girl);
-            maps.currentMap = 0;
+            maps.nextMap = 0;
             myGameArea.transition = true;
         } else if (choice == 1) {
             componentMapSwitch(192, 360, 1, character);
             componentMapSwitch(176, 360, 1, girl);
-            maps.currentMap = 1;
+            maps.nextMap = 1;
             myGameArea.transition = true;
         } else if (choice == 2) {
             componentMapSwitch(166, 210, 2, character);
             componentMapSwitch(150, 210, 2, girl);
-            maps.currentMap = 2;
+            maps.nextMap = 2;
             myGameArea.transition = true;
         }
     }
-}
-
-var girldialog2 = new dialog();
-girldialog2.setDialog(["We are on this map!"]);
-
-var musicdialog = new dialog();
-musicdialog.setDialog(["This is jukebox!", "Wanna here some music?", "#choice", "#entered"], null, ["Yes", "No"]);
-musicdialog.event = function (choice) {
-    if (choice == 0) myHarp.startPlaying();
-    if (choice == 1) myHarp.stopPlaying();
-}
-
-var catdialog = new dialog();
-catdialog.setDialog(["Meow!", "Want meow to meow?", "#choice", "#entered"], null, ["Yes", "No"]);
-catdialog.event = function (choice) {
+});
+addEvent(function (choice) {
+    if (choice == 0) {
+        castledoor.startSpecial(); // Opening Animation
+        dialogs.data[5].setDialog(["The door is opened", "...", "There is no map for the castle."]);
+    }
+});
+addEvent(function (choice) {
     if (choice == 0)
         audio.data[8].play();
-}
-
-var doordialog = new dialog();
-doordialog.setDialog(["The door is locked!"]);
-
-girl.faceOnInteraction = true;
-girl.enterEvent = function () {
-    myGameArea.gameSequence = true;
-    currentDialog = girldialog;
-}
-
-cat.faceOnInteraction = true;
-cat.enterEvent = function () {
-    myGameArea.gameSequence = true;
-    currentDialog = catdialog;
+});
+addEvent(function () {
+    dialogs.currentDialog = dialogs.data[1];;
+});
+addEvent(function () {
+    audio.data[9].play();
+});
+addEvent(function () {
+    dialogs.currentDialog = dialogs.data[3];
+});
+addEvent(function () {
+    dialogs.currentDialog = dialogs.data[4];;
     if (cat.routeForward) cat.routeIndex--;
     else cat.routeIndex++;
     cat.routeForward = toggle(cat.routeForward);
-}
-
-dog.faceOnInteraction = true;
-dog.enterEvent = function () {
-    audio.data[9].play();
-}
-
-jukebox.enterEvent = function () {
-    myGameArea.gameSequence = true;
-    currentDialog = musicdialog;
-}
-
-castledoor.enterEvent = function () {
-    //castledoor.startSpecial(); // Opening Animation
-    myGameArea.gameSequence = true;
-    currentDialog = doordialog;
-}
-
-// Cat walk
-cat.route = [[50, 390], [50, 380], [50, 150], [600, 150], [600, 390]];
-cat.routeIndex = 0;
-cat.speed = 5;
-cat.routeForward = true;
-// You can use this.variable in the function because it will be called in the cat Component
-cat.movementEvent = function () {
+});
+addEvent(function () {
+    dialogs.currentDialog = dialogs.data[5];
+});
+addEvent(function () {
     if (!myGameArea.gameSequence) {
         if (this.routeIndex >= this.route.length) this.routeIndex = 0;
         if (this.routeIndex < 0) this.routeIndex = this.route.length - 1;
-
         // First reach x
         if (this.x == this.route[this.routeIndex][0]) {
             // Than reach y
@@ -294,10 +119,8 @@ cat.movementEvent = function () {
         } else if (this.x < this.route[this.routeIndex][0]) this.speedX = this.speed;
         else this.speedX = -this.speed;
     }
-}
-
-// Dog walk (simple! will walk against walls)
-dog.movementEvent = function () {
+});
+addEvent(function () {
     if (!myGameArea.gameSequence) {
         // x move
         if (Math.abs(this.x + this.offset_x - girl.x) > Math.abs(this.y + this.offset_y - girl.y)) {
@@ -314,11 +137,96 @@ dog.movementEvent = function () {
             }
         }
     }
+});
+
+// #######
+// Dialogs
+// #######
+addDialog(["Just an old stone."]);
+addDialog(["Hello!", "Choose a map!", ["Grass", "Snow", "Castletown"]], 4);
+addDialog(["We are on this map!"]);
+addDialog(["This is jukebox!", "Wanna here some music?", ["Yes", "No"]], 3);
+addDialog(["Meow!", "Want meow to meow?", ["Yes", "No"]], 6);
+addDialog(["The door is closed!", ["Yes", "No"]], 5);
+
+// #################################################################################################
+
+// TODO: Add in tiles event id
+// Dialog on enter / click / touch on character in front of stone when facing it (direction: North)
+for (var i = 1070; i <= 1071; i++) {
+    maps.data[2].tiles[i].enterEvent = events.data[0];
+}
+// Teleports
+// Castle to town
+for (var i = 1650; i <= 1667; i++) {
+    maps.data[2].tiles[i].stepOnEvent = events.data[1];
+}
+// Town to castle
+for (var i = 12; i <= 29; i++) {
+    maps.data[3].tiles[i].stepOnEvent = events.data[2];
 }
 
-//###
+// Setup Character
+var character = new Component(240, 280, spritesheets.data[4])
+    .collision(4, 16, 16, 16)
+    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
+    .control(87, 83, 65, 68, true /*Mouse/Touch-Control*/ );
 
-// Maps
+// Setup Girl
+var girl = new Component(370, 210, spritesheets.data[5])
+    .collision(4, 16, 16, 16)
+    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
+    .control(38, 40, 37, 39);
+
+// Setup Cat
+var cat = new Component(160, 390, spritesheets.data[6])
+    .collision(4, 16, 16, 16)
+    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+
+// Setup Dog
+var dog = new Component(100, 100, spritesheets.data[7])
+    .animation().idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14])
+    .collision(4, 16, 16, 16);
+
+// Setup Jukebox
+var jukebox = new Component(260, 120, spritesheets.data[8])
+    .animation()
+    .collision(0, 16, 24, 16);
+
+// Setup Castledoor
+var castledoor = new Component(144, 62, spritesheets.data[9])
+    .collision(0, 0, 47, 40)
+    .animation().specialAnimation(20, [0, 1, 2, 3]);
+
+// Add Objects to map
+// TODO: add on create, no "var character = ..."
+maps.data[0].addComponent([character, girl, cat]);
+maps.data[1].addComponent([jukebox, dog]);
+maps.data[2].addComponent([castledoor]);
+maps.data[3].addComponent([]);
+
+girl.enterEvent = events.data[7];
+dog.enterEvent = events.data[8];
+jukebox.enterEvent = events.data[9];
+cat.enterEvent = events.data[10];
+castledoor.enterEvent = events.data[11];
+
+// Cat walk
+cat.route = [[50, 390], [50, 380], [50, 150], [600, 150], [600, 390]];
+cat.routeIndex = 0;
+cat.speed = 5;
+cat.routeForward = true;
+// You can use this.variable in the function because it will be called in the cat Component
+cat.movementEvent = events.data[12];
+
+// Dog walk (simple! will walk against walls)
+dog.movementEvent = events.data[13];
+
+// #################################################################################################
+
+// ###############
+// Maps Layer Data
+// ###############
 
 //################
 //### Grassmap ###

@@ -1,14 +1,62 @@
-//convert 2dim array coordinates to 1dim array coordinates
+// Convert 2dim array coordinates to 1dim array coordinates
 function xy2i(x, y, width) {
     var index = y * width + x;
     return index;
 }
 
-//convert 1dim array coordinates to 2dim array coordinates
+// Convert 1dim array coordinates to 2dim array coordinates
 function i2xy(index, width) {
     var x = index % width;
     var y = Math.floor(index / width);
     return [x, y];
+}
+
+// Rectangle collision
+function rectangleOverlap(x1, y1, w1, h1, x2, y2, w2, h2) {
+    if ((x1 + w1 < x2) || (x2 + w2 < x1) || (y1 + h1 < y2) || (y2 + h2 < y1)) return false;
+    return true;
+}
+
+// Rectangle mid
+function rectangleMid(x, y, w, h) {
+    return [x + w / 2, y + h / 2];
+}
+
+// Euclidean distance between to points on a cartesian grid
+function distance(xy1, xy2) {
+    return Math.sqrt(Math.pow(xy1[0] - xy2[0], 2) + Math.pow(xy1[1] - xy2[1], 2));
+}
+
+/**
+ * Check if an array contains a certain object
+ * If it contains it return it's index else return false
+ * @param the array (i.e. dialogs.data)
+ * @param the object (i.e. dialogs.data[4])
+ */
+function containsObject(data, obj) {
+    for (var i = 0, l = data.length; i < l; i++)
+        if (data[i] === obj) return i;
+    return false;
+}
+
+/**
+ * Removes an object from an array if it contains it
+ * @param the array
+ * @param the object
+ */
+function removeObject(data, obj) {
+    var index = containsObject(data, obj);
+    if (index !== false) data.splice(index, 1);
+}
+
+/**
+ * Add an object to an array if it doesn't already contains it
+ * @param the array
+ * @param the object
+ */
+function addObject(data, obj) {
+    var index = containsObject(data, obj);
+    if (!index) data.push(obj);
 }
 
 /** 
@@ -17,22 +65,27 @@ function i2xy(index, width) {
  * @param new components y
  * @param new map
  * @param the component
+ * @param {bool} change map?
  */
-function componentMapSwitch(x, y, map, obj) {
-    // Change the components position
-    if (x != null) obj.x = x;
-    if (y != null) obj.y = y;
-    // Find the component on the current map and remove it
-    for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
-        if (maps.data[maps.currentMap].objects[i] == obj) maps.data[maps.currentMap].objects.splice(i, 1);
-
-    // Add the component to the new map
-    maps.data[map].objects.push(obj);
+function componentMapSwitch(x, y, nextMap, component, changeMap) {
+    // Change the position of the component
+    if (x != null) component.x = x;
+    if (y != null) component.y = y;
+    // Removes the component from the current map
+    removeObject(maps.data[maps.currentMap].components, component);
+    // Adds the component to the new map
+    addObject(maps.data[nextMap].components, component);
+    if (changeMap) {
+        maps.nextMap = nextMap;
+        myGameArea.transition = true;
+    }
 }
+
+
 // Harp: audio.data[0-7].play();
 var myHarp = (function () {
     var note = 0;
-    var melody = [0,4,6,7,6,4,1,2,5,4,0,3,2,1,0,2,3,1,0,7,6,4,3,2,5,7,6,4];
+    var melody = [0, 4, 6, 7, 6, 4, 1, 2, 5, 4, 0, 3, 2, 1, 0, 2, 3, 1, 0, 7, 6, 4, 3, 2, 5, 7, 6, 4];
     var melodyIndex = 0;
     var playing = false;
 
@@ -67,6 +120,28 @@ var myHarp = (function () {
         }
     };
 })();
+
+// Timer: init() sets the start time to now, value() gets the start time, check(seconds) tells if "seconds" have passed
+var Timer = function () {
+    var start;
+
+    function initStart() {
+        start = new Date();
+    }
+    return {
+        init: function () {
+            initStart();
+        },
+        value: function () {
+            return start;
+        },
+        check: function (seconds) {
+            var tmp = new Date();
+            if (Math.floor((tmp - start) / 1000 >= seconds)) return true;
+            else return false;
+        }
+    }
+};
 
 //convert listmap to a grid
 function getGrid(maplayer, width, height) {
@@ -212,7 +287,7 @@ function showTime() {
     ctx = myGameArea.context;
     ctx.font = "bold 20px Serif";
     ctx.fillStyle = "black";
-    ctx.fillText("Timer : " + Math.round(time / 1000), 5, 20);
+    ctx.fillText("Timer : " + Math.floor(time / 1000), 5, 20);
 }
 
 // Init FPS and time
@@ -221,39 +296,15 @@ start = Date.now();
 before = Date.now();
 fps = 0;
 
-/**
- * Timer
- */
-function timer() {
-    this.init = function (delta) {
-        this.start = Date.now();
-        this.delta = delta;
-    }
-    this.check = function () {
-        if (this.delta != undefined) {
-            if (Date.now() - this.start >= this.delta) {
-                this.delta = undefined;
-                return true;
-            } else return false;
-        }
-    }
-}
-
-function sleep(milliseconds) {
-    var start = new Date().getTime();
-    for (var i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds) {
-            break;
-        }
-    }
+function everyinterval(n) {
+    if ((myGameArea.frameNo / n) % 1 == 0) return true;
+    return false;
 }
 
 function updateFPS() {
     now = Date.now();
     time = now - start;
-    if (myGameArea.frameNo == 1 || everyinterval(30)) {
-        fps = Math.round(1000 / (now - before));
-    }
+    if (everyinterval(30)) fps = Math.floor(1000 / (now - before));
     before = now;
 }
 
@@ -269,6 +320,18 @@ function showPosition(target) {
     ctx.fillStyle = "black";
     ctx.fillText("x:" + (target.x + target.offset_x) + ", y:" + (target.y + target.offset_y), 5, 60);
     ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x) / maps.data[maps.currentMap].tileset.spriteWidth) + ", " + Math.floor((target.y + target.offset_y) / maps.data[maps.currentMap].tileset.spriteHeight) + "]", 5, 80);
+}
+
+function showDistance() {
+    /*
+    ctx = myGameArea.context;
+    ctx.beginPath();
+    ctx.lineWidth = 2; //2px
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = black;
+    ctx.stroke();
+    */
 }
 
 // Button functions

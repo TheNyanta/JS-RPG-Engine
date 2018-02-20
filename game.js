@@ -52,11 +52,14 @@ var myGameArea = {
 
         this.frameNo = 0;
         this.gameSequence = false;
-        
+
         this.keys = [];
+
         // To only fire a single event on enter / mousedown / touchdown
-        this.eventReady = true;
+        this.eventReady = false;
         this.enter = false;
+        this.mousedown = false;
+        this.touchdown = false;
 
         //this.canvas.style.cursor = "none"; //hide the original cursor
 
@@ -98,7 +101,7 @@ var myGameArea = {
             }
         }
         // Init Camera Target
-        this.gameCamera.setTarget(cameraTarget);
+        this.gameCamera.setTarget(character);
 
         // Initalize Maps
         for (i = 0, l = maps.data.length; i < l; i++) {
@@ -154,7 +157,6 @@ var myGameArea = {
                 '<button class="w3-button w3-green" onclick="enterFullscreen()">Fullscreen</button>' +
                 '<button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug Off</button>' +
                 '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +
-                '<button class="w3-button w3-orange" onclick="audio.data[0].play()">Play a sound</button>' +
                 '<br>' +
                 '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(character)">Camera on Character</button>' +
                 '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(cat)">Camera on Cat</button>' +
@@ -213,14 +215,14 @@ var myGameArea = {
             myGameArea.keys = (myGameArea.keys || []);
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
             // Enter key
-            if (e.keyCode == constants.KEY_ENTER) myGameArea.enter = true;
+            if (e.keyCode == 13) myGameArea.enter = true;
             // no scrolling on arrow keys
             if ([37, 38, 39, 40].indexOf(e.keyCode) > -1) e.preventDefault();
         })
         // Keyup
         window.addEventListener('keyup', function (e) {
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
-            if (e.keyCode == constants.KEY_ENTER) myGameArea.enter = false;
+            if (e.keyCode == 13) myGameArea.enter = false;
         })
         if (myGameArea.editor) {
             // Mouse down
@@ -412,43 +414,32 @@ var myGameArea = {
     }
 };
 
-function everyinterval(n) {
-    if ((myGameArea.frameNo / n) % 1 == 0) {
-        return true;
-    }
-    return false;
-}
-
 /**
  * Updates the current map with all it's components
  * TODO: Clean up - structure; for-loop length as var in the loop BUT care it must not change will the loop runs EVENTS that change map / delete objects
  */
 function update() {
-    // Check enter / mousedown / touchdown
-    if (!myGameArea.enter && !myGameArea.mousedown && !myGameArea.touchdown) myGameArea.eventReady = true;
-
-    // In a myGameArea.gameSequence there will be no movement (i.e. activate myGameArea.gameSequence when opening a menu or a dialog)
+    // While myGameArea.gameSequence == true all components will stop moving (i.e. used for menus, dialogs,...)
     if (!myGameArea.gameSequence) {
         // For components that can start an interacted
-        for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
-            if (maps.data[maps.currentMap].objects[i].actor)
-                for (var j = 0; j < maps.data[maps.currentMap].objects.length; j++) maps.data[maps.currentMap].objects[i].updateInteraction(maps.data[maps.currentMap].objects[j]);
+        for (var i = 0; i < maps.data[maps.currentMap].components.length; i++)
+            // The controlled component can acted with other component
+            if (maps.data[maps.currentMap].components[i] == myGameArea.gameCamera.target)
+                for (var j = 0; j < maps.data[maps.currentMap].components.length; j++) maps.data[maps.currentMap].components[i].updateInteraction(maps.data[maps.currentMap].components[j]);
 
-        // Update the movement of all Components in maps_objects[maps.currentMap] (this includes mapCollision resolving)
+        // Update the movement of all components on the current map (this also resolves tileCollision)
         if (!myGameArea.transition)
-            for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++) maps.data[maps.currentMap].objects[i].updateMovement();
+            for (var i = 0; i < maps.data[maps.currentMap].components.length; i++) maps.data[maps.currentMap].components[i].updateMovement();
 
-        // Check each combination pair of Components in maps_objects[maps.currentMap] for Component-Component-collision
-        for (var i = 0; i < maps.data[maps.currentMap].objects.length; i++)
-            for (var j = i + 1; j < maps.data[maps.currentMap].objects.length; j++)
-                if (maps.data[maps.currentMap].objects[i].componentCollision != undefined)
-                    maps.data[maps.currentMap].objects[i].componentCollision(maps.data[maps.currentMap].objects[j]);
+        // Check each combination pair of components on the current map for component-component-collision
+        for (var i = 0; i < maps.data[maps.currentMap].components.length; i++)
+            for (var j = i + 1; j < maps.data[maps.currentMap].components.length; j++)
+                if (maps.data[maps.currentMap].components[i].componentCollision != undefined)
+                    maps.data[maps.currentMap].components[i].componentCollision(maps.data[maps.currentMap].components[j]);
 
-        // Update the position of all components in maps.data[maps.currentMap].objects
-        for (var i = 0, l = maps.data[maps.currentMap].objects.length; i < l; i++) maps.data[maps.currentMap].objects[i].updatePosition();
+        // Update the position of all components on the current map
+        for (var i = 0, l = maps.data[maps.currentMap].components.length; i < l; i++) maps.data[maps.currentMap].components[i].updatePosition();
     }
-
-    myGameArea.gameCamera.update();
 }
 
 /**
@@ -460,23 +451,24 @@ function update() {
  * Four it draws the gui
  */
 function draw() {
-    // Clear the canvas
-    myGameArea.context.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
-    
-    // Draw Background
-    maps.data[maps.currentMap].drawBackground();
-
-    // Sorts the array after it's y value so that Components with bigger y are drawn later
-    maps.data[maps.currentMap].objects.sort(function (a, b) {
-        return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);
-    });
-    // Draw Objects of the current map
-    for (var i = 0, l = maps.data[maps.currentMap].objects.length; i < l; i++) maps.data[maps.currentMap].objects[i].draw(myGameArea.context);
-
-    // Draw Foreground
-    maps.data[maps.currentMap].drawForeground();
-
-    // Extras
+    // Draw map transition
+    if (myGameArea.transition) blackTransition();
+    // Draw map
+    else {
+        // Clear the canvas
+        myGameArea.context.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
+        // Draw Background
+        maps.data[maps.currentMap].drawBackground();
+        // Sorts the array after it's y value so that components with bigger y are drawn later
+        maps.data[maps.currentMap].components.sort(function (a, b) {
+            return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);
+        });
+        // Draw Objects of the current map
+        for (var i = 0, l = maps.data[maps.currentMap].components.length; i < l; i++) maps.data[maps.currentMap].components[i].draw(myGameArea.context);
+        // Draw Foreground
+        maps.data[maps.currentMap].drawForeground();
+    }
+    // Draw extras
     if (myGameArea.showExtra) {
         extraGuiRect();
         showTime();
@@ -492,10 +484,10 @@ function draw() {
  */
 function updateGameArea() {
     myGameArea.frameNo += 1;
-    
+
     // Redraw caches' on map change + map switch transition
-    if (maps.shownMap != maps.currentMap) {
-        maps.shownMap = maps.currentMap;
+    if (maps.currentMap != maps.nextMap) {
+        maps.currentMap = maps.nextMap;
         maps.data[maps.currentMap].drawCache();
         if (myGameArea.editor != undefined) maps.data[maps.currentMap].drawTileset();
         setTimeout(function () {
@@ -503,14 +495,19 @@ function updateGameArea() {
         }, 400);
     }
 
+    // Update game
     update();
-
-    // Draw transition
-    if (myGameArea.transition) blackTransition();
-    else draw();
+    // Update camera
+    myGameArea.gameCamera.update();
+    // Draw game
+    draw();
 
     // Draw dialog
-    if (myGameArea.gameSequence && currentDialog != undefined) currentDialog.update();
+    if (dialogs.currentDialog != undefined) {
+        myGameArea.gameSequence = true;
+        dialogs.currentDialog.update();
+    } else myGameArea.gameSequence = false;
 
+    // Simple hardcoded sound player for jukebox
     myHarp.play(Math.round(Math.random()));
 }

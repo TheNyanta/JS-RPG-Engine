@@ -3,13 +3,8 @@ var scriptsToLoad = [
     'jquery-3.2.1.js',
     'game.js',
     'astar.js',
-    'constants.js',
-    'spritesheet.js',
     'utility.js',
-    'component.js',
-    'map.js',
-    'dialog.js',
-    'audio.js',
+    'gameObjects.js',
     'data.js'];
 scriptsToLoad.forEach(function (src) {
     var script = document.createElement('script');
