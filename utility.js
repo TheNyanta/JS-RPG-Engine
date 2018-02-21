@@ -344,7 +344,7 @@ function showPosition(target) {
     ctx = game.context;
     ctx.fillStyle = "black";
     ctx.fillText("x:" + (target.x + target.offsetX) + ", y:" + (target.y + target.offsetY), 5, 60);
-    ctx.fillText("Tile[" + Math.floor((target.x + target.offsetX) / maps.data[maps.currentMap].tileset.spriteWidth) + ", " + Math.floor((target.y + target.offsetY) / maps.data[maps.currentMap].tileset.spriteHeight) + "]", 5, 80);
+    ctx.fillText("Tile[" + Math.floor((target.x + target.offsetX) / spritesheets.data[maps.data[maps.currentMap].spritesheetID].spriteWidth) + ", " + Math.floor((target.y + target.offsetY) / spritesheets.data[maps.data[maps.currentMap].spritesheetID].spriteHeight) + "]", 5, 80);
 }
 
 function showDistance() {
