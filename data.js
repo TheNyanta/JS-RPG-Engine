@@ -32,7 +32,7 @@ addAudio("Assets/Audio/dog.m4a");
 // ######
 addEvent(function (componentID) {
     // Enter key down / click / touch
-    if (myGameArea.enter || myGameArea.mousedown || myGameArea.touchdown) {
+    if (game.enter || game.mousedown || game.touchdown) {
         if (maps.data[2].tiles[i].fireEvent) {
             if (components.data[componentID].direction == 4) {
                 dialogs.currentDialog = dialogs.data[0];;
@@ -62,17 +62,17 @@ addEvent(function (choice) {
             componentMapSwitch(380, 208, 0, 0);
             componentMapSwitch(364, 208, 0, 1);
             maps.nextMap = 0;
-            myGameArea.transition = true;
+            game.transition = true;
         } else if (choice == 1) {
             componentMapSwitch(192, 360, 1, 0);
             componentMapSwitch(176, 360, 1, 1);
             maps.nextMap = 1;
-            myGameArea.transition = true;
+            game.transition = true;
         } else if (choice == 2) {
             componentMapSwitch(166, 210, 2, 0);
             componentMapSwitch(150, 210, 2, 1);
             maps.nextMap = 2;
-            myGameArea.transition = true;
+            game.transition = true;
         }
     }
 });
@@ -104,40 +104,52 @@ addEvent(function () {
 addEvent(function () {
     dialogs.currentDialog = dialogs.data[5];
 });
-addEvent(function () {
-    if (!myGameArea.gameSequence) {
-        if (this.routeIndex >= this.route.length) this.routeIndex = 0;
-        if (this.routeIndex < 0) this.routeIndex = this.route.length - 1;
+addEvent(function (target) {
+    // Cat run in circle
+    if (!game.gameSequence) {
+        if (target.routeIndex >= target.route.length) target.routeIndex = 0;
+        if (target.routeIndex < 0) target.routeIndex = target.route.length - 1;
         // First reach x
-        if (this.x == this.route[this.routeIndex][0]) {
+        if (target.x == target.route[target.routeIndex][0]) {
             // Than reach y
-            if (this.y == this.route[this.routeIndex][1]) {
-                if (this.routeForward) this.routeIndex++;
-                else this.routeIndex--;
-            } else if (this.y < this.route[this.routeIndex][1]) this.speedY = this.speed;
-            else this.speedY = -this.speed;
-        } else if (this.x < this.route[this.routeIndex][0]) this.speedX = this.speed;
-        else this.speedX = -this.speed;
+            if (target.y == target.route[target.routeIndex][1]) {
+                if (target.routeForward) target.routeIndex++;
+                else target.routeIndex--;
+            } else if (target.y < target.route[target.routeIndex][1]) target.speedY = target.speed;
+            else target.speedY = -target.speed;
+        } else if (target.x < target.route[target.routeIndex][0]) target.speedX = target.speed;
+        else target.speedX = -target.speed;
     }
 });
-addEvent(function () {
-    if (!myGameArea.gameSequence) {
+addEvent(function (target) {
+    // Dog simple follow controlled component
+    if (!game.gameSequence && game.camera.target != undefined) {
         // x move
-        if (Math.abs(this.x + this.offset_x - components.data[1].x) > Math.abs(this.y + this.offset_y - components.data[1].y)) {
-            if (this.x + this.offset_x != components.data[1].x) {
-                if (this.x + this.offset_x < components.data[1].x) this.speedX = this.speed;
-                else this.speedX = -this.speed;
+        if (Math.abs(target.x + target.offsetX - game.camera.target.x) > Math.abs(target.y + target.offsetY - game.camera.target.y)) {
+            if (target.x + target.offsetX != game.camera.target.x) {
+                if (target.x + target.offsetX < game.camera.target.x) target.speedX = target.speed;
+                else target.speedX = -target.speed;
             }
         }
         // y move
         else {
-            if (this.y + this.offset_y != components.data[1].y) {
-                if (this.y + this.offset_y < components.data[1].y) this.speedY = this.speed
-                else this.speedY = -this.speed;
+            if (target.y + target.offsetY != game.camera.target.y) {
+                if (target.y + target.offsetY < game.camera.target.y) target.speedY = target.speed;
+                else target.speedY = -target.speed;
             }
         }
     }
 });
+
+// ##########
+// Components
+// ##########
+addComponent("Boy", 4, 240, 280, 4, 16, 16, 16, 7, undefined, 0);
+addComponent("Girl", 5, 370, 210, 4, 16, 16, 16, 7, undefined, 0);
+addComponent("Cat", 6, 160, 390, 4, 16, 16, 16, 10, 12, 0);
+addComponent("Dog", 7, 100, 100, 4, 16, 16, 16, 8, 13, 1);
+addComponent("Jukebox", 8, 260, 120, 0, 16, 24, 16, 9, undefined, 1);
+addComponent("Door", 9, 144, 62, 0, 0, 47, 40, 11, undefined, 2);
 
 // #######
 // Dialogs
@@ -149,17 +161,9 @@ addDialog(["This is jukebox!", "Wanna here some music?", ["Yes", "No"]], 3);
 addDialog(["Meow!", "Want meow to meow?", ["Yes", "No"]], 6);
 addDialog(["The door is closed!", ["Yes", "No"]], 5);
 
-// ##########
-// Components
-// ##########
-addComponent(4, 240, 280, 4, 16, 16, 16, 7, 0);
-addComponent(5, 370, 210, 4, 16, 16, 16, 7, 0);
-addComponent(6, 160, 390, 4, 16, 16, 16, 10, 0);
-addComponent(7, 100, 100, 4, 16, 16, 16, 8, 1);
-addComponent(8, 260, 120, 0, 16, 24, 16, 9, 1);
-addComponent(9, 144, 62, 0, 0, 47, 40, 11, 2);
-
 // #################################################################################################
+
+// TODO: INCLUDE IN SELF DATA GENERATION
 
 // Dialog on enter / click / touch when controlled character in front of stone when facing it (looking up)
 for (var i = 1070; i <= 1071; i++) {
@@ -185,10 +189,6 @@ components.data[2].route = [[50, 390], [50, 380], [50, 150], [600, 150], [600, 3
 components.data[2].routeIndex = 0;
 components.data[2].speed = 5;
 components.data[2].routeForward = true;
-// You can use this.variable in the function because it will be called in the cat Component
-components.data[2].movementEvent = events.data[12];
-// Dog walk (simple! will walk against walls)
-components.data[3].movementEvent = events.data[13];
 
 // #################################################################################################
 

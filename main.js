@@ -1,16 +1,16 @@
 function startGame() {
-    myGameArea.editor = false;
-    myGameArea.init();
-    myGameArea.start();
+    game.editor = false;
+    game.init();
+    game.start();
 }
 
 function startEditor() {
-    myGameArea.editor = true;
-    myGameArea.init()
-    myGameArea.start();
+    game.editor = true;
+    game.init()
+    game.start();
 }
 
-var myGameArea = {
+var game = {
     canvas: document.createElement("canvas"),
     tileset: document.createElement("canvas"),
     debug: false, // Global Variable for debugging
@@ -74,7 +74,7 @@ var myGameArea = {
         this.cgx3 = this.foreground.getContext("2d");
 
         // Camera
-        this.gameCamera = new function () {
+        this.camera = new function () {
             this.x = 0;
             this.y = 0;
 
@@ -88,45 +88,45 @@ var myGameArea = {
             this.update = function () {
                 // Follow target
                 if (this.target != undefined) {
-                    this.x = this.target.x - myGameArea.canvas.width / 2;
-                    this.y = this.target.y - myGameArea.canvas.height / 2;
+                    this.x = this.target.x - game.canvas.width / 2;
+                    this.y = this.target.y - game.canvas.height / 2;
                     // Check if it key control is allowed
-                    if (!this.disableControls && !myGameArea.gameSequence) {
+                    if (!this.disableControls && !game.gameSequence) {
                         // Listen to keys: "Else if" to limit movement in only one direction at the same time (no diagonal moving)
-                        if (myGameArea.keys[38] || myGameArea.keys[87])
+                        if (game.keys[38] || game.keys[87])
                             this.target.speedY = -this.target.speed;
-                        else if (myGameArea.keys[40] || myGameArea.keys[83])
+                        else if (game.keys[40] || game.keys[83])
                             this.target.speedY = this.target.speed;
-                        else if (myGameArea.keys[37] || myGameArea.keys[65])
+                        else if (game.keys[37] || game.keys[65])
                             this.target.speedX = -this.target.speed;
-                        else if (myGameArea.keys[39] || myGameArea.keys[68])
+                        else if (game.keys[39] || game.keys[68])
                             this.target.speedX = this.target.speed;
                         else if (!this.disableMouse) {
-                            if (myGameArea.mousedown || myGameArea.touchdown) {
+                            if (game.mousedown || game.touchdown) {
                                 // Move direction = To current mousemove/touch position
                                 /*
-                                if (Math.abs(myGameArea.x + this.x - this.target.x - this.target.offset_x) >= Math.abs(myGameArea.y + this.y - this.target.y - this.target.offset_y)) {
-                                    if (this.target.x + this.target.offset_x < myGameArea.x + this.x - 4)
+                                if (Math.abs(game.x + this.x - this.target.x - this.target.offsetX) >= Math.abs(game.y + this.y - this.target.y - this.target.offsetY)) {
+                                    if (this.target.x + this.target.offsetX < game.x + this.x - 4)
                                         this.target.speedX += this.target.speed;
-                                    else if (this.target.x + this.target.offset_x > myGameArea.x + this.x + 4)
+                                    else if (this.target.x + this.target.offsetX > game.x + this.x + 4)
                                         this.target.speedX -= this.target.speed;
                                 } else {
-                                    if (this.target.y + this.target.offset_y < myGameArea.y + this.y - 4)
+                                    if (this.target.y + this.target.offsetY < game.y + this.y - 4)
                                         this.target.speedY += this.target.speed;
-                                    else if (this.target.y + this.target.offset_y > myGameArea.y + this.y + 4)
+                                    else if (this.target.y + this.target.offsetY > game.y + this.y + 4)
                                         this.target.speedY -= this.target.speed;
                                 }
                                 */
                                 // Move direction = Difference between clicked and current mousemove/touch position
-                                if (Math.abs(myGameArea.x - myGameArea.clickdownX) > Math.abs(myGameArea.y - myGameArea.clickdownY)) {
-                                    if (myGameArea.x < myGameArea.clickdownX - 4)
+                                if (Math.abs(game.x - game.clickdownX) > Math.abs(game.y - game.clickdownY)) {
+                                    if (game.x < game.clickdownX - 4)
                                         this.target.speedX -= this.target.speed;
-                                    else if (myGameArea.x > myGameArea.clickdownX + 4)
+                                    else if (game.x > game.clickdownX + 4)
                                         this.target.speedX += this.target.speed;
                                 } else {
-                                    if (myGameArea.y < myGameArea.clickdownY - 4)
+                                    if (game.y < game.clickdownY - 4)
                                         this.target.speedY -= this.target.speed;
-                                    else if (myGameArea.y > myGameArea.clickdownY + 4)
+                                    else if (game.y > game.clickdownY + 4)
                                         this.target.speedY += this.target.speed;
                                 }
 
@@ -137,20 +137,20 @@ var myGameArea = {
 
                 // Keep camera view inside the map
                 if (this.x < 0) this.x = 0;
-                if (this.x > maps.data[maps.currentMap].width - myGameArea.canvas.width) this.x = maps.data[maps.currentMap].width - myGameArea.canvas.width;
+                if (this.x > maps.data[maps.currentMap].width - game.canvas.width) this.x = maps.data[maps.currentMap].width - game.canvas.width;
                 if (this.y < 0) this.y = 0;
-                if (this.y > maps.data[maps.currentMap].height - myGameArea.canvas.height) this.y = maps.data[maps.currentMap].height - myGameArea.canvas.height;
+                if (this.y > maps.data[maps.currentMap].height - game.canvas.height) this.y = maps.data[maps.currentMap].height - game.canvas.height;
 
                 // Camera (0,0) if map smaller than canvas
-                if (maps.data[maps.currentMap].width - myGameArea.canvas.width < 0) this.x = 0;
-                if (maps.data[maps.currentMap].height - myGameArea.canvas.height < 0) this.y = 0;
+                if (maps.data[maps.currentMap].width - game.canvas.width < 0) this.x = 0;
+                if (maps.data[maps.currentMap].height - game.canvas.height < 0) this.y = 0;
             }
         }
 
         // Init Camera Target
-        this.gameCamera.setTarget(components.data[0]);
+        this.camera.setTarget(components.data[0]);
         // Disable Mouse Control in Editor Mode
-        if (myGameArea.editor) myGameArea.gameCamera.disableMouse = true;
+        if (game.editor) game.camera.disableMouse = true;
 
         // Initalize Maps
         for (i = 0, l = maps.data.length; i < l; i++) {
@@ -165,12 +165,12 @@ var myGameArea = {
 
         // Draw the first or current map onto the cached canvas'
         maps.data[maps.currentMap].drawCache();
-        if (myGameArea.editor) {
+        if (game.editor) {
             // Draw Tileset
             maps.data[maps.currentMap].drawTileset();
 
             // Collision setup
-            myGameArea.tileCollisions = [false, false, false, false];
+            game.tileCollisions = [false, false, false, false];
 
             // Editor Mode Buttons
             var myGameButtons =
@@ -207,8 +207,8 @@ var myGameArea = {
                 '<button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug Off</button>' +
                 '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +
                 '<br>' +
-                '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(components.data[0])">Control Boy</button>' +
-                '<button class="w3-button w3-blue" onclick="myGameArea.gameCamera.setTarget(components.data[1])">Control Girl</button>' +
+                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(components.data[0])">Control Boy</button>' +
+                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(components.data[1])">Control Girl</button>' +
                 '</div>';
         }
 
@@ -219,7 +219,7 @@ var myGameArea = {
         // Delete Start Editor Button
         document.getElementById("startEditor").parentNode.removeChild(document.getElementById("startEditor"));
         // Insert tileset canvas after game canvas if editor mode
-        if (myGameArea.editor) this.canvas.after(this.tileset);
+        if (game.editor) this.canvas.after(this.tileset);
 
         window.requestAnimationFrame = window.requestAnimationFrame ||
             window.mozRequestAnimationFrame ||
@@ -247,7 +247,7 @@ var myGameArea = {
         // INITIALIZE USER INPUT
         // Customize context menu on right click if canvas
         window.addEventListener('contextmenu', function (e) {
-            if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
+            if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
                 console.log("Default context menu prevent");
                 e.preventDefault();
                 //toggleMenuOn();
@@ -260,184 +260,184 @@ var myGameArea = {
         })
         // Keydown
         window.addEventListener('keydown', function (e) {
-            myGameArea.keys = (myGameArea.keys || []);
-            myGameArea.keys[e.keyCode] = (e.type == "keydown");
-            if (myGameArea.printkeyCode) console.log(e.keyCode);
+            game.keys = (game.keys || []);
+            game.keys[e.keyCode] = (e.type == "keydown");
+            if (game.printkeyCode) console.log(e.keyCode);
             // Enter key
-            if (e.keyCode == 13) myGameArea.enter = true;
+            if (e.keyCode == 13) game.enter = true;
             // no scrolling on arrow keys
             if ([37, 38, 39, 40].indexOf(e.keyCode) > -1) e.preventDefault();
         })
         // Keyup
         window.addEventListener('keyup', function (e) {
-            myGameArea.keys[e.keyCode] = (e.type == "keydown");
-            if (e.keyCode == 13) myGameArea.enter = false;
+            game.keys[e.keyCode] = (e.type == "keydown");
+            if (e.keyCode == 13) game.enter = false;
         })
-        if (myGameArea.editor) {
+        if (game.editor) {
             // Mouse down
             window.addEventListener('mousedown', function (e) {
-                myGameArea.mousedown = true;
-                if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
-                    myGameArea.clickdownX = Math.floor(e.clientX - myGameArea.canvas.getBoundingClientRect().x);
-                    myGameArea.clickdownY = Math.floor(e.clientY - myGameArea.canvas.getBoundingClientRect().y);
+                game.mousedown = true;
+                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                    game.clickdownX = Math.floor(e.clientX - game.canvas.getBoundingClientRect().x);
+                    game.clickdownY = Math.floor(e.clientY - game.canvas.getBoundingClientRect().y);
                     e.preventDefault();
-                    maps.data[maps.currentMap].clickedTile(myGameArea.clickdownX, myGameArea.clickdownY);
-                } else if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.tileset)) {
-                    myGameArea.clickdownX = Math.floor(e.clientX - myGameArea.tileset.getBoundingClientRect().x);
-                    myGameArea.clickdownY = Math.floor(e.clientY - myGameArea.tileset.getBoundingClientRect().y);
+                    maps.data[maps.currentMap].clickedTile(game.clickdownX, game.clickdownY);
+                } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
+                    game.clickdownX = Math.floor(e.clientX - game.tileset.getBoundingClientRect().x);
+                    game.clickdownY = Math.floor(e.clientY - game.tileset.getBoundingClientRect().y);
                     e.preventDefault();
-                    maps.data[maps.currentMap].clickedTile(myGameArea.clickdownX, myGameArea.clickdownY);
+                    maps.data[maps.currentMap].clickedTile(game.clickdownX, game.clickdownY);
                 } else {
-                    myGameArea.clickdownX = undefined;
-                    myGameArea.clickdownY = undefined;
+                    game.clickdownX = undefined;
+                    game.clickdownY = undefined;
                 }
             })
             // Mouse up
             window.addEventListener('mouseup', function (e) {
-                myGameArea.mousedown = false;
+                game.mousedown = false;
 
-                if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
-                    myGameArea.clickupX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
-                    myGameArea.clickupY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
-                } else if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.tileset)) {
-                    myGameArea.clickupX = e.clientX - myGameArea.tileset.getBoundingClientRect().x;
-                    myGameArea.clickupY = e.clientY - myGameArea.tileset.getBoundingClientRect().y;
+                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                    game.clickupX = e.clientX - game.canvas.getBoundingClientRect().x;
+                    game.clickupY = e.clientY - game.canvas.getBoundingClientRect().y;
+                } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
+                    game.clickupX = e.clientX - game.tileset.getBoundingClientRect().x;
+                    game.clickupY = e.clientY - game.tileset.getBoundingClientRect().y;
                 } else {
-                    myGameArea.activeCanvas = undefined;
-                    myGameArea.clickupX = undefined;
-                    myGameArea.clickupY = undefined;
+                    game.activeCanvas = undefined;
+                    game.clickupX = undefined;
+                    game.clickupY = undefined;
                 }
             })
             // Mouse move
             window.addEventListener('mousemove', function (e) {
-                if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
-                    myGameArea.activeCanvas = 0;
+                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                    game.activeCanvas = 0;
                     document.getElementById("activeCanvas").innerHTML = "Game";
-                    myGameArea.x = Math.floor(e.clientX - myGameArea.canvas.getBoundingClientRect().x);
-                    myGameArea.y = Math.floor(e.clientY - myGameArea.canvas.getBoundingClientRect().y);
-                    document.getElementById("canvasXY").innerHTML = "[" + myGameArea.x + " | " + myGameArea.y + "]";
-                } else if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.tileset)) {
-                    myGameArea.activeCanvas = 1;
+                    game.x = Math.floor(e.clientX - game.canvas.getBoundingClientRect().x);
+                    game.y = Math.floor(e.clientY - game.canvas.getBoundingClientRect().y);
+                    document.getElementById("canvasXY").innerHTML = "[" + game.x + " | " + game.y + "]";
+                } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
+                    game.activeCanvas = 1;
                     document.getElementById("activeCanvas").innerHTML = "Tileset";
-                    myGameArea.x = Math.floor(e.clientX - myGameArea.tileset.getBoundingClientRect().x);
-                    myGameArea.y = Math.floor(e.clientY - myGameArea.tileset.getBoundingClientRect().y);
-                    document.getElementById("canvasXY").innerHTML = "[" + myGameArea.x + " | " + myGameArea.y + "]";
+                    game.x = Math.floor(e.clientX - game.tileset.getBoundingClientRect().x);
+                    game.y = Math.floor(e.clientY - game.tileset.getBoundingClientRect().y);
+                    document.getElementById("canvasXY").innerHTML = "[" + game.x + " | " + game.y + "]";
                 } else {
-                    myGameArea.activeCanvas = undefined;
+                    game.activeCanvas = undefined;
                     document.getElementById("activeCanvas").innerHTML = "Off Canvas";
                     document.getElementById("canvasXY").innerHTML = "[" + e.clientX + " | " + e.clientY + "]";
-                    myGameArea.x = undefined;
-                    myGameArea.y = undefined;
+                    game.x = undefined;
+                    game.y = undefined;
                 }
             })
             // Touch start
             window.addEventListener('touchstart', function (e) {
-                myGameArea.touchdown = true;
+                game.touchdown = true;
 
-                if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
-                    myGameArea.clickdownX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
-                    myGameArea.clickdownY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
+                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                    game.clickdownX = e.clientX - game.canvas.getBoundingClientRect().x;
+                    game.clickdownY = e.clientY - game.canvas.getBoundingClientRect().y;
                     e.preventDefault();
-                } else if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.tileset)) {
-                    myGameArea.clickdownX = e.clientX - myGameArea.tileset.getBoundingClientRect().x;
-                    myGameArea.clickdownY = e.clientY - myGameArea.tileset.getBoundingClientRect().y;
+                } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
+                    game.clickdownX = e.clientX - game.tileset.getBoundingClientRect().x;
+                    game.clickdownY = e.clientY - game.tileset.getBoundingClientRect().y;
                     e.preventDefault();
                 } else {
                     activeCanvas = undefined;
-                    myGameArea.clickdownX = undefined;
-                    myGameArea.clickdownY = undefined;
+                    game.clickdownX = undefined;
+                    game.clickdownY = undefined;
                 }
             })
             // Touch end
             window.addEventListener('touchend', function (e) {
-                myGameArea.touchdown = false;
-                if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
-                    myGameArea.clickupX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
-                    myGameArea.clickupY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
-                } else if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.tileset)) {
-                    myGameArea.clickupX = e.clientX - myGameArea.tileset.getBoundingClientRect().x;
-                    myGameArea.clickupY = e.clientY - myGameArea.tileset.getBoundingClientRect().y;
+                game.touchdown = false;
+                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                    game.clickupX = e.clientX - game.canvas.getBoundingClientRect().x;
+                    game.clickupY = e.clientY - game.canvas.getBoundingClientRect().y;
+                } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
+                    game.clickupX = e.clientX - game.tileset.getBoundingClientRect().x;
+                    game.clickupY = e.clientY - game.tileset.getBoundingClientRect().y;
                 } else {
                     activeCanvas = undefined;
-                    myGameArea.clickdownX = undefined;
-                    myGameArea.clickdownY = undefined;
+                    game.clickdownX = undefined;
+                    game.clickdownY = undefined;
                 }
             })
             // Touch move
             window.addEventListener('touchmove', function (e) {
-                if (myGameArea.onCanvas(e.touches[0].clientX, e.touches[0].clientY, myGameArea.canvas)) {
+                if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.canvas)) {
                     activeCanvas = 0;
-                    myGameArea.x1 = Math.floor(e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().x);
-                    myGameArea.y1 = Math.floor(e.touches[0].clientY - myGameArea.tileset.getBoundingClientRect().y);
+                    game.x1 = Math.floor(e.touches[0].clientX - game.canvas.getBoundingClientRect().x);
+                    game.y1 = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
                     e.preventDefault();
                 } else {
-                    myGameArea.x1 = undefined;
-                    myGameArea.y1 = undefined;
+                    game.x1 = undefined;
+                    game.y1 = undefined;
                 }
-                if (myGameArea.onCanvas(e.touches[0].clientX, e.touches[0].clientY, myGameArea.tileset)) {
+                if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.tileset)) {
                     activeCanvas = 1;
-                    myGameArea.x2 = Math.floor(e.touches[0].clientX - myGameArea.tileset.getBoundingClientRect().x);
-                    myGameArea.y2 = Math.floor(e.touches[0].clientY - myGameArea.tileset.getBoundingClientRect().y);
+                    game.x2 = Math.floor(e.touches[0].clientX - game.tileset.getBoundingClientRect().x);
+                    game.y2 = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
                     e.preventDefault();
                 } else {
-                    myGameArea.x2 = undefined;
-                    myGameArea.y2 = undefined;
+                    game.x2 = undefined;
+                    game.y2 = undefined;
                 }
             })
         } else {
             // Mouse down
             window.addEventListener('mousedown', function (e) {
-                myGameArea.mousedown = true;
-                if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
-                    myGameArea.clickdownX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
-                    myGameArea.clickdownY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
+                game.mousedown = true;
+                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                    game.clickdownX = e.clientX - game.canvas.getBoundingClientRect().x;
+                    game.clickdownY = e.clientY - game.canvas.getBoundingClientRect().y;
                     e.preventDefault();
                 }
             })
             // Mouse up
             window.addEventListener('mouseup', function (e) {
-                myGameArea.mousedown = false;
-                if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
-                    myGameArea.clickupX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
-                    myGameArea.clickupY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
+                game.mousedown = false;
+                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                    game.clickupX = e.clientX - game.canvas.getBoundingClientRect().x;
+                    game.clickupY = e.clientY - game.canvas.getBoundingClientRect().y;
                 }
             })
             // Mouse move
             window.addEventListener('mousemove', function (e) {
-                if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
-                    myGameArea.x = Math.floor(e.clientX - myGameArea.canvas.getBoundingClientRect().x);
-                    myGameArea.y = Math.floor(e.clientY - myGameArea.canvas.getBoundingClientRect().y);
+                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                    game.x = Math.floor(e.clientX - game.canvas.getBoundingClientRect().x);
+                    game.y = Math.floor(e.clientY - game.canvas.getBoundingClientRect().y);
                 } else {
-                    myGameArea.x = undefined;
-                    myGameArea.y = undefined;
+                    game.x = undefined;
+                    game.y = undefined;
                 }
             })
             // Touch start
             window.addEventListener('touchstart', function (e) {
-                myGameArea.touchdown = true;
-                if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
-                    myGameArea.clickdownX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
-                    myGameArea.clickdownY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
+                game.touchdown = true;
+                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                    game.clickdownX = e.clientX - game.canvas.getBoundingClientRect().x;
+                    game.clickdownY = e.clientY - game.canvas.getBoundingClientRect().y;
                     e.preventDefault();
                 }
             })
             // Touch end
             window.addEventListener('touchend', function (e) {
-                myGameArea.touchdown = false;
-                if (myGameArea.onCanvas(e.clientX, e.clientY, myGameArea.canvas)) {
-                    myGameArea.clickupX = e.clientX - myGameArea.canvas.getBoundingClientRect().x;
-                    myGameArea.clickupY = e.clientY - myGameArea.canvas.getBoundingClientRect().y;
+                game.touchdown = false;
+                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                    game.clickupX = e.clientX - game.canvas.getBoundingClientRect().x;
+                    game.clickupY = e.clientY - game.canvas.getBoundingClientRect().y;
                 }
             })
             // Touch move
             window.addEventListener('touchmove', function (e) {
-                if (myGameArea.onCanvas(e.touches[0].clientX, e.touches[0].clientY, myGameArea.canvas)) {
-                    myGameArea.x = Math.floor(e.touches[0].clientX - myGameArea.canvas.getBoundingClientRect().x);
-                    myGameArea.y = Math.floor(e.touches[0].clientY - myGameArea.tileset.getBoundingClientRect().y);
+                if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.canvas)) {
+                    game.x = Math.floor(e.touches[0].clientX - game.canvas.getBoundingClientRect().x);
+                    game.y = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
                     e.preventDefault();
                 } else {
-                    myGameArea.x = undefined;
-                    myGameArea.y = undefined;
+                    game.x = undefined;
+                    game.y = undefined;
                 }
             })
         }
@@ -468,12 +468,12 @@ var myGameArea = {
  * TODO: Clean up - structure; for-loop length as var in the loop BUT care it must not change will the loop runs EVENTS that change map / delete objects
  */
 function update() {
-    // While myGameArea.gameSequence == true all components will stop moving (i.e. used for menus, dialogs,...)
-    if (!myGameArea.gameSequence) {
+    // While game.gameSequence == true all components will stop moving (i.e. used for menus, dialogs,...)
+    if (!game.gameSequence) {
         // For components that can start an interacted
         for (var i = 0; i < maps.data[maps.currentMap].components.length; i++)
             // The controlled component can acted with other component
-            if (components.data[maps.data[maps.currentMap].components[i]] == myGameArea.gameCamera.target)
+            if (components.data[maps.data[maps.currentMap].components[i]] == game.camera.target)
                 for (var j = 0; j < maps.data[maps.currentMap].components.length; j++) {
                     var c1 = components.data[maps.data[maps.currentMap].components[i]];
                     var c2 = components.data[maps.data[maps.currentMap].components[j]];
@@ -481,7 +481,7 @@ function update() {
                 }
 
         // Update the movement of all components on the current map (this also resolves tileCollision)
-        if (!myGameArea.transition)
+        if (!game.transition)
             for (var i = 0; i < maps.data[maps.currentMap].components.length; i++)
                 components.data[maps.data[maps.currentMap].components[i]].updateMovement();
 
@@ -508,11 +508,11 @@ function update() {
  */
 function draw() {
     // Draw map transition
-    if (myGameArea.transition) blackTransition();
+    if (game.transition) blackTransition();
     // Draw map
     else {
         // Clear the canvas
-        myGameArea.context.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
+        game.context.clearRect(0, 0, game.canvas.width, game.canvas.height);
         // Draw Background
         maps.data[maps.currentMap].drawBackground();
         // Sorts the array after it's y value so that components with bigger y are drawn later
@@ -520,17 +520,17 @@ function draw() {
             return (components.data[a].y > components.data[b].y) ? 1 : ((components.data[b].y > components.data[a].y) ? -1 : 0);
         });
         // Draw Objects of the current map
-        for (var i = 0, l = maps.data[maps.currentMap].components.length; i < l; i++) components.data[maps.data[maps.currentMap].components[i]].draw(myGameArea.context);
+        for (var i = 0, l = maps.data[maps.currentMap].components.length; i < l; i++) components.data[maps.data[maps.currentMap].components[i]].draw(game.context);
         // Draw Foreground
         maps.data[maps.currentMap].drawForeground();
     }
     // Draw extras
-    if (myGameArea.showExtra) {
+    if (game.showExtra) {
         extraGuiRect();
         showTime();
         updateFPS();
         showFPS();
-        if (myGameArea.gameCamera.target != undefined) showPosition(myGameArea.gameCamera.target);
+        if (game.camera.target != undefined) showPosition(game.camera.target);
     }
 }
 
@@ -539,20 +539,20 @@ function draw() {
  * This is the core function of the game
  */
 function updateGameArea() {
-    myGameArea.frameNo += 1;
+    game.frameNo += 1;
 
     // Redraw caches' on map change + map switch transition
     if (maps.currentMap != maps.nextMap) {
         maps.currentMap = maps.nextMap;
         maps.data[maps.currentMap].drawCache();
-        if (myGameArea.editor != undefined) maps.data[maps.currentMap].drawTileset();
+        if (game.editor != undefined) maps.data[maps.currentMap].drawTileset();
         setTimeout(function () {
-            myGameArea.transition = false;
+            game.transition = false;
         }, 400);
     }
 
     // Update camera
-    myGameArea.gameCamera.update();
+    game.camera.update();
     // Update game
     update();
     // Draw game
@@ -560,9 +560,9 @@ function updateGameArea() {
 
     // Draw dialog
     if (dialogs.currentDialog != undefined) {
-        myGameArea.gameSequence = true;
+        game.gameSequence = true;
         dialogs.currentDialog.update();
-    } else myGameArea.gameSequence = false;
+    } else game.gameSequence = false;
 
     // Simple hardcoded sound player for jukebox
     myHarp.play(Math.round(Math.random()));

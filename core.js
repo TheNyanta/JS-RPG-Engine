@@ -5,16 +5,42 @@
 var events = {
     data: [], // Contains all events
     variables: [], // Contains all the variables
+    freeIDs: [] // FreeIDs
 };
 
 /**
  * For adding a new event
- * @param {function}
+ * @param {function} event
  */
 function addEvent(fnc) {
+    // Add
     events.data.push(fnc);
+    // ID management
+    if (events.freeIDs.length > 0) events.data[events.data.length - 1].id = events.freeIDs[0].pop();
+    else events.data[events.data.length - 1].id = events.data.length - 1;
+}
+
+/**
+ * Remove an event
+ */
+function removeEvent(id) {
+    for (var i = 0, l = events.data.length; i < l; i++)
+        if (events.data[i].id == id) {
+            // Remove if ID found
+            events.data.splice(id, 1);
+            // ID Management
+            events.freeIDs.push(id);
+            break;
+        }
+}
+
+/**
+ * Generate the data for the events
+ */
+function generateEventData() {
     // Datastring
-    myGameArea.data += "addEvent(" + fnc + ");\n";
+    for (var i = 0, l = events.data.length; i < l; i++)
+        game.data += "addEvent(" + events.data[i] + ");\n";
 }
 
 // SPRITESHEETS ----------------------------------------------------------------
@@ -23,19 +49,58 @@ function addEvent(fnc) {
  * Contains all the spritesheets of the game
  */
 var spritesheets = {
-    data: [] // Contains the spritesheets
+    data: [], // Contains the spritesheets
+    freeIDs: [] // Free IDs
 };
 
 /**
  * For adding a new spritesheet
  */
 function addSprite(src, spritesX, spritesY, spriteWidth, spriteHeight, name) {
+    // Add
     spritesheets.data.push(new Spritesheet(src, spritesX, spritesY, spriteWidth, spriteHeight, name));
-    spritesheets.data[spritesheets.data.length - 1].id = spritesheets.data.length - 1;
-    // Datastring
-    myGameArea.data += "addSprite('" + src + "', " + spritesX + ", " + spritesY + ", " + spriteWidth + ", " + spriteHeight + ", " + name + ");\n";
+    // ID management
+    if (spritesheets.freeIDs.length > 0) spritesheets.data[spritesheets.data.length - 1].id = spritesheets.freeIDs[0].pop();
+    else spritesheets.data[spritesheets.data.length - 1].id = spritesheets.data.length - 1;
 }
 
+/**
+ * Remove a spritesheet
+ */
+function removeSprite(id) {
+    for (var i = 0, l = spritesheets.data.length; i < l; i++)
+        if (spritesheets.data[i].id == id) {
+            // Remove if ID found
+            spritesheets.data.splice(id, 1);
+            // ID Management
+            spritesheets.freeIDs.push(id);
+            break;
+        }
+}
+
+/**
+ * Generate the data for the spritesheets
+ */
+function generateSpriteData() {
+    // Datastring
+    for (var i = 0, l = spritesheets.data.length; i < l; i++)
+        game.data += "addSprite('" + spritesheets.data[i].img.src + "', " + +spritesheets.data[i].spritesX + ", " + +spritesheets.data[i].spritesY + ", " + +spritesheets.data[i].spriteWidth + ", " + +spritesheets.data[i].spriteHeight + ");\n";
+}
+
+/**
+ * Spritesheet for map-tiles and objects
+ */
+function Spritesheet(src, spritesX, spritesY, spriteWidth, spriteHeight) {
+    this.img = new Image();
+    this.img.src = src;
+    this.width = spritesX * spriteWidth;
+    this.height = spritesY * spriteHeight;
+    this.spritesX = spritesX;
+    this.spritesY = spritesY;
+    this.spriteWidth = spriteWidth;
+    this.spriteHeight = spriteHeight;
+    this.name = src.match(/[\w]+\.[A-Za-z]{3}$/)[0];
+}
 
 /**
  * Draw a specific sprite of a spritesheet
@@ -50,22 +115,6 @@ function drawSprite(ctx, spritesheet, number, x, y) {
     ctx.drawImage(spritesheet.img, res[0] * spritesheet.spriteWidth, res[1] * spritesheet.spriteHeight, spritesheet.spriteWidth, spritesheet.spriteHeight, x, y, spritesheet.spriteWidth, spritesheet.spriteHeight);
 }
 
-/**
- * Spritesheet for map-tiles and objects
- */
-function Spritesheet(src, spritesX, spritesY, spriteWidth, spriteHeight, name) {
-    this.img = new Image();
-    this.img.src = src;
-    this.width = spritesX * spriteWidth;
-    this.height = spritesY * spriteHeight;
-    this.spritesX = spritesX;
-    this.spritesY = spritesY;
-    this.spriteWidth = spriteWidth;
-    this.spriteHeight = spriteHeight;
-    if (name != undefined) this.name = name;
-    else this.name = src.match(/[\w]+\.[A-Za-z]{3}$/)[0];
-}
-
 // MAPS ----------------------------------------------------------------------
 
 /**
@@ -75,6 +124,7 @@ var maps = {
     data: [], // Contains the maps
     currentMap: 0, // The map which is currently used
     nextMap: 0, // The map that will be switched to in the next iteration
+    freeIDs: [] // Free IDs
 };
 
 /**
@@ -83,16 +133,37 @@ var maps = {
  * @param id of the spritesheet
  * @param the maps number of tiles in x direction
  * @param the maps number of tiles in y direction
- * @param give the map a name
  */
 function addMap(image, spritesheetId, mapWidth, mapHeight) {
-    maps.data.push(new Map(image, spritesheets.data[spritesheetId], mapWidth, mapHeight, name));
-    maps.data[maps.data.length - 1].id = maps.data.length - 1;
+    // Add
+    maps.data.push(new Map(image, spritesheets.data[spritesheetId], mapWidth, mapHeight));
+    // ID management
+    if (maps.freeIDs.length > 0) maps.data[maps.data.length - 1].id = maps.freeIDs[0].pop();
+    else maps.data[maps.data.length - 1].id = maps.data.length - 1;
+}
+
+/**
+ * Remove a map
+ */
+function removeMap(id) {
+    for (var i = 0, l = maps.data.length; i < l; i++)
+        if (maps.data[i].id == id) {
+            // Remove if ID found
+            maps.data.splice(id, 1);
+            // ID Management
+            maps.freeIDs.push(id);
+            break;
+        }
+}
+
+/**
+ * Generate the data for the maps
+ * TODO: INCLUDE LAYER DATA and for this add a TILE EVENTS LAYER
+ */
+function generateMapData() {
     // Datastring
-    if (image != undefined)
-        myGameArea.data += "addMap('" + image + "', spritesheets.data[" + spritesheetId + "], " + mapWidth + ", " + mapHeight + ");\n";
-    else
-        myGameArea.data += "addMap(" + image + ", spritesheets.data[" + spritesheetId + "], " + mapWidth + ", " + mapHeight + ");\n";
+    for (var i = 0, l = maps.data.length; i < l; i++)
+        game.data += "addMap(" + maps.data[i].image.src + ", " + maps.data[i].spritesheetID + ", " + maps.data[i].mapWidth + ", " + maps.data[i].mapHeight + ");\n";
 }
 
 /**
@@ -127,24 +198,24 @@ function Tile(spritesheet, x, y) {
         if (this.layer2 - 1 >= 0) drawSprite(ctx1, this.spritesheet, this.layer2 - 1, this.x, this.y);
         if (this.layer3 - 1 >= 0) drawSprite(ctx2, this.spritesheet, this.layer3 - 1, this.x, this.y);
         // Debug information
-        if (myGameArea.debug) {
+        if (game.debug) {
             // Show collision layer: TODO: Visualize direction restrictions
-            myGameArea.cgx3.globalAlpha = 0.3;
-            if (this.collision === 0) myGameArea.cgx3.fillStyle = "blue";
-            else if (this.collision === 1) myGameArea.cgx3.fillStyle = "red";
+            game.cgx3.globalAlpha = 0.3;
+            if (this.collision === 0) game.cgx3.fillStyle = "blue";
+            else if (this.collision === 1) game.cgx3.fillStyle = "red";
             else {
-                if (this.collision[0] == 0) myGameArea.cgx3.fillStyle = "purple";
-                if (this.collision[0] == 1) myGameArea.cgx3.fillStyle = "cyan";
-                if (this.collision[0] == 2) myGameArea.cgx3.fillStyle = "yellow";
-                if (this.collision[0] == 3) myGameArea.cgx3.fillStyle = "black";
+                if (this.collision[0] == 0) game.cgx3.fillStyle = "purple";
+                if (this.collision[0] == 1) game.cgx3.fillStyle = "cyan";
+                if (this.collision[0] == 2) game.cgx3.fillStyle = "yellow";
+                if (this.collision[0] == 3) game.cgx3.fillStyle = "black";
             }
-            myGameArea.cgx3.fillRect(this.x, this.y, this.width, this.height);
-            myGameArea.cgx3.globalAlpha = 1.0;
+            game.cgx3.fillRect(this.x, this.y, this.width, this.height);
+            game.cgx3.globalAlpha = 1.0;
             // Show event
             if (this.stepOnEventID != undefined || this.interactEventID != undefined) {
-                myGameArea.cgx3.font = "bold 8px Serif";
-                myGameArea.cgx3.fillStyle = "black";
-                myGameArea.cgx3.fillText("E", this.x + 1, this.y + 7);
+                game.cgx3.font = "bold 8px Serif";
+                game.cgx3.fillStyle = "black";
+                game.cgx3.fillText("E", this.x + 1, this.y + 7);
             }
         }
     }
@@ -230,25 +301,25 @@ function Map(image, tileset, mapWidth, mapHeight) {
      */
     this.drawCache = function () {
         // Adjust the cache canvas' size
-        myGameArea.panorama.width = myGameArea.canvas.width;
-        myGameArea.panorama.height = myGameArea.canvas.height;
+        game.panorama.width = game.canvas.width;
+        game.panorama.height = game.canvas.height;
 
-        myGameArea.background.width = this.width;
-        myGameArea.background.height = this.height;
+        game.background.width = this.width;
+        game.background.height = this.height;
 
-        myGameArea.foreground.width = this.width;
-        myGameArea.foreground.height = this.height;
+        game.foreground.width = this.width;
+        game.foreground.height = this.height;
 
         // Clear the canvas' ...
-        myGameArea.context.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
-        myGameArea.cgx1.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
-        myGameArea.cgx2.clearRect(0, 0, myGameArea.background.width, myGameArea.background.height);
-        myGameArea.cgx3.clearRect(0, 0, myGameArea.foreground.width, myGameArea.foreground.height);
+        game.context.clearRect(0, 0, game.canvas.width, game.canvas.height);
+        game.cgx1.clearRect(0, 0, game.canvas.width, game.canvas.height);
+        game.cgx2.clearRect(0, 0, game.background.width, game.background.height);
+        game.cgx3.clearRect(0, 0, game.foreground.width, game.foreground.height);
 
         // ...  and repaint!
-        if (this.image != undefined) myGameArea.cgx1.drawImage(this.image, this.x, this.y, myGameArea.panorama.width, myGameArea.panorama.height);
+        if (this.image != undefined) game.cgx1.drawImage(this.image, this.x, this.y, game.panorama.width, game.panorama.height);
 
-        for (var i = 0, l = this.mapWidth * this.mapHeight; i < l; i++) this.tiles[i].draw(myGameArea.cgx2, myGameArea.cgx3);
+        for (var i = 0, l = this.mapWidth * this.mapHeight; i < l; i++) this.tiles[i].draw(game.cgx2, game.cgx3);
     }
 
     // ####################################
@@ -261,17 +332,17 @@ function Map(image, tileset, mapWidth, mapHeight) {
      * Draws the Panorama & the background of the map
      */
     this.drawBackground = function () {
-        ctx = myGameArea.context;
-        ctx.drawImage(myGameArea.panorama, 0, 0);
-        ctx.drawImage(myGameArea.background, -myGameArea.gameCamera.x, -myGameArea.gameCamera.y);
+        ctx = game.context;
+        ctx.drawImage(game.panorama, 0, 0);
+        ctx.drawImage(game.background, -game.camera.x, -game.camera.y);
     }
 
     /**
      * Draws the foreground of the map
      */
     this.drawForeground = function () {
-        ctx = myGameArea.context;
-        ctx.drawImage(myGameArea.foreground, -myGameArea.gameCamera.x, -myGameArea.gameCamera.y);
+        ctx = game.context;
+        ctx.drawImage(game.foreground, -game.camera.x, -game.camera.y);
     }
 
     // ################
@@ -290,27 +361,27 @@ function Map(image, tileset, mapWidth, mapHeight) {
      */
     this.clickedTile = function (param_x, param_y) {
         // Click on Map
-        if (myGameArea.activeCanvas == 0) {
-            var x = Math.floor((param_x + myGameArea.gameCamera.x) / this.tileset.spriteWidth);
-            var y = Math.floor((param_y + myGameArea.gameCamera.y) / this.tileset.spriteHeight);
+        if (game.activeCanvas == 0) {
+            var x = Math.floor((param_x + game.camera.x) / this.tileset.spriteWidth);
+            var y = Math.floor((param_y + game.camera.y) / this.tileset.spriteHeight);
             var d = maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)];
             // Clicked Tile console.log(xy2i(x, y, this.mapWidth));
-            if (myGameArea.drawingOn) {
-                if (myGameArea.currentLayer == 0) d.layer1 = myGameArea.tiletype;
-                if (myGameArea.currentLayer == 1) d.layer2 = myGameArea.tiletype;
-                if (myGameArea.currentLayer == 2) d.layer3 = myGameArea.tiletype;
-                if (myGameArea.currentLayer == 3) d.collision = myGameArea.tileCollisionType;
+            if (game.drawingOn) {
+                if (game.currentLayer == 0) d.layer1 = game.tiletype;
+                if (game.currentLayer == 1) d.layer2 = game.tiletype;
+                if (game.currentLayer == 2) d.layer3 = game.tiletype;
+                if (game.currentLayer == 3) d.collision = game.tileCollisionType;
 
                 maps.data[maps.currentMap].drawCache();
             }
             document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
         }
         // Click on Tileset
-        if (myGameArea.activeCanvas == 1) {
+        if (game.activeCanvas == 1) {
             var x = Math.floor(param_x / this.tileset.spriteWidth);
             var y = Math.floor(param_y / this.tileset.spriteHeight);
-            myGameArea.tiletype = xy2i(x, y, this.tileset.spritesX) + 1;
-            document.getElementById("selectedTile").innerHTML = myGameArea.tiletype;
+            game.tiletype = xy2i(x, y, this.tileset.spritesX) + 1;
+            document.getElementById("selectedTile").innerHTML = game.tiletype;
             document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
             this.drawTileset();
         }
@@ -320,9 +391,9 @@ function Map(image, tileset, mapWidth, mapHeight) {
      * Draw the tileset on the tileset canvas
      */
     this.drawTileset = function () {
-        myGameArea.tileset.width = this.tileset.spriteWidth * this.tileset.spritesX;
-        myGameArea.tileset.height = this.tileset.spriteHeight * this.tileset.spritesY;
-        myGameArea.tilecontext.clearRect(0, 0, this.tileset.spriteWidth * this.tileset.spritesX, this.tileset.spriteHeight * this.tileset.spritesY);
+        game.tileset.width = this.tileset.spriteWidth * this.tileset.spritesX;
+        game.tileset.height = this.tileset.spriteHeight * this.tileset.spritesY;
+        game.tilecontext.clearRect(0, 0, this.tileset.spriteWidth * this.tileset.spritesX, this.tileset.spriteHeight * this.tileset.spritesY);
 
         var mapIndex = 0;
         var tile_w, tile_h;
@@ -331,17 +402,17 @@ function Map(image, tileset, mapWidth, mapHeight) {
                 tile_w = w * this.tileset.spriteWidth;
                 tile_h = h * this.tileset.spriteHeight;
                 //(ctx, spritesheet, number, x, y)
-                drawSprite(myGameArea.tilecontext, this.tileset, mapIndex, tile_w, tile_h);
+                drawSprite(game.tilecontext, this.tileset, mapIndex, tile_w, tile_h);
 
                 // Show Tileset Grid
                 if (false) {
-                    myGameArea.tilecontext.strokeStyle = "black";
-                    myGameArea.tilecontext.strokeRect(tile_w, tile_h, 8, 8);
+                    game.tilecontext.strokeStyle = "black";
+                    game.tilecontext.strokeRect(tile_w, tile_h, 8, 8);
                 }
 
-                if (myGameArea.tiletype - 1 == mapIndex) {
-                    myGameArea.tilecontext.strokeStyle = "red";
-                    myGameArea.tilecontext.strokeRect(tile_w, tile_h, 8, 8);
+                if (game.tiletype - 1 == mapIndex) {
+                    game.tilecontext.strokeStyle = "red";
+                    game.tilecontext.strokeRect(tile_w, tile_h, 8, 8);
                 }
             }
         }
@@ -395,56 +466,19 @@ function Map(image, tileset, mapWidth, mapHeight) {
     }
 }
 
-function loadImage(img) {
-    var tmp;
-    for (var i = 0, l = spritesheets.data.length; i < l; i++) {
-        if (spritesheets.data[i].img.src.match(/[\w]+\.[A-Za-z]{3}$/)[0] == img.match(/[\w]+\.[A-Za-z]{3}$/)[0]) {
-            console.log("spritesheet already exists: taking existing one");
-            tmp = spritesheets.data[i];
-        }
-    }
-    if (tmp == undefined) {
-        console.log("created new spritesheet")
-        addSprite(img, 60, 32, 8, 8);
-        tmp = spritesheets.data[spritesheets.data.length - 1];
-    }
-    //maps.data[maps.currentMap].image.src = img; //maps background image
-    maps.data[maps.currentMap].tileset = tmp;
-    maps.data[maps.currentMap].switchTileset();
-
-    setTimeout(function () {
-        maps.data[maps.currentMap].drawCache();
-        maps.data[maps.currentMap].drawTileset();
-    }, 100);
-}
-
 // COMPONENTS ----------------------------------------------------------------
 
 /**
  * Contains all components of the game
  */
 var components = {
-    data: [] // Contains the components
+    data: [], // Contains the components
+    freeIDs: [] // Free IDs
 }
 
 /**
  * For adding a new component
- */
-function addComponent(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID, mapID) {
-    if (interactEventID != undefined)
-        components.data.push(new Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID));
-    else components.data.push(new Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight));
-    components.data[components.data.length - 1].id = components.data.length - 1;
-    // Datastring
-    myGameArea.data += "addComponent(" + spritesheetID + ", " + x + ", " + y + ", " + offsetX + ", " + offsetY + ", " + offsetWidth + ", " + offsetHeight;
-    if (interactEventID != undefined) myGameArea.data += ", " + interactEventID + ");\n";
-    else myGameArea.data += ");\n";
-    // Add ID to map
-    maps.data[mapID].components.push(components.data.length - 1);
-}
-
-/**
- * Component constructor
+ * @param name
  * @param spritesheetID
  * @param x-position
  * @param y-position
@@ -453,10 +487,61 @@ function addComponent(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offset
  * @param offsetWidth
  * @param offsetHeight
  * @param interactEventID
+ * @param movementEventID
  */
-function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID) {
+function addComponent(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID, movementEventID, mapID) {
+    // Add
+    components.data.push(new Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID, movementEventID));
+    // ID management
+    if (components.freeIDs.length > 0) components.data[components.data.length - 1].id = components.freeIDs[0].pop();
+    else components.data[components.data.length - 1].id = components.data.length - 1;
+    // Add ID to map
+    maps.data[mapID].components.push(components.data.length - 1);
+}
 
+/**
+ * Remove a component
+ */
+function removeComponent(id) {
+    for (var i = 0, l = components.data.length; i < l; i++)
+        if (components.data[i].id == id) {
+            // Remove if ID found
+            components.data.splice(id, 1);
+            // ID Management
+            components.freeIDs.push(id);
+            break;
+        }
+    // TODO: Run over maps and remove its id
+    // Also check if there are any references elsewhere (i.e. events) hm...
+}
+
+/**
+ * Generate the data for the components
+ */
+function generateComponentData() {
+    // Datastring
+    for (var i = 0, l = components.data.length; i < l; i++)
+        game.data += "addComponent(" + components.data[i].name + ", " + components.data[i].spritesheetID + ", " + components.data[i].x + ", " + components.data[i].y + ", " + components.data[i].offsetX + ", " + components.data[i].offsetY + ", " + components.data[i].offsetWidth + ", " + components.data[i].offsetHeight + ", " + components.data[i].interactEventID + ", " + components.data[i].movementEventID + ");\n";
+}
+
+/**
+ * Component constructor
+ * @param name
+ * @param spritesheetID
+ * @param x-position
+ * @param y-position
+ * @param offsetX
+ * @param offsetY
+ * @param offsetWidth
+ * @param offsetHeight
+ * @param interactEventID
+ * @param movementEventID
+ */
+function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID, movementEventID) {
+
+    this.name = name;
     this.spritesheetID = spritesheetID;
+
     this.x = x;
     this.y = y;
     this.width = spritesheets.data[this.spritesheetID].spriteWidth;
@@ -486,16 +571,17 @@ function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHei
 
     // Event Properties
     if (interactEventID != undefined) this.interactEventID = interactEventID;
+    if (movementEventID != undefined) this.movementEventID = movementEventID;
 
     this.draw = function (ctx) {
         // Sets animations (based on moving and direction)        
         this.updateAnimation();
 
         // Debug information
-        if (myGameArea.debug) {
+        if (game.debug) {
             // Draw Collision Box
             ctx.strokeStyle = "black";
-            ctx.strokeRect(this.x + this.offsetX - myGameArea.gameCamera.x, this.y + this.offsetY - myGameArea.gameCamera.y, this.offsetWidth, this.offsetHeight);
+            ctx.strokeRect(this.x + this.offsetX - game.camera.x, this.y + this.offsetY - game.camera.y, this.offsetWidth, this.offsetHeight);
         }
 
         // Animation: Moving / Idle
@@ -505,10 +591,10 @@ function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHei
                 this.animationIndexCounter++;
                 if (this.animationIndexCounter >= this.sequence.length) this.animationIndexCounter = 0;
             }
-            drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence[this.animationIndexCounter], (this.x - myGameArea.gameCamera.x), (this.y - myGameArea.gameCamera.y));
+            drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence[this.animationIndexCounter], (this.x - game.camera.x), (this.y - game.camera.y));
         }
         // No Animation: Just sprite image
-        else drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence, (this.x - myGameArea.gameCamera.x), (this.y - myGameArea.gameCamera.y));
+        else drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence, (this.x - game.camera.x), (this.y - game.camera.y));
     }
 
     this.idleAnimation = function (idleAnimationTime, idleUp, idleDown, idleLeft, idleRight) {
@@ -574,7 +660,7 @@ function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHei
             }
         }
         // Moving sequence
-        else if (this.isMoving && !myGameArea.gameSequence) {
+        else if (this.isMoving && !game.gameSequence) {
             if (this.moveAnimationTime != undefined) {
                 this.animationTime = this.moveAnimationTime;
                 if (this.direction == 4) this.sequence = this.moveUp;
@@ -642,7 +728,7 @@ function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHei
         }
 
         // Checks if the component can trigger tile events: the main character
-        if (this == myGameArea.gameCamera.target) {
+        if (this == game.camera.target) {
             // stepOnEvent
             if (d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID != undefined)
                 events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID](this.id);
@@ -801,13 +887,13 @@ function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHei
         // No self interaction
         if (this != other) {
             if (distance(this.mid(), other.mid()) <= Math.min(other.width, other.height) && this.facing(other)) {
-                if (myGameArea.enter || myGameArea.mousedown || myGameArea.touchdown) {
-                    if (myGameArea.eventReady) {
+                if (game.enter || game.mousedown || game.touchdown) {
+                    if (game.eventReady) {
                         if (other.faceOnInteraction) this.face(other);
                         if (other.interactEventID != undefined) events.data[other.interactEventID]();
-                        myGameArea.eventReady = false;
+                        game.eventReady = false;
                     }
-                } else myGameArea.eventReady = true;
+                } else game.eventReady = true;
             }
         }
     }
@@ -818,13 +904,13 @@ function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHei
      */
     this.isClicked = function () {
         // Mouse / Touchdown
-        if (myGameArea.mousedown || myGameArea.touchdown) {
-            if (myGameArea.clickdownX != undefined && myGameArea.clickdownY != undefined) {
+        if (game.mousedown || game.touchdown) {
+            if (game.clickdownX != undefined && game.clickdownY != undefined) {
                 // Not clicked (on sprite)
-                if ((this.x > myGameArea.clickdownX + myGameArea.gameCamera.x) ||
-                    (this.x + this.width < myGameArea.clickdownX + myGameArea.gameCamera.x) ||
-                    (this.y > myGameArea.clickdownY + myGameArea.gameCamera.y) ||
-                    (this.y + this.height < myGameArea.clickdownY + myGameArea.gameCamera.y)) return false;
+                if ((this.x > game.clickdownX + game.camera.x) ||
+                    (this.x + this.width < game.clickdownX + game.camera.x) ||
+                    (this.y > game.clickdownY + game.camera.y) ||
+                    (this.y + this.height < game.clickdownY + game.camera.y)) return false;
                 // Clicked
                 else return true;
             }
@@ -877,17 +963,11 @@ function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHei
 
     /**
      * Update the components movement (based on speedX/Y values)
-     * Movement can change through user control, movement events (and TODO: moveable interaction)
+     * Here the movement can change through movementEvents (and TODO: moveable interaction)
      */
     this.updateMovement = function () {
-        // If the component has a control event
-        if (this.controlEvent != undefined) this.controlEvent();
-
         // If the component has an movement event it will be called here
-        if (this.movementEvent != undefined) this.movementEvent();
-
-        // If the component has an interactEvent it will be called here
-        if (this.interactEvent != undefined) this.interactEvent();
+        if (this.movementEventID != undefined) events.data[this.movementEventID](this);
 
         // The direction the component is facing can be updated after the speedX/Y is set
         this.updateDirection();
@@ -925,20 +1005,43 @@ function Component(spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHei
 var dialogs = {
     data: [], // Contains the dialogs
     currentDialog: null, // The current dialog
+    freeIDs: [] // FreeIDs
 };
 
 /**
  * For adding a new dialog
  * @param the text
+ * @param eventID
  */
 function addDialog(input, eventID) {
-    if (eventID != undefined) dialogs.data.push(new Dialog(input, eventID));
-    else dialogs.data.push(new Dialog(input));
-    dialogs.data[dialogs.data.length - 1].id = dialogs.data.length - 1;
+    // Add
+    dialogs.data.push(new Dialog(input, eventID));
+    // ID Management
+    if (dialogs.freeIDs.length != 0) dialogs.data[dialogs.data.length - 1].id = dialogs.freeIDs.pop();
+    else dialogs.data[dialogs.data.length - 1].id = dialogs.data.length - 1;
+}
+
+/**
+ * Remove a dialog
+ */
+function removeDialog(id) {
+    for (var i = 0, l = dialogs.data.length; i < l; i++)
+        if (dialogs.data[i].id == id) {
+            // Remove if ID found
+            dialogs.data.splice(id, 1);
+            // ID Management
+            dialogs.freeIDs.push(id);
+            break;
+        }
+}
+
+/**
+ * Generate the data for the dialogs
+ */
+function generateDialogData() {
     // Datastring
-    myGameArea.data += "addDialog(" + JSON.stringify(input);
-    if (eventID != undefined) myGameArea.data += ", " + eventID + ");\n";
-    else myGameArea.data += ");\n";
+    for (var i = 0, l = dialogs.data.length; i < l; i++)
+        game.data += "addDialog(" + JSON.stringify(dialogs.data[i].text) + ", " + dialogs.data[i].eventID + ");\n";
 }
 
 /**
@@ -997,7 +1100,7 @@ function Dialog(input, eventID) {
 
     this.draw = function () {
         // Setup dialog design
-        ctx = myGameArea.context;
+        ctx = game.context;
         // Black box
         ctx.globalAlpha = 0.8;
         ctx.fillStyle = "black";
@@ -1009,8 +1112,8 @@ function Dialog(input, eventID) {
         ctx.font = '30px serif';
         ctx.fillStyle = 'white';
         // Position (for testing)
-        this.y = myGameArea.canvas.height - 50;
-        this.width = myGameArea.canvas.width + 1;
+        this.y = game.canvas.height - 50;
+        this.width = game.canvas.width + 1;
 
         // Options
         if (this.text[this.chatCounter] instanceof Array) {
@@ -1031,30 +1134,30 @@ function Dialog(input, eventID) {
     }
 
     this.selectOption = function () {
-        if (myGameArea.keys[87] || myGameArea.keys[83] || myGameArea.keys[38] || myGameArea.keys[40]) {
+        if (game.keys[87] || game.keys[83] || game.keys[38] || game.keys[40]) {
             if (this.keyPush) {
-                if (myGameArea.keys[87] || myGameArea.keys[38]) this.selectedOption--;
-                else if (myGameArea.keys[83] || myGameArea.keys[40]) this.selectedOption++;
+                if (game.keys[87] || game.keys[38]) this.selectedOption--;
+                else if (game.keys[83] || game.keys[40]) this.selectedOption++;
                 this.keyPush = false;
             }
         } else this.keyPush = true;
         // TODO: Refine select with Mouseover / Touching
-        if (myGameArea.x > 30 && myGameArea.x < 140 && myGameArea.y > 345 && myGameArea.y < 370) this.selectedOption = 0;
-        else if (myGameArea.x > 30 && myGameArea.x < 140 && myGameArea.y > 370 && myGameArea.y < 395) this.selectedOption = 1;
-        else if (myGameArea.x > 190 && myGameArea.x < 350 && myGameArea.y > 345 && myGameArea.y < 370) this.selectedOption = 2;
-        else if (myGameArea.x > 190 && myGameArea.x < 350 && myGameArea.y > 370 && myGameArea.y < 395) this.selectedOption = 3;
+        if (game.x > 30 && game.x < 140 && game.y > 345 && game.y < 370) this.selectedOption = 0;
+        else if (game.x > 30 && game.x < 140 && game.y > 370 && game.y < 395) this.selectedOption = 1;
+        else if (game.x > 190 && game.x < 350 && game.y > 345 && game.y < 370) this.selectedOption = 2;
+        else if (game.x > 190 && game.x < 350 && game.y > 370 && game.y < 395) this.selectedOption = 3;
         // Stay in range
         if (this.selectedOption < 0) this.selectedOption = this.selectedOption + this.text[this.chatCounter].length;
         else this.selectedOption = this.selectedOption % this.text[this.chatCounter].length;
     }
 
     this.nextText = function () {
-        if (myGameArea.enter || myGameArea.mousedown || myGameArea.touchdown) {
-            if (myGameArea.eventReady) {
+        if (game.enter || game.mousedown || game.touchdown) {
+            if (game.eventReady) {
                 this.chatCounter++;
-                myGameArea.eventReady = false;
+                game.eventReady = false;
             }
-        } else myGameArea.eventReady = true;
+        } else game.eventReady = true;
     }
 }
 
@@ -1064,16 +1167,57 @@ function Dialog(input, eventID) {
  * Contains all the audio of the game
  */
 var audio = {
-    data: []
+    data: [], // The audios
+    freeIDs: [] // freeIDs
 }
 
 /**
  * Add a new audio
+ * @param {file} src
  */
 function addAudio(src) {
+    // Add
     audio.data.push(new Audio(src));
-    audio.data[audio.data.length - 1].id = audio.data.length - 1;
+    // ID Management
+    if (audio.freeIDs.length != 0) audio.data[audio.data.length - 1].id = audio.freeIDs.pop();
+    else audio.data[audio.data.length - 1].id = audio.data.length - 1;
+    // Sets default volume 0.2 for all added audios; maybe include as parameter on creating
     audio.data[audio.data.length - 1].volume = 0.2;
+}
+
+/**
+ * Remove an audio
+ */
+function removeAudio(id) {
+    for (var i = 0, l = audio.data.length; i < l; i++)
+        if (audio.data[i].id == id) {
+            // Remove if ID found
+            audio.data.splice(id, 1);
+            // ID Management
+            audio.freeIDs.push(id);
+            break;
+        }
+}
+
+/**
+ * Generate the data for the audios
+ */
+function generateAudioData() {
     // Datastring
-    myGameArea.data += "addAudio(new Audio('" + src + "');\n";
+    for (var i = 0, l = audio.data.length; i < l; i++)
+        game.data += "addAudio('" + audio.data[i].src + "');\n";
+}
+
+// GENERATE GAME DATA --------------------------------------------------------
+
+/**
+ * Generate the all the data of the game
+ */
+function generateGameData() {
+    generateEventData();
+    generateSpriteData();
+    generateMapData();
+    generateComponentData();
+    generateDialogData();
+    generateAudioData();
 }

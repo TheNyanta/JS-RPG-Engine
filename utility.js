@@ -77,8 +77,34 @@ function componentMapSwitch(x, y, nextMap, componentID, changeMap) {
     addComponentID(maps.data[nextMap].components, componentID);
     if (changeMap) {
         maps.nextMap = nextMap;
-        myGameArea.transition = true;
+        game.transition = true;
     }
+}
+
+/**
+ * For loading src: Check if the file name already exists
+ */
+function loadImage(img) {
+    var tmp;
+    for (var i = 0, l = spritesheets.data.length; i < l; i++) {
+        if (spritesheets.data[i].img.src.match(/[\w]+\.[A-Za-z]{3}$/)[0] == img.match(/[\w]+\.[A-Za-z]{3}$/)[0]) {
+            console.log("spritesheet already exists: taking existing one");
+            tmp = spritesheets.data[i];
+        }
+    }
+    if (tmp == undefined) {
+        console.log("created new spritesheet")
+        addSprite(img, 60, 32, 8, 8);
+        tmp = spritesheets.data[spritesheets.data.length - 1];
+    }
+    //maps.data[maps.currentMap].image.src = img; //maps background image
+    maps.data[maps.currentMap].tileset = tmp;
+    maps.data[maps.currentMap].switchTileset();
+
+    setTimeout(function () {
+        maps.data[maps.currentMap].drawCache();
+        maps.data[maps.currentMap].drawTileset();
+    }, 100);
 }
 
 // Harp: audio.data[0-7].play();
@@ -204,7 +230,7 @@ function EnableScrollbar() {
 }
 
 function enterFullscreen() {
-    element = myGameArea.canvas;
+    element = game.canvas;
     if (element.requestFullscreen) {
         element.requestFullscreen();
     } else if (element.mozRequestFullScreen) {
@@ -220,17 +246,17 @@ function enterFullscreen() {
 function resizeCanvas() {
     if (document.body.clientWidth > maps.data[maps.currentMap].width) {
         // Screen bigger than map
-        myGameArea.canvas.width = maps.data[maps.currentMap].width;
+        game.canvas.width = maps.data[maps.currentMap].width;
     }
     // Screen fits on map
-    else myGameArea.canvas.width = myGameArea.canvas.width = document.body.clientWidth;
+    else game.canvas.width = game.canvas.width = document.body.clientWidth;
 
     if (document.body.clientHeight > maps.data[maps.currentMap].height) {
         // Screen bigger than map
-        myGameArea.canvas.height = maps.data[maps.currentMap].height;
+        game.canvas.height = maps.data[maps.currentMap].height;
     }
     // Screen fits on map
-    else myGameArea.canvas.height = myGameArea.canvas.height = document.body.clientHeight;
+    else game.canvas.height = game.canvas.height = document.body.clientHeight;
 }
 
 /**
@@ -269,13 +295,13 @@ function toggle(boolean) {
 }
 
 function blackTransition() {
-    ctx = myGameArea.context;
+    ctx = game.context;
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, maps.data[maps.currentMap].width, maps.data[maps.currentMap].height);
 }
 
 function extraGuiRect() {
-    ctx = myGameArea.context;
+    ctx = game.context;
     ctx.globalAlpha = 0.5;
     ctx.fillStyle = "cyan";
     ctx.fillRect(0, 0, 120, 90);
@@ -283,7 +309,7 @@ function extraGuiRect() {
 }
 
 function showTime() {
-    ctx = myGameArea.context;
+    ctx = game.context;
     ctx.font = "bold 20px Serif";
     ctx.fillStyle = "black";
     ctx.fillText("Timer : " + Math.floor(time / 1000), 5, 20);
@@ -296,7 +322,7 @@ before = Date.now();
 fps = 0;
 
 function everyinterval(n) {
-    if ((myGameArea.frameNo / n) % 1 == 0) return true;
+    if ((game.frameNo / n) % 1 == 0) return true;
     return false;
 }
 
@@ -308,22 +334,22 @@ function updateFPS() {
 }
 
 function showFPS() {
-    ctx = myGameArea.context;
+    ctx = game.context;
     ctx.font = "bold 20px Serif";
     ctx.fillStyle = "black";
     ctx.fillText("FPS : " + fps, 5, 40);
 }
 
 function showPosition(target) {
-    ctx = myGameArea.context;
+    ctx = game.context;
     ctx.fillStyle = "black";
-    ctx.fillText("x:" + (target.x + target.offset_x) + ", y:" + (target.y + target.offset_y), 5, 60);
-    ctx.fillText("Tile[" + Math.floor((target.x + target.offset_x) / maps.data[maps.currentMap].tileset.spriteWidth) + ", " + Math.floor((target.y + target.offset_y) / maps.data[maps.currentMap].tileset.spriteHeight) + "]", 5, 80);
+    ctx.fillText("x:" + (target.x + target.offsetX) + ", y:" + (target.y + target.offsetY), 5, 60);
+    ctx.fillText("Tile[" + Math.floor((target.x + target.offsetX) / maps.data[maps.currentMap].tileset.spriteWidth) + ", " + Math.floor((target.y + target.offsetY) / maps.data[maps.currentMap].tileset.spriteHeight) + "]", 5, 80);
 }
 
 function showDistance() {
     /*
-    ctx = myGameArea.context;
+    ctx = game.context;
     ctx.beginPath();
     ctx.lineWidth = 2; //2px
     ctx.moveTo(x1, y1);
@@ -336,9 +362,9 @@ function showDistance() {
 // Button functions
 
 function debugButton() {
-    myGameArea.debug = toggle(myGameArea.debug);
+    game.debug = toggle(game.debug);
     maps.data[maps.currentMap].drawCache();
-    if (myGameArea.debug) {
+    if (game.debug) {
         document.getElementById("debugButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("debugButton").innerHTML = "Debug On";
     } else {
@@ -348,8 +374,8 @@ function debugButton() {
 }
 
 function guiButton() {
-    myGameArea.showExtra = toggle(myGameArea.showExtra);
-    if (myGameArea.showExtra) {
+    game.showExtra = toggle(game.showExtra);
+    if (game.showExtra) {
         document.getElementById("guiButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("guiButton").innerHTML = "GUI On";
     } else {
@@ -363,7 +389,7 @@ function guiButton() {
 // ##########
 
 function layerButton(i) {
-    myGameArea.currentLayer = i;
+    game.currentLayer = i;
     if (i == 0) {
         document.getElementById("layer1Button").setAttribute("class", "w3-button w3-green");
         document.getElementById("layer2Button").setAttribute("class", "w3-button w3-blue");
@@ -387,44 +413,44 @@ function layerButton(i) {
         document.getElementById("layer2Button").setAttribute("class", "w3-button w3-blue");
         document.getElementById("layer3Button").setAttribute("class", "w3-button w3-blue");
         document.getElementById("layerCButton").setAttribute("class", "w3-button w3-green");
-        if (!myGameArea.debug) debugButton();
+        if (!game.debug) debugButton();
     }
-    if (!myGameArea.drawingOn) drawButton();
+    if (!game.drawingOn) drawButton();
 }
 
 function collisionButton(i) {
-    if (!myGameArea.debug) debugButton();
+    if (!game.debug) debugButton();
     layerButton(3);
-    if (!myGameArea.drawingOn) drawButton();
-    myGameArea.tileCollisions[i] = toggle(myGameArea.tileCollisions[i]);
-    if (myGameArea.tileCollisions[0]) document.getElementById("collisionUpButton").setAttribute("class", "w3-button w3-green");
+    if (!game.drawingOn) drawButton();
+    game.tileCollisions[i] = toggle(game.tileCollisions[i]);
+    if (game.tileCollisions[0]) document.getElementById("collisionUpButton").setAttribute("class", "w3-button w3-green");
     else document.getElementById("collisionUpButton").setAttribute("class", "w3-button w3-red");
-    if (myGameArea.tileCollisions[1]) document.getElementById("collisionDownButton").setAttribute("class", "w3-button w3-green");
+    if (game.tileCollisions[1]) document.getElementById("collisionDownButton").setAttribute("class", "w3-button w3-green");
     else document.getElementById("collisionDownButton").setAttribute("class", "w3-button w3-red");
-    if (myGameArea.tileCollisions[2]) document.getElementById("collisionLeftButton").setAttribute("class", "w3-button w3-green");
+    if (game.tileCollisions[2]) document.getElementById("collisionLeftButton").setAttribute("class", "w3-button w3-green");
     else document.getElementById("collisionLeftButton").setAttribute("class", "w3-button w3-red");
-    if (myGameArea.tileCollisions[3]) document.getElementById("collisionRightButton").setAttribute("class", "w3-button w3-green");
+    if (game.tileCollisions[3]) document.getElementById("collisionRightButton").setAttribute("class", "w3-button w3-green");
     else document.getElementById("collisionRightButton").setAttribute("class", "w3-button w3-red");
 
     // Update tileCollisionType
-    if (myGameArea.tileCollisions[0] && myGameArea.tileCollisions[1] && myGameArea.tileCollisions[2] && myGameArea.tileCollisions[3])
-        myGameArea.tileCollisionType = 1;
-    else if (!myGameArea.tileCollisions[0] && !myGameArea.tileCollisions[1] && !myGameArea.tileCollisions[2] && !myGameArea.tileCollisions[3])
-        myGameArea.tileCollisionType = 0;
+    if (game.tileCollisions[0] && game.tileCollisions[1] && game.tileCollisions[2] && game.tileCollisions[3])
+        game.tileCollisionType = 1;
+    else if (!game.tileCollisions[0] && !game.tileCollisions[1] && !game.tileCollisions[2] && !game.tileCollisions[3])
+        game.tileCollisionType = 0;
     else {
         var collision = [];
-        if (myGameArea.tileCollisions[0]) collision.push(0);
-        if (myGameArea.tileCollisions[1]) collision.push(1);
-        if (myGameArea.tileCollisions[2]) collision.push(2);
-        if (myGameArea.tileCollisions[3]) collision.push(3);
-        myGameArea.tileCollisionType = collision;
+        if (game.tileCollisions[0]) collision.push(0);
+        if (game.tileCollisions[1]) collision.push(1);
+        if (game.tileCollisions[2]) collision.push(2);
+        if (game.tileCollisions[3]) collision.push(3);
+        game.tileCollisionType = collision;
     }
 
 }
 
 function drawButton() {
-    myGameArea.drawingOn = toggle(myGameArea.drawingOn);
-    if (myGameArea.drawingOn) {
+    game.drawingOn = toggle(game.drawingOn);
+    if (game.drawingOn) {
         document.getElementById("drawButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("drawButton").innerHTML = "Drawing On";
     } else {
