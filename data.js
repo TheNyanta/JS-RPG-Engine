@@ -123,7 +123,7 @@ addComponent("Jukebox", 1, 8, 260, 120, 0, 16, 24, 16,
     function () {
         game.currentDialog = dialogs.data[3];
     });
-addComponent("Door", 2, 9, 144, 62, 0, 0, 47, 40,
+addComponent("Door", 2, 9, 144, 62, 0, 0, 47, 42,
     function () {
         game.currentDialog = dialogs.data[5];
     });

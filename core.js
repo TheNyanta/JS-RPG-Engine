@@ -877,7 +877,7 @@ function Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWid
     this.updateInteraction = function (other) {
         // No self interaction
         if (this != other) {
-            if (distance(this.mid(), other.mid()) <= Math.max(other.boundingBox.width, other.boundingBox.height) + 4 && this.facing(other)) {
+            if (this.boundingBoxOverlap(other) && this.facing(other)) {
                 if (game.enter || game.mousedown || game.touchdown) {
                     if (game.eventReady) {
                         if (other.faceOnInteraction) this.face(other);
@@ -906,11 +906,14 @@ function Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWid
                 else return true;
             }
         }
-        // Click / Touch ended: enable Click Event again
-        else {
-            this.fireClickEvent = true;
-            return false;
-        }
+    }
+
+    /**
+     *
+     */
+    this.boundingBoxOverlap = function (other) {
+        return rectangleOverlap(this.boundingBox.x, this.boundingBox.y, this.boundingBox.width, this.boundingBox.height, other.boundingBox.x, other.boundingBox.y, other.boundingBox.width, other.boundingBox.height);
+        return false;
     }
 
     /**
