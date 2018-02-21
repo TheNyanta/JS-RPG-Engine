@@ -45,15 +45,12 @@ addMap(null, 3, 42, 60);
 addEvent(function (componentID) {
     // Enter key down / click / touch
     if (game.enter || game.mousedown || game.touchdown) {
-        if (maps.data[2].tiles[i].fireEvent) {
-            if (components.data[componentID].direction == 4) {
-                dialogs.currentDialog = dialogs.data[0];;
-                maps.data[2].tiles[i].fireEvent = false;
-            }
+        if (game.eventReady) {
+            // Looking up
+            if (components.data[componentID].direction == 4) dialogs.currentDialog = dialogs.data[0];
+            game.eventReady = false;
         }
-    }
-    // Enter key up / click up / touch relase: Enable next enter push
-    else maps.data[2].tiles[i].fireEvent = true;
+    } else game.eventReady = true;
 });
 addEvent(function (componentID) {
     componentMapSwitch(null, -8, 3, componentID, true);

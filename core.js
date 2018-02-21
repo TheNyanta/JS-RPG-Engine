@@ -277,8 +277,6 @@ function Tile(spritesheetID, x, y) {
 
     this.interactEventID;
     this.stepOnEventID;
-    // To fire only a single event on enter / mousedown / touchdown
-    this.fireEvent = true
 
     /** This draws the tile on the cached canvas'
      * @param Cached canvas context for layer 1 & 2 (Background)
