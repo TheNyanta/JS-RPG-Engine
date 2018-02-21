@@ -28,12 +28,22 @@ function distance(xy1, xy2) {
 }
 
 /**
- * Check if an array contains an object with a given id and mapID
+ * Check if array contains object with the given id
+ * If it contains it return it else return undefined
+ */
+function containsID(data, id) {
+    for (var i = 0, l = data.length; i < l; i++)
+        if (data[i].id == id) return data[i];
+    return undefined;
+}
+
+/**
+ * Check if an array contains the component with the given id and mapID
  * If it contains it return it else return undefined
  * @param the array (i.e. maps.data)
  * @param the object (i.e. 3)
  */
-function containsObject(data, id, mapID) {
+function containsComponent(data, id, mapID) {
     for (var i = 0, l = data.length; i < l; i++)
         if (data[i].id == id && data[i].mapID == mapID) return data[i];
     return undefined;

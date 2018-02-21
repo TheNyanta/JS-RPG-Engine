@@ -38,41 +38,16 @@ addMap(10, 0, 80, 60);
 addMap(null, 1, 80, 60);
 addMap(null, 2, 42, 40);
 addMap(null, 3, 42, 60);
-
-/*
-//Stone
-addEvent(function (componentID) {
-    // Enter key down / click / touch
-    if (game.enter || game.mousedown || game.touchdown) {
-        if (game.eventReady) {
-            // Looking up
-            if (components.data[componentID].direction == 4) game.currentDialog = dialogs.data[0];
-            game.eventReady = false;
-        }
-    } else game.eventReady = true;
-});
-
-// Teleport
-addEvent(function (componentID) {
-    componentMapSwitch(null, -8, 3, componentID, true);
-});
-addEvent(function (componentID) {
-    componentMapSwitch(null, 280, 2, componentID, true);
-});
-*/
-
-// ##########
 // Components
-// ##########
-addComponent("Boy", 0, 4, 240, 280, 4, 16, 16, 16,
+addComponent("Boy", 0, 4, 240, 280, 4, 16, 16, 16, true, undefined,
     function () {
         game.currentDialog = dialogs.data[1];
     }, undefined);
-addComponent("Girl", 0, 5, 370, 210, 4, 16, 16, 16,
+addComponent("Girl", 0, 5, 370, 210, 4, 16, 16, 16, true, undefined,
     function () {
         game.currentDialog = dialogs.data[1];
     }, undefined);
-addComponent("Cat", 0, 6, 160, 390, 4, 16, 16, 16,
+addComponent("Cat", 0, 6, 160, 390, 4, 16, 16, 16, true, undefined,
     function () {
         game.currentDialog = dialogs.data[4];
         if (this.routeForward) this.routeIndex--;
@@ -96,7 +71,7 @@ addComponent("Cat", 0, 6, 160, 390, 4, 16, 16, 16,
             else this.speedX = -this.speed;
         }
     });
-addComponent("Dog", 1, 7, 100, 100, 4, 16, 16, 16,
+addComponent("Dog", 1, 7, 100, 100, 4, 16, 16, 16, true, undefined,
     function () {
         audio.data[9].play();
     },
@@ -119,18 +94,27 @@ addComponent("Dog", 1, 7, 100, 100, 4, 16, 16, 16,
             }
         }
     });
-addComponent("Jukebox", 1, 8, 260, 120, 0, 16, 24, 16,
+addComponent("Jukebox", 1, 8, 260, 120, 0, 16, 24, 16, true, undefined,
     function () {
         game.currentDialog = dialogs.data[3];
     });
-addComponent("Door", 2, 9, 144, 62, 0, 0, 47, 42,
+addComponent("Door", 2, 9, 144, 62, 0, 0, 47, 42, true, undefined,
     function () {
         game.currentDialog = dialogs.data[5];
     });
-
-// #######
+addComponent("Townport", 2, undefined, 96, 312, 0, 0, 146, 8, false,
+    function () {
+        teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 3, null, -6);
+        game.nextMap = 3;
+        game.transition = true;
+    });
+addComponent("Castleport", 3, undefined, 96, 0, 0, 0, 146, 8, false,
+    function () {
+        teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 2, null, 278);
+        game.nextMap = 2;
+        game.transition = true;
+    });
 // Dialogs
-// #######
 addDialog(["Just an old stone."]);
 addDialog(["Hello!", "Choose a map!", ["Grass", "Snow", "Castletown"]], function (choice) {
     if (choice == game.currentMap) {
@@ -138,18 +122,18 @@ addDialog(["Hello!", "Choose a map!", ["Grass", "Snow", "Castletown"]], function
         game.currentDialog = dialogs.data[2];
     } else {
         if (choice == 0) {
-            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 0, 0), 0, 380, 208);
-            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 1, 0), 0, 364, 208);
+            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 0, 380, 208);
+            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 1, 0), 0, 364, 208);
             game.nextMap = 0;
             game.transition = true;
         } else if (choice == 1) {
-            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 0, 0), 1, 192, 360);
-            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 1, 0), 1, 176, 360);
+            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 1, 192, 360);
+            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 1, 0), 1, 176, 360);
             game.nextMap = 1;
             game.transition = true;
         } else if (choice == 2) {
-            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 0, 0), 2, 166, 210);
-            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 1, 0), 2, 150, 210);
+            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 2, 166, 210);
+            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 1, 0), 2, 150, 210);
             game.nextMap = 2;
             game.transition = true;
         }
@@ -171,25 +155,7 @@ addDialog(["The door is closed!", ["Yes", "No"]], function (choice) {
     }
 });
 
-// #################################################################################################
-
-// TODO: INCLUDE IN SELF DATA GENERATION
-
-/*
-// Dialog on enter / click / touch when controlled character in front of stone when facing it (looking up)
-for (var i = 1070; i <= 1071; i++) {
-    maps.data[2].tiles[i].enterEventID = 1;
-}
-// Teleports
-// Castle to town
-for (var i = 1650; i <= 1667; i++) {
-    maps.data[2].tiles[i].stepOnEventID = 2;
-}
-// Town to castle
-for (var i = 12; i <= 29; i++) {
-    maps.data[3].tiles[i].stepOnEventID = 3;
-}
-*/
+// ######## TODO: Add into self generation
 
 // Add animation sequences
 maps.data[0].components.data[0].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);

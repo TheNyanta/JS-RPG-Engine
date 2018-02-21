@@ -211,8 +211,8 @@ var game = {
                 '<button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug Off</button>' +
                 '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +
                 '<br>' +
-                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(containsObject(maps.data[game.currentMap].components.data, 0, 0))">Control Boy</button>' +
-                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(containsObject(maps.data[game.currentMap].components.data, 1, 0))">Control Girl</button>' +
+                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(containsComponent(maps.data[game.currentMap].components.data, 0, 0))">Control Boy</button>' +
+                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(containsComponent(maps.data[game.currentMap].components.data, 1, 0))">Control Girl</button>' +
                 '</div>';
         }
 
@@ -523,7 +523,12 @@ function draw() {
         maps.data[game.currentMap].components.data.sort(function (a, b) {
             return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);
         });
-        // Draw Objects of the current map
+        // Draw the invisiable components of the current map in editor mode
+        if (game.editor)
+            for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++)
+                if (maps.data[game.currentMap].components.data[i].editorDraw != undefined)
+                    maps.data[game.currentMap].components.data[i].editorDraw(game.context);
+        // Draw the visiable components of the current map
         for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) maps.data[game.currentMap].components.data[i].draw(game.context);
         // Draw Foreground
         maps.data[game.currentMap].drawForeground();

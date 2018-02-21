@@ -502,13 +502,16 @@ function Map(imageID, spritesheetID, mapWidth, mapHeight) {
  * @param offsetY
  * @param offsetWidth
  * @param offsetHeight
- * @param {function} trigger to be defined in function
+ * @param collidable
+ * @param {function} collisionEvent
+ * @param {function} triggerEvent
+ * @param {function} moveEvent 
  */
-function addComponent(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, triggerEvent, moveEvent) {
-    var map = containsObject(maps.data, mapID);
+function addComponent(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, collidable, collisionEvent, triggerEvent, moveEvent) {
+    var map = containsComponent(maps.data, mapID);
     if (map != undefined) {
         // Add
-        var index = map.components.data.push(new Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, triggerEvent, moveEvent));
+        var index = map.components.data.push(new Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, collidable, collisionEvent, triggerEvent, moveEvent));
         // ID management
         if (map.components.freeIDs.length > 0) map.components.data[index - 1].id = map.components.freeIDs[0].pop();
         else map.components.data[index - 1].id = index - 1;
@@ -543,7 +546,7 @@ function generateComponentData() {
     for (var i = 0, l = maps.data.length; i < l; i++)
         for (var j = 0; j < maps.data[i].components.data.length; j++) {
             var c = maps.data[i].components.data;
-            game.data += "addComponent('" + c[j].name + "', " + c[j].mapID + ", " + c[j].spritesheetID + ", " + c[j].x + ", " + c[j].y + ", " + c[j].boundingBox.x + ", " + c[j].boundingBox.y + ", " + c[j].boundingBox.width + ", " + c[j].boundingBox.height + ", " + c[j].triggerEvent + ", " + c[j].moveEvent + ");\n";
+            game.data += "addComponent('" + c[j].name + "', " + c[j].mapID + ", " + c[j].spritesheetID + ", " + c[j].x + ", " + c[j].y + ", " + c[j].boundingBox.x + ", " + c[j].boundingBox.y + ", " + c[j].boundingBox.width + ", " + c[j].boundingBox.height + ", " + c[j].collidable + ", " + c[j].triggerEvent + ", " + c[j].moveEvent + ");\n";
         }
 }
 
@@ -558,10 +561,12 @@ function generateComponentData() {
  * @param offsetY
  * @param offsetWidth
  * @param offsetHeight
+ * @param collidable
+ * @param {function} collisionEvent
  * @param {function} triggerEvent
  * @param {function} moveEvent
  */
-function Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, triggerEvent, moveEvent) {
+function Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, collidable, collisionEvent, triggerEvent, moveEvent) {
     this.name = name;
     this.mapID = mapID;
     this.spritesheetID = spritesheetID;
@@ -582,11 +587,13 @@ function Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWid
         height: offsetHeight,
         offsetX: offsetX, // To restore this.x after a teleport
         offsetY: offsetY, // To restore this.y after a teleport
-        collidable: true,
+        collidable: collidable,
         //moveable: false // TODO: Implement
     };
 
     // NOOP function if no event
+    this.collisionEvent = function () {};
+    if (collisionEvent instanceof Function) this.collisionEvent = collisionEvent;
     this.triggerEvent = function () {};
     if (triggerEvent instanceof Function) this.triggerEvent = triggerEvent;
     this.moveEvent = function () {};
@@ -627,6 +634,12 @@ function Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWid
             // No Animation: Just sprite image
             else drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence, (this.x - game.camera.x), (this.y - game.camera.y));
         }
+    } else this.editorDraw = function (ctx) {
+        // For editing draw a rectangle for components without an image
+        ctx.fillStyle = "cyan";
+        ctx.globalAlpha = 0.8;
+        ctx.fillRect(this.x - game.camera.x, this.y - game.camera.y, this.boundingBox.width, this.boundingBox.height);
+        ctx.globalAlpha = 1.0;
     }
 
     this.idleAnimation = function (idleAnimationTime, idleUp, idleDown, idleLeft, idleRight) {
@@ -866,7 +879,6 @@ function Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWid
                 if (otherobj.speedY <= 0) otherobj.speedY = 0;
             }
         }
-
     }
 
     this.mid = function () {
@@ -877,14 +889,17 @@ function Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWid
     this.updateInteraction = function (other) {
         // No self interaction
         if (this != other) {
-            if (this.boundingBoxOverlap(other) && this.facing(other)) {
-                if (game.enter || game.mousedown || game.touchdown) {
-                    if (game.eventReady) {
-                        if (other.faceOnInteraction) this.face(other);
-                        other.triggerEvent();
-                        game.eventReady = false;
-                    }
-                } else game.eventReady = true;
+            if (this.boundingBoxOverlap(other)) {
+                other.collisionEvent();
+                if (this.facing(other)) {
+                    if (game.enter || other.isClicked()) {
+                        if (game.eventReady) {
+                            if (other.faceOnInteraction) this.face(other);
+                            other.triggerEvent();
+                            game.eventReady = false;
+                        }
+                    } else game.eventReady = true;
+                }
             }
         }
     }
@@ -897,11 +912,10 @@ function Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWid
         // Mouse / Touchdown
         if (game.mousedown || game.touchdown) {
             if (game.clickdownX != undefined && game.clickdownY != undefined) {
-                // Not clicked (on sprite)
-                if ((this.x > game.clickdownX + game.camera.x) ||
-                    (this.x + this.width < game.clickdownX + game.camera.x) ||
-                    (this.y > game.clickdownY + game.camera.y) ||
-                    (this.y + this.height < game.clickdownY + game.camera.y)) return false;
+                if ((this.boundingBox.x > game.clickdownX + game.camera.x) ||
+                    (this.boundingBox.x + this.boundingBox.width < game.clickdownX + game.camera.x) ||
+                    (this.boundingBox.y > game.clickdownY + game.camera.y) ||
+                    (this.boundingBox.y + this.boundingBox.height < game.clickdownY + game.camera.y)) return false;
                 // Clicked
                 else return true;
             }
