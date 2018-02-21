@@ -1,20 +1,15 @@
-// Spritesheet Maps
-addSprite("Assets/Image/forest.png", 60, 32, 8, 8);
-addSprite("Assets/Image/snowforest.png", 60, 32, 8, 8);
-addSprite("Assets/Image/castle.png", 60, 32, 8, 8);
-addSprite("Assets/Image/castletown.png", 60, 32, 8, 8);
-// Spritesheet Objects
-addSprite("Assets/Image/character.png", 12, 8, 24, 32);
-addSprite("Assets/Image/girl.png", 12, 8, 24, 32);
-addSprite("Assets/Image/cat.png", 12, 8, 24, 32);
-addSprite("Assets/Image/animal.png", 12, 8, 24, 32);
-addSprite("Assets/Image/snow_jukebox.png", 12, 8, 24, 32);
-addSprite("Assets/Image/castledoor_1.png", 1, 4, 47, 48);
-// Maps
-addMap("Assets/Image/sunset1.png", 0, 80, 60);
-addMap(null, 1, 80, 60);
-addMap(null, 2, 42, 40);
-addMap(null, 3, 42, 60);
+// Images
+addImage("Assets/Image/forest.png");
+addImage("Assets/Image/snowforest.png");
+addImage("Assets/Image/castle.png");
+addImage("Assets/Image/castletown.png");
+addImage("Assets/Image/character.png");
+addImage("Assets/Image/girl.png");
+addImage("Assets/Image/cat.png");
+addImage("Assets/Image/animal.png");
+addImage("Assets/Image/snow_jukebox.png");
+addImage("Assets/Image/castledoor_1.png");
+addImage("Assets/Image/sunset1.png");
 // Audio
 addAudio("Assets/Audio/harp_60C.m4a");
 addAudio("Assets/Audio/harp_62D.m4a");
@@ -26,6 +21,23 @@ addAudio("Assets/Audio/harp_71H.m4a");
 addAudio("Assets/Audio/harp_72C.m4a");
 addAudio("Assets/Audio/cat.m4a");
 addAudio("Assets/Audio/dog.m4a");
+// Spritesheet Maps
+addSprite(0, 60, 32, 8, 8);
+addSprite(1, 60, 32, 8, 8);
+addSprite(2, 60, 32, 8, 8);
+addSprite(3, 60, 32, 8, 8);
+// Spritesheet Objects
+addSprite(4, 12, 8, 24, 32);
+addSprite(5, 12, 8, 24, 32);
+addSprite(6, 12, 8, 24, 32);
+addSprite(7, 12, 8, 24, 32);
+addSprite(8, 12, 8, 24, 32);
+addSprite(9, 1, 4, 47, 48);
+// Maps
+addMap(10, 0, 80, 60);
+addMap(null, 1, 80, 60);
+addMap(null, 2, 42, 40);
+addMap(null, 3, 42, 60);
 
 // ######
 // Events
@@ -144,12 +156,20 @@ addEvent(function (target) {
 // ##########
 // Components
 // ##########
-addComponent("Boy", 4, 240, 280, 4, 16, 16, 16, 7, undefined, 0);
-addComponent("Girl", 5, 370, 210, 4, 16, 16, 16, 7, undefined, 0);
-addComponent("Cat", 6, 160, 390, 4, 16, 16, 16, 10, 12, 0);
-addComponent("Dog", 7, 100, 100, 4, 16, 16, 16, 8, 13, 1);
-addComponent("Jukebox", 8, 260, 120, 0, 16, 24, 16, 9, undefined, 1);
-addComponent("Door", 9, 144, 62, 0, 0, 47, 40, 11, undefined, 2);
+addComponent("Boy", 4, 240, 280, 4, 16, 16, 16, 7, undefined);
+addComponent("Girl", 5, 370, 210, 4, 16, 16, 16, 7, undefined);
+addComponent("Cat", 6, 160, 390, 4, 16, 16, 16, 10, 12);
+addComponent("Dog", 7, 100, 100, 4, 16, 16, 16, 8, 13);
+addComponent("Jukebox", 8, 260, 120, 0, 16, 24, 16, 9, undefined);
+addComponent("Door", 9, 144, 62, 0, 0, 47, 40, 11, undefined);
+
+// Add componentID to assigned map
+maps.data[0].components.push(0);
+maps.data[0].components.push(1);
+maps.data[0].components.push(2);
+maps.data[1].components.push(3);
+maps.data[1].components.push(4);
+maps.data[2].components.push(5);
 
 // #######
 // Dialogs

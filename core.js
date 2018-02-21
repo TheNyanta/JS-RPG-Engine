@@ -1,3 +1,95 @@
+// IMAGES ----------------------------------------------------------------------
+/**
+ * Contains all the images of the game
+ */
+var images = {
+    data: [], // Contains all loaded images
+    freeIDs: [] // FreeIDs
+};
+
+/**
+ * For adding a new image
+ * @param {file} image src
+ */
+function addImage(image) {
+    // Add
+    images.data.push(new Image());
+    images.data[images.data.length - 1].src = image;
+    // ID management
+    if (images.freeIDs.length > 0) images.data[images.data.length - 1].id = images.freeIDs[0].pop();
+    else images.data[images.data.length - 1].id = images.data.length - 1;
+}
+
+/**
+ * Remove an image
+ */
+function removeImage(id) {
+    for (var i = 0, l = images.data.length; i < l; i++)
+        if (images.data[i].id == id) {
+            // Remove if ID found
+            images.data.splice(id, 1);
+            // ID Management
+            images.freeIDs.push(id);
+            break;
+        }
+}
+
+/**
+ * Generate the data for loading the images
+ */
+function generateImageData() {
+    // Datastring
+    for (var i = 0, l = images.data.length; i < l; i++)
+        game.data += "addImage('" + images.data[i].src + "');\n";
+}
+
+// AUDIO ---------------------------------------------------------------------
+
+/**
+ * Contains all the audio of the game
+ */
+var audio = {
+    data: [], // The audios
+    freeIDs: [] // freeIDs
+}
+
+/**
+ * Add a new audio
+ * @param {file} src
+ */
+function addAudio(src) {
+    // Add
+    audio.data.push(new Audio(src));
+    // ID Management
+    if (audio.freeIDs.length != 0) audio.data[audio.data.length - 1].id = audio.freeIDs.pop();
+    else audio.data[audio.data.length - 1].id = audio.data.length - 1;
+    // Sets default volume 0.2 for all added audios; maybe include as parameter on creating
+    audio.data[audio.data.length - 1].volume = 0.2;
+}
+
+/**
+ * Remove an audio
+ */
+function removeAudio(id) {
+    for (var i = 0, l = audio.data.length; i < l; i++)
+        if (audio.data[i].id == id) {
+            // Remove if ID found
+            audio.data.splice(id, 1);
+            // ID Management
+            audio.freeIDs.push(id);
+            break;
+        }
+}
+
+/**
+ * Generate the data for the audios
+ */
+function generateAudioData() {
+    // Datastring
+    for (var i = 0, l = audio.data.length; i < l; i++)
+        game.data += "addAudio('" + audio.data[i].src + "');\n";
+}
+
 // EVENTS ----------------------------------------------------------------------
 /**
  * Contains all the events of the game
@@ -84,35 +176,34 @@ function removeSprite(id) {
 function generateSpriteData() {
     // Datastring
     for (var i = 0, l = spritesheets.data.length; i < l; i++)
-        game.data += "addSprite('" + spritesheets.data[i].img.src + "', " + +spritesheets.data[i].spritesX + ", " + +spritesheets.data[i].spritesY + ", " + +spritesheets.data[i].spriteWidth + ", " + +spritesheets.data[i].spriteHeight + ");\n";
+        game.data += "addSprite(" + spritesheets.data[i].imageID + ", " + +spritesheets.data[i].spritesX + ", " + +spritesheets.data[i].spritesY + ", " + +spritesheets.data[i].spriteWidth + ", " + +spritesheets.data[i].spriteHeight + ");\n";
 }
 
 /**
  * Spritesheet for map-tiles and objects
  */
-function Spritesheet(src, spritesX, spritesY, spriteWidth, spriteHeight) {
-    this.img = new Image();
-    this.img.src = src;
+function Spritesheet(imageID, spritesX, spritesY, spriteWidth, spriteHeight) {
+    this.imageID = imageID;
     this.width = spritesX * spriteWidth;
     this.height = spritesY * spriteHeight;
     this.spritesX = spritesX;
     this.spritesY = spritesY;
     this.spriteWidth = spriteWidth;
     this.spriteHeight = spriteHeight;
-    this.name = src.match(/[\w]+\.[A-Za-z]{3}$/)[0];
+    this.name = images.data[this.imageID].src.match(/[\w]+\.[A-Za-z]{3}$/)[0];
 }
 
 /**
  * Draw a specific sprite of a spritesheet
  * @param the context where to draw it
- * @param the spritesheet where the source image is
+ * @param the spritesheet
  * @param the specific sprite
  * @param x position
  * @param y position
  */
 function drawSprite(ctx, spritesheet, number, x, y) {
     var res = i2xy(number, Math.max(spritesheet.spritesX, spritesheet.spritesY));
-    ctx.drawImage(spritesheet.img, res[0] * spritesheet.spriteWidth, res[1] * spritesheet.spriteHeight, spritesheet.spriteWidth, spritesheet.spriteHeight, x, y, spritesheet.spriteWidth, spritesheet.spriteHeight);
+    ctx.drawImage(images.data[spritesheet.imageID], res[0] * spritesheet.spriteWidth, res[1] * spritesheet.spriteHeight, spritesheet.spriteWidth, spritesheet.spriteHeight, x, y, spritesheet.spriteWidth, spritesheet.spriteHeight);
 }
 
 // MAPS ----------------------------------------------------------------------
@@ -129,14 +220,14 @@ var maps = {
 
 /**
  * For adding a new map
- * @param a background panorama
- * @param id of the spritesheet
+ * @param imageID of the background panorama
+ * @param spritesheetID of the tile spritesheet
  * @param the maps number of tiles in x direction
  * @param the maps number of tiles in y direction
  */
-function addMap(image, spritesheetId, mapWidth, mapHeight) {
+function addMap(imageID, spritesheetID, mapWidth, mapHeight) {
     // Add
-    maps.data.push(new Map(image, spritesheets.data[spritesheetId], mapWidth, mapHeight));
+    maps.data.push(new Map(imageID, spritesheetID, mapWidth, mapHeight));
     // ID management
     if (maps.freeIDs.length > 0) maps.data[maps.data.length - 1].id = maps.freeIDs[0].pop();
     else maps.data[maps.data.length - 1].id = maps.data.length - 1;
@@ -163,17 +254,17 @@ function removeMap(id) {
 function generateMapData() {
     // Datastring
     for (var i = 0, l = maps.data.length; i < l; i++)
-        game.data += "addMap(" + maps.data[i].image.src + ", " + maps.data[i].spritesheetID + ", " + maps.data[i].mapWidth + ", " + maps.data[i].mapHeight + ");\n";
+        game.data += "addMap(" + maps.data[i].imageID + ", " + maps.data[i].spritesheetID + ", " + maps.data[i].mapWidth + ", " + maps.data[i].mapHeight + ");\n";
 }
 
 /**
  * A Tile
- * @param {spritesheet} spritesheet
+ * @param spritesheetID
  */
-function Tile(spritesheet, x, y) {
-    this.spritesheet = spritesheet;
-    this.width = this.spritesheet.spriteWidth;
-    this.height = this.spritesheet.spriteHeight;
+function Tile(spritesheetID, x, y) {
+    this.spritesheetID = spritesheetID;
+    this.width = spritesheets.data[this.spritesheetID].spriteWidth;
+    this.height = spritesheets.data[this.spritesheetID].spriteHeight;
     // Position
     this.x = x;
     this.y = y;
@@ -194,9 +285,9 @@ function Tile(spritesheet, x, y) {
      * @param Cached canvas context for layer 3 (Foreground)
      */
     this.draw = function (ctx1, ctx2) {
-        if (this.layer1 - 1 >= 0) drawSprite(ctx1, this.spritesheet, this.layer1 - 1, this.x, this.y);
-        if (this.layer2 - 1 >= 0) drawSprite(ctx1, this.spritesheet, this.layer2 - 1, this.x, this.y);
-        if (this.layer3 - 1 >= 0) drawSprite(ctx2, this.spritesheet, this.layer3 - 1, this.x, this.y);
+        if (this.layer1 - 1 >= 0) drawSprite(ctx1, spritesheets.data[this.spritesheetID], this.layer1 - 1, this.x, this.y);
+        if (this.layer2 - 1 >= 0) drawSprite(ctx1, spritesheets.data[this.spritesheetID], this.layer2 - 1, this.x, this.y);
+        if (this.layer3 - 1 >= 0) drawSprite(ctx2, spritesheets.data[this.spritesheetID], this.layer3 - 1, this.x, this.y);
         // Debug information
         if (game.debug) {
             // Show collision layer: TODO: Visualize direction restrictions
@@ -223,17 +314,16 @@ function Tile(spritesheet, x, y) {
 
 /**
  * Define a map
- * @param a background panorama
- * @param {Spritesheet} a spritesheet with the tiles for the map
+ * @param imageID of background panorama
+ * @param spritesheetID of the tiles spritesheet
  * @param the maps number of tiles in x direction
  * @param the maps number of tiles in y direction
  */
-function Map(image, tileset, mapWidth, mapHeight) {
+function Map(imageID, spritesheetID, mapWidth, mapHeight) {
 
     // Panorama Image
-    if (image != undefined) {
-        this.image = new Image();
-        this.image.src = image;
+    if (imageID != undefined) {
+        this.imageID = imageID;
         // Panorama Properties
         this.x = 0;
         this.y = 0;
@@ -242,25 +332,25 @@ function Map(image, tileset, mapWidth, mapHeight) {
     }
 
     // Tileset Spritesheet
-    this.tileset = tileset;
+    this.spritesheetID = spritesheetID;
 
     // Map Properties
     this.mapWidth = mapWidth;
     this.mapHeight = mapHeight;
 
     // Pixel width & height
-    this.width = this.mapWidth * tileset.spriteWidth;
-    this.height = this.mapHeight * tileset.spriteHeight;
+    this.width = this.mapWidth * spritesheets.data[this.spritesheetID].spriteWidth;
+    this.height = this.mapHeight * spritesheets.data[this.spritesheetID].spriteHeight;
 
     // The name is the filename
-    this.name = tileset.name.match(/[\w]+/)[0];
+    this.name = spritesheets.data[this.spritesheetID].name.match(/[\w]+/)[0];
 
     // Contains all the tiles
     // A tile is a component which contains the layers and the collision
     this.tiles = [];
     for (var i = 0, l = this.mapWidth * this.mapHeight; i < l; i++) {
         var res = i2xy(i, this.mapWidth);
-        this.tiles.push(new Tile(this.tileset, res[0] * this.tileset.spriteWidth, res[1] * this.tileset.spriteHeight));
+        this.tiles.push(new Tile(this.spritesheetID, res[0] * spritesheets.data[this.spritesheetID].spriteWidth, res[1] * spritesheets.data[this.spritesheetID].spriteHeight));
     }
     // Contains all the components of the map
     this.components = [];
@@ -317,7 +407,7 @@ function Map(image, tileset, mapWidth, mapHeight) {
         game.cgx3.clearRect(0, 0, game.foreground.width, game.foreground.height);
 
         // ...  and repaint!
-        if (this.image != undefined) game.cgx1.drawImage(this.image, this.x, this.y, game.panorama.width, game.panorama.height);
+        if (this.imageID != undefined) game.cgx1.drawImage(images.data[this.imageID], this.x, this.y, game.panorama.width, game.panorama.height);
 
         for (var i = 0, l = this.mapWidth * this.mapHeight; i < l; i++) this.tiles[i].draw(game.cgx2, game.cgx3);
     }
@@ -362,8 +452,8 @@ function Map(image, tileset, mapWidth, mapHeight) {
     this.clickedTile = function (param_x, param_y) {
         // Click on Map
         if (game.activeCanvas == 0) {
-            var x = Math.floor((param_x + game.camera.x) / this.tileset.spriteWidth);
-            var y = Math.floor((param_y + game.camera.y) / this.tileset.spriteHeight);
+            var x = Math.floor((param_x + game.camera.x) / spritesheets.data[this.spritesheetID].spriteWidth);
+            var y = Math.floor((param_y + game.camera.y) / spritesheets.data[this.spritesheetID].spriteHeight);
             var d = maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)];
             // Clicked Tile console.log(xy2i(x, y, this.mapWidth));
             if (game.drawingOn) {
@@ -378,9 +468,9 @@ function Map(image, tileset, mapWidth, mapHeight) {
         }
         // Click on Tileset
         if (game.activeCanvas == 1) {
-            var x = Math.floor(param_x / this.tileset.spriteWidth);
-            var y = Math.floor(param_y / this.tileset.spriteHeight);
-            game.tiletype = xy2i(x, y, this.tileset.spritesX) + 1;
+            var x = Math.floor(param_x / spritesheets.data[this.spritesheetID].spriteWidth);
+            var y = Math.floor(param_y / spritesheets.data[this.spritesheetID].spriteHeight);
+            game.tiletype = xy2i(x, y, spritesheets.data[this.spritesheetID].spritesX) + 1;
             document.getElementById("selectedTile").innerHTML = game.tiletype;
             document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
             this.drawTileset();
@@ -391,18 +481,18 @@ function Map(image, tileset, mapWidth, mapHeight) {
      * Draw the tileset on the tileset canvas
      */
     this.drawTileset = function () {
-        game.tileset.width = this.tileset.spriteWidth * this.tileset.spritesX;
-        game.tileset.height = this.tileset.spriteHeight * this.tileset.spritesY;
-        game.tilecontext.clearRect(0, 0, this.tileset.spriteWidth * this.tileset.spritesX, this.tileset.spriteHeight * this.tileset.spritesY);
+        game.tileset.width = spritesheets.data[this.spritesheetID].spriteWidth * spritesheets.data[this.spritesheetID].spritesX;
+        game.tileset.height = spritesheets.data[this.spritesheetID].spriteHeight * spritesheets.data[this.spritesheetID].spritesY;
+        game.tilecontext.clearRect(0, 0, spritesheets.data[this.spritesheetID].spriteWidth * spritesheets.data[this.spritesheetID].spritesX, spritesheets.data[this.spritesheetID].spriteHeight * spritesheets.data[this.spritesheetID].spritesY);
 
         var mapIndex = 0;
         var tile_w, tile_h;
-        for (var h = 0, m = this.tileset.spritesY; h < m; h++) {
-            for (var w = 0, n = this.tileset.spritesX; w < n; w++, mapIndex++) {
-                tile_w = w * this.tileset.spriteWidth;
-                tile_h = h * this.tileset.spriteHeight;
+        for (var h = 0, m = spritesheets.data[this.spritesheetID].spritesY; h < m; h++) {
+            for (var w = 0, n = spritesheets.data[this.spritesheetID].spritesX; w < n; w++, mapIndex++) {
+                tile_w = w * spritesheets.data[this.spritesheetID].spriteWidth;
+                tile_h = h * spritesheets.data[this.spritesheetID].spriteHeight;
                 //(ctx, spritesheet, number, x, y)
-                drawSprite(game.tilecontext, this.tileset, mapIndex, tile_w, tile_h);
+                drawSprite(game.tilecontext, spritesheets.data[this.spritesheetID], mapIndex, tile_w, tile_h);
 
                 // Show Tileset Grid
                 if (false) {
@@ -489,14 +579,12 @@ var components = {
  * @param interactEventID
  * @param movementEventID
  */
-function addComponent(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID, movementEventID, mapID) {
+function addComponent(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID, movementEventID) {
     // Add
     components.data.push(new Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID, movementEventID));
     // ID management
     if (components.freeIDs.length > 0) components.data[components.data.length - 1].id = components.freeIDs[0].pop();
     else components.data[components.data.length - 1].id = components.data.length - 1;
-    // Add ID to map
-    maps.data[mapID].components.push(components.data.length - 1);
 }
 
 /**
@@ -521,7 +609,7 @@ function removeComponent(id) {
 function generateComponentData() {
     // Datastring
     for (var i = 0, l = components.data.length; i < l; i++)
-        game.data += "addComponent(" + components.data[i].name + ", " + components.data[i].spritesheetID + ", " + components.data[i].x + ", " + components.data[i].y + ", " + components.data[i].offsetX + ", " + components.data[i].offsetY + ", " + components.data[i].offsetWidth + ", " + components.data[i].offsetHeight + ", " + components.data[i].interactEventID + ", " + components.data[i].movementEventID + ");\n";
+        game.data += "addComponent('" + components.data[i].name + "', " + components.data[i].spritesheetID + ", " + components.data[i].x + ", " + components.data[i].y + ", " + components.data[i].offsetX + ", " + components.data[i].offsetY + ", " + components.data[i].offsetWidth + ", " + components.data[i].offsetHeight + ", " + components.data[i].interactEventID + ", " + components.data[i].movementEventID + ");\n";
 }
 
 /**
@@ -1161,63 +1249,17 @@ function Dialog(input, eventID) {
     }
 }
 
-// AUDIO ---------------------------------------------------------------------
-
-/**
- * Contains all the audio of the game
- */
-var audio = {
-    data: [], // The audios
-    freeIDs: [] // freeIDs
-}
-
-/**
- * Add a new audio
- * @param {file} src
- */
-function addAudio(src) {
-    // Add
-    audio.data.push(new Audio(src));
-    // ID Management
-    if (audio.freeIDs.length != 0) audio.data[audio.data.length - 1].id = audio.freeIDs.pop();
-    else audio.data[audio.data.length - 1].id = audio.data.length - 1;
-    // Sets default volume 0.2 for all added audios; maybe include as parameter on creating
-    audio.data[audio.data.length - 1].volume = 0.2;
-}
-
-/**
- * Remove an audio
- */
-function removeAudio(id) {
-    for (var i = 0, l = audio.data.length; i < l; i++)
-        if (audio.data[i].id == id) {
-            // Remove if ID found
-            audio.data.splice(id, 1);
-            // ID Management
-            audio.freeIDs.push(id);
-            break;
-        }
-}
-
-/**
- * Generate the data for the audios
- */
-function generateAudioData() {
-    // Datastring
-    for (var i = 0, l = audio.data.length; i < l; i++)
-        game.data += "addAudio('" + audio.data[i].src + "');\n";
-}
-
 // GENERATE GAME DATA --------------------------------------------------------
 
 /**
  * Generate the all the data of the game
  */
 function generateGameData() {
+    generateImageData();
+    generateAudioData();
     generateEventData();
     generateSpriteData();
     generateMapData();
     generateComponentData();
     generateDialogData();
-    generateAudioData();
 }
