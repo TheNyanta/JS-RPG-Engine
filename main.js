@@ -13,7 +13,7 @@ function startEditor() {
 var game = {
     canvas: document.createElement("canvas"),
     tileset: document.createElement("canvas"),
-    debug: false, // Global Variable for debugging
+    debug: false, // For debugging
     showExtra: false,
     // Map Editor Variables
     activeCanvas: undefined,
@@ -21,6 +21,10 @@ var game = {
     tileCollisionType: 0,
     currentLayer: 0,
     drawingOn: false,
+    // Game
+    currentMap: 0, // The map which is currently used
+    nextMap: 0, // The map that will be switched to in the next iteration of the game loop
+    currentDialog: null, // The current dialog
     // The data of the game: When creating new spritesheets/maps/components it will be saved as a string
     // If you start the engine again and feed it this data it will be the same game data as before
     data: "",
@@ -137,18 +141,18 @@ var game = {
 
                 // Keep camera view inside the map
                 if (this.x < 0) this.x = 0;
-                if (this.x > maps.data[maps.currentMap].width - game.canvas.width) this.x = maps.data[maps.currentMap].width - game.canvas.width;
+                if (this.x > maps.data[game.currentMap].width - game.canvas.width) this.x = maps.data[game.currentMap].width - game.canvas.width;
                 if (this.y < 0) this.y = 0;
-                if (this.y > maps.data[maps.currentMap].height - game.canvas.height) this.y = maps.data[maps.currentMap].height - game.canvas.height;
+                if (this.y > maps.data[game.currentMap].height - game.canvas.height) this.y = maps.data[game.currentMap].height - game.canvas.height;
 
                 // Camera (0,0) if map smaller than canvas
-                if (maps.data[maps.currentMap].width - game.canvas.width < 0) this.x = 0;
-                if (maps.data[maps.currentMap].height - game.canvas.height < 0) this.y = 0;
+                if (maps.data[game.currentMap].width - game.canvas.width < 0) this.x = 0;
+                if (maps.data[game.currentMap].height - game.canvas.height < 0) this.y = 0;
             }
         }
 
         // Init Camera Target
-        this.camera.setTarget(components.data[0]);
+        this.camera.setTarget(maps.data[0].components.data[0]);
         // Disable Mouse Control in Editor Mode
         if (game.editor) game.camera.disableMouse = true;
 
@@ -164,10 +168,10 @@ var game = {
         //this.canvas.height = this.minHeight;
 
         // Draw the first or current map onto the cached canvas'
-        maps.data[maps.currentMap].drawCache();
+        maps.data[game.currentMap].drawCache();
         if (game.editor) {
             // Draw Tileset
-            maps.data[maps.currentMap].drawTileset();
+            maps.data[game.currentMap].drawTileset();
 
             // Collision setup
             game.tileCollisions = [false, false, false, false];
@@ -207,8 +211,8 @@ var game = {
                 '<button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug Off</button>' +
                 '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +
                 '<br>' +
-                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(components.data[0])">Control Boy</button>' +
-                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(components.data[1])">Control Girl</button>' +
+                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(containsObject(maps.data[game.currentMap].components.data, 0, 0))">Control Boy</button>' +
+                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(containsObject(maps.data[game.currentMap].components.data, 1, 0))">Control Girl</button>' +
                 '</div>';
         }
 
@@ -281,12 +285,12 @@ var game = {
                     game.clickdownX = Math.floor(e.clientX - game.canvas.getBoundingClientRect().x);
                     game.clickdownY = Math.floor(e.clientY - game.canvas.getBoundingClientRect().y);
                     e.preventDefault();
-                    maps.data[maps.currentMap].clickedTile(game.clickdownX, game.clickdownY);
+                    maps.data[game.currentMap].clickedTile(game.clickdownX, game.clickdownY);
                 } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
                     game.clickdownX = Math.floor(e.clientX - game.tileset.getBoundingClientRect().x);
                     game.clickdownY = Math.floor(e.clientY - game.tileset.getBoundingClientRect().y);
                     e.preventDefault();
-                    maps.data[maps.currentMap].clickedTile(game.clickdownX, game.clickdownY);
+                    maps.data[game.currentMap].clickedTile(game.clickdownX, game.clickdownY);
                 } else {
                     game.clickdownX = undefined;
                     game.clickdownY = undefined;
@@ -471,40 +475,40 @@ function update() {
     // While game.gameSequence == true all components will stop moving (i.e. used for menus, dialogs,...)
     if (!game.gameSequence) {
         // For components that can start an interacted
-        for (var i = 0; i < maps.data[maps.currentMap].components.length; i++)
+        for (var i = 0; i < maps.data[game.currentMap].components.data.length; i++)
             // The controlled component can acted with other component
-            if (components.data[maps.data[maps.currentMap].components[i]] == game.camera.target)
-                for (var j = 0; j < maps.data[maps.currentMap].components.length; j++) {
-                    var c1 = components.data[maps.data[maps.currentMap].components[i]];
-                    var c2 = components.data[maps.data[maps.currentMap].components[j]];
+            if (maps.data[game.currentMap].components.data[i] == game.camera.target)
+                for (var j = 0; j < maps.data[game.currentMap].components.data.length; j++) {
+                    var c1 = maps.data[game.currentMap].components.data[i];
+                    var c2 = maps.data[game.currentMap].components.data[j];
                     c1.updateInteraction(c2);
                 }
 
         // Update the movement of all components on the current map (this also resolves tileCollision)
         if (!game.transition)
-            for (var i = 0; i < maps.data[maps.currentMap].components.length; i++)
-                components.data[maps.data[maps.currentMap].components[i]].updateMovement();
+            for (var i = 0; i < maps.data[game.currentMap].components.data.length; i++)
+                maps.data[game.currentMap].components.data[i].updateMovement();
 
         // Check each combination pair of components on the current map for component-component-collision
-        for (var i = 0; i < maps.data[maps.currentMap].components.length; i++)
-            for (var j = i + 1; j < maps.data[maps.currentMap].components.length; j++) {
-                var c1 = components.data[maps.data[maps.currentMap].components[i]];
-                var c2 = components.data[maps.data[maps.currentMap].components[j]];
+        for (var i = 0; i < maps.data[game.currentMap].components.data.length; i++)
+            for (var j = 0; j < maps.data[game.currentMap].components.data.length; j++) {
+                var c1 = maps.data[game.currentMap].components.data[i];
+                var c2 = maps.data[game.currentMap].components.data[j];
                 c1.componentCollision(c2);
             }
 
         // Update the position of all components on the current map
-        for (var i = 0, l = maps.data[maps.currentMap].components.length; i < l; i++) components.data[maps.data[maps.currentMap].components[i]].updatePosition();
+        for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) maps.data[game.currentMap].components.data[i].updatePosition();
     }
 }
 
 /**
  * Draws the canvas
- * Zero it clears the canvas
- * First it draws the background
- * Second it draws the objects
- * Third it draws the foreground
- * Four it draws the gui
+ * 1) Clear the canvas
+ * 2) Draw the background
+ * 3) Draw the objects
+ * 4) Draw the foreground
+ * 4) Draw the gui
  */
 function draw() {
     // Draw map transition
@@ -514,15 +518,15 @@ function draw() {
         // Clear the canvas
         game.context.clearRect(0, 0, game.canvas.width, game.canvas.height);
         // Draw Background
-        maps.data[maps.currentMap].drawBackground();
+        maps.data[game.currentMap].drawBackground();
         // Sorts the array after it's y value so that components with bigger y are drawn later
-        maps.data[maps.currentMap].components.sort(function (a, b) {
-            return (components.data[a].y > components.data[b].y) ? 1 : ((components.data[b].y > components.data[a].y) ? -1 : 0);
+        maps.data[game.currentMap].components.data.sort(function (a, b) {
+            return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);
         });
         // Draw Objects of the current map
-        for (var i = 0, l = maps.data[maps.currentMap].components.length; i < l; i++) components.data[maps.data[maps.currentMap].components[i]].draw(game.context);
+        for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) maps.data[game.currentMap].components.data[i].draw(game.context);
         // Draw Foreground
-        maps.data[maps.currentMap].drawForeground();
+        maps.data[game.currentMap].drawForeground();
     }
     // Draw extras
     if (game.showExtra) {
@@ -542,10 +546,10 @@ function updateGameArea() {
     game.frameNo += 1;
 
     // Redraw caches' on map change + map switch transition
-    if (maps.currentMap != maps.nextMap) {
-        maps.currentMap = maps.nextMap;
-        maps.data[maps.currentMap].drawCache();
-        if (game.editor != undefined) maps.data[maps.currentMap].drawTileset();
+    if (game.currentMap != game.nextMap) {
+        game.currentMap = game.nextMap;
+        maps.data[game.currentMap].drawCache();
+        if (game.editor != undefined) maps.data[game.currentMap].drawTileset();
         setTimeout(function () {
             game.transition = false;
         }, 400);
@@ -559,9 +563,9 @@ function updateGameArea() {
     draw();
 
     // Draw dialog
-    if (dialogs.currentDialog != undefined) {
+    if (game.currentDialog != undefined) {
         game.gameSequence = true;
-        dialogs.currentDialog.update();
+        game.currentDialog.update();
     } else game.gameSequence = false;
 
     // Simple hardcoded sound player for jukebox

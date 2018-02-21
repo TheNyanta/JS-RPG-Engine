@@ -39,173 +39,170 @@ addMap(null, 1, 80, 60);
 addMap(null, 2, 42, 40);
 addMap(null, 3, 42, 60);
 
-// ######
-// Events
-// ######
+/*
+//Stone
 addEvent(function (componentID) {
     // Enter key down / click / touch
     if (game.enter || game.mousedown || game.touchdown) {
         if (game.eventReady) {
             // Looking up
-            if (components.data[componentID].direction == 4) dialogs.currentDialog = dialogs.data[0];
+            if (components.data[componentID].direction == 4) game.currentDialog = dialogs.data[0];
             game.eventReady = false;
         }
     } else game.eventReady = true;
 });
+
+// Teleport
 addEvent(function (componentID) {
     componentMapSwitch(null, -8, 3, componentID, true);
 });
 addEvent(function (componentID) {
     componentMapSwitch(null, 280, 2, componentID, true);
 });
-addEvent(function (choice) {
-    if (choice == 0) myHarp.startPlaying();
-    if (choice == 1) myHarp.stopPlaying();
-});
-addEvent(function (choice) {
-    if (choice == maps.currentMap) {
-        // Chaining dialogs by calling a new in the dialog event function
-        dialogs.currentDialog = dialogs.data[2];
-    } else {
-        if (choice == 0) {
-            componentMapSwitch(380, 208, 0, 0);
-            componentMapSwitch(364, 208, 0, 1);
-            maps.nextMap = 0;
-            game.transition = true;
-        } else if (choice == 1) {
-            componentMapSwitch(192, 360, 1, 0);
-            componentMapSwitch(176, 360, 1, 1);
-            maps.nextMap = 1;
-            game.transition = true;
-        } else if (choice == 2) {
-            componentMapSwitch(166, 210, 2, 0);
-            componentMapSwitch(150, 210, 2, 1);
-            maps.nextMap = 2;
-            game.transition = true;
-        }
-    }
-});
-addEvent(function (choice) {
-    if (choice == 0) {
-        components.data[5].startSpecial(); // Opening Animation
-        dialogs.data[5].setDialog(["The door is opened", "...", "There is no map for the castle."]);
-    }
-});
-addEvent(function (choice) {
-    if (choice == 0)
-        audio.data[8].play();
-});
-addEvent(function () {
-    dialogs.currentDialog = dialogs.data[1];
-});
-addEvent(function () {
-    audio.data[9].play();
-});
-addEvent(function () {
-    dialogs.currentDialog = dialogs.data[3];
-});
-addEvent(function () {
-    dialogs.currentDialog = dialogs.data[4];
-    if (components.data[2].routeForward) components.data[2].routeIndex--;
-    else components.data[2].routeIndex++;
-    components.data[2].routeForward = toggle(components.data[2].routeForward);
-});
-addEvent(function () {
-    dialogs.currentDialog = dialogs.data[5];
-});
-addEvent(function (target) {
-    // Cat run in circle
-    if (!game.gameSequence) {
-        if (target.routeIndex >= target.route.length) target.routeIndex = 0;
-        if (target.routeIndex < 0) target.routeIndex = target.route.length - 1;
-        // First reach x
-        if (target.x == target.route[target.routeIndex][0]) {
-            // Than reach y
-            if (target.y == target.route[target.routeIndex][1]) {
-                if (target.routeForward) target.routeIndex++;
-                else target.routeIndex--;
-            } else if (target.y < target.route[target.routeIndex][1]) target.speedY = target.speed;
-            else target.speedY = -target.speed;
-        } else if (target.x < target.route[target.routeIndex][0]) target.speedX = target.speed;
-        else target.speedX = -target.speed;
-    }
-});
-addEvent(function (target) {
-    // Dog simple follow controlled component
-    if (!game.gameSequence && game.camera.target != undefined) {
-        // x move
-        if (Math.abs(target.x + target.offsetX - game.camera.target.x) > Math.abs(target.y + target.offsetY - game.camera.target.y)) {
-            if (target.x + target.offsetX != game.camera.target.x) {
-                if (target.x + target.offsetX < game.camera.target.x) target.speedX = target.speed;
-                else target.speedX = -target.speed;
-            }
-        }
-        // y move
-        else {
-            if (target.y + target.offsetY != game.camera.target.y) {
-                if (target.y + target.offsetY < game.camera.target.y) target.speedY = target.speed;
-                else target.speedY = -target.speed;
-            }
-        }
-    }
-});
+*/
 
 // ##########
 // Components
 // ##########
-addComponent("Boy", 4, 240, 280, 4, 16, 16, 16, 7, undefined);
-addComponent("Girl", 5, 370, 210, 4, 16, 16, 16, 7, undefined);
-addComponent("Cat", 6, 160, 390, 4, 16, 16, 16, 10, 12);
-addComponent("Dog", 7, 100, 100, 4, 16, 16, 16, 8, 13);
-addComponent("Jukebox", 8, 260, 120, 0, 16, 24, 16, 9, undefined);
-addComponent("Door", 9, 144, 62, 0, 0, 47, 40, 11, undefined);
-
-// Add componentID to assigned map
-maps.data[0].components.push(0);
-maps.data[0].components.push(1);
-maps.data[0].components.push(2);
-maps.data[1].components.push(3);
-maps.data[1].components.push(4);
-maps.data[2].components.push(5);
+addComponent("Boy", 0, 4, 240, 280, 4, 16, 16, 16,
+    function () {
+        game.currentDialog = dialogs.data[1];
+    }, undefined);
+addComponent("Girl", 0, 5, 370, 210, 4, 16, 16, 16,
+    function () {
+        game.currentDialog = dialogs.data[1];
+    }, undefined);
+addComponent("Cat", 0, 6, 160, 390, 4, 16, 16, 16,
+    function () {
+        game.currentDialog = dialogs.data[4];
+        if (this.routeForward) this.routeIndex--;
+        else this.routeIndex++;
+        this.routeForward = toggle(this.routeForward);
+    },
+    function () {
+        // Cat run in circle
+        if (!game.gameSequence) {
+            if (this.routeIndex >= this.route.length) this.routeIndex = 0;
+            if (this.routeIndex < 0) this.routeIndex = this.route.length - 1;
+            // First reach x
+            if (this.x == this.route[this.routeIndex][0]) {
+                // Than reach y
+                if (this.y == this.route[this.routeIndex][1]) {
+                    if (this.routeForward) this.routeIndex++;
+                    else this.routeIndex--;
+                } else if (this.y < this.route[this.routeIndex][1]) this.speedY = this.speed;
+                else this.speedY = -this.speed;
+            } else if (this.x < this.route[this.routeIndex][0]) this.speedX = this.speed;
+            else this.speedX = -this.speed;
+        }
+    });
+addComponent("Dog", 1, 7, 100, 100, 4, 16, 16, 16,
+    function () {
+        audio.data[9].play();
+    },
+    function () {
+        // Dog simple follow controlled component
+        if (!game.gameSequence && game.camera.target != undefined) {
+            // x move
+            if (Math.abs(this.boundingBox.x - game.camera.target.x) > Math.abs(this.boundingBox.y - game.camera.target.y)) {
+                if (this.boundingBox.x != game.camera.target.x) {
+                    if (this.boundingBox.x < game.camera.target.x) this.speedX = this.speed;
+                    else this.speedX = -this.speed;
+                }
+            }
+            // y move
+            else {
+                if (this.boundingBox.y != game.camera.target.y) {
+                    if (this.boundingBox.y < game.camera.target.y) this.speedY = this.speed;
+                    else this.speedY = -this.speed;
+                }
+            }
+        }
+    });
+addComponent("Jukebox", 1, 8, 260, 120, 0, 16, 24, 16,
+    function () {
+        game.currentDialog = dialogs.data[3];
+    });
+addComponent("Door", 2, 9, 144, 62, 0, 0, 47, 40,
+    function () {
+        game.currentDialog = dialogs.data[5];
+    });
 
 // #######
 // Dialogs
 // #######
 addDialog(["Just an old stone."]);
-addDialog(["Hello!", "Choose a map!", ["Grass", "Snow", "Castletown"]], 4);
+addDialog(["Hello!", "Choose a map!", ["Grass", "Snow", "Castletown"]], function (choice) {
+    if (choice == game.currentMap) {
+        // Chaining dialogs by calling a new in the dialog event function
+        game.currentDialog = dialogs.data[2];
+    } else {
+        if (choice == 0) {
+            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 0, 0), 0, 380, 208);
+            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 1, 0), 0, 364, 208);
+            game.nextMap = 0;
+            game.transition = true;
+        } else if (choice == 1) {
+            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 0, 0), 1, 192, 360);
+            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 1, 0), 1, 176, 360);
+            game.nextMap = 1;
+            game.transition = true;
+        } else if (choice == 2) {
+            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 0, 0), 2, 166, 210);
+            teleportComponent(containsObject(maps.data[game.currentMap].components.data, 1, 0), 2, 150, 210);
+            game.nextMap = 2;
+            game.transition = true;
+        }
+    }
+});
 addDialog(["We are on this map!"]);
-addDialog(["This is jukebox!", "Wanna here some music?", ["Yes", "No"]], 3);
-addDialog(["Meow!", "Want meow to meow?", ["Yes", "No"]], 6);
-addDialog(["The door is closed!", ["Yes", "No"]], 5);
+addDialog(["This is jukebox!", "Wanna here some music?", ["Yes", "No"]], function (choice) {
+    if (choice == 0) myHarp.startPlaying();
+    if (choice == 1) myHarp.stopPlaying();
+});
+addDialog(["Meow!", "Want meow to meow?", ["Yes", "No"]], function (choice) {
+    if (choice == 0)
+        audio.data[8].play();
+});
+addDialog(["The door is closed!", ["Yes", "No"]], function (choice) {
+    if (choice == 0) {
+        maps.data[2].components.data[0].startSpecial(); // Opening Animation
+        dialogs.data[5].setDialog(["The door is opened", "...", "There is no map for the castle."]);
+    }
+});
 
 // #################################################################################################
 
 // TODO: INCLUDE IN SELF DATA GENERATION
 
+/*
 // Dialog on enter / click / touch when controlled character in front of stone when facing it (looking up)
 for (var i = 1070; i <= 1071; i++) {
-    maps.data[2].tiles[i].enterEventID = 0;
+    maps.data[2].tiles[i].enterEventID = 1;
 }
 // Teleports
 // Castle to town
 for (var i = 1650; i <= 1667; i++) {
-    maps.data[2].tiles[i].stepOnEventID = 1;
+    maps.data[2].tiles[i].stepOnEventID = 2;
 }
 // Town to castle
 for (var i = 12; i <= 29; i++) {
-    maps.data[3].tiles[i].stepOnEventID = 2;
+    maps.data[3].tiles[i].stepOnEventID = 3;
 }
+*/
+
 // Add animation sequences
-components.data[0].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-components.data[1].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-components.data[2].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-components.data[3].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-components.data[5].specialAnimation(20, [0, 1, 2, 3]);
+maps.data[0].components.data[0].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+maps.data[0].components.data[1].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+maps.data[0].components.data[2].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+maps.data[1].components.data[0].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+maps.data[2].components.data[0].specialAnimation(20, [0, 1, 2, 3]);
 // Cat walk
-components.data[2].route = [[50, 390], [50, 380], [50, 150], [600, 150], [600, 390]];
-components.data[2].routeIndex = 0;
-components.data[2].speed = 5;
-components.data[2].routeForward = true;
+maps.data[0].components.data[2].route = [[50, 390], [50, 380], [50, 150], [600, 150], [600, 390]];
+maps.data[0].components.data[2].routeIndex = 0;
+maps.data[0].components.data[2].speed = 5;
+maps.data[0].components.data[2].routeForward = true;
+
 
 // #################################################################################################
 

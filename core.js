@@ -90,51 +90,6 @@ function generateAudioData() {
         game.data += "addAudio('" + audio.data[i].src + "');\n";
 }
 
-// EVENTS ----------------------------------------------------------------------
-/**
- * Contains all the events of the game
- */
-var events = {
-    data: [], // Contains all events
-    variables: [], // Contains all the variables
-    freeIDs: [] // FreeIDs
-};
-
-/**
- * For adding a new event
- * @param {function} event
- */
-function addEvent(fnc) {
-    // Add
-    events.data.push(fnc);
-    // ID management
-    if (events.freeIDs.length > 0) events.data[events.data.length - 1].id = events.freeIDs[0].pop();
-    else events.data[events.data.length - 1].id = events.data.length - 1;
-}
-
-/**
- * Remove an event
- */
-function removeEvent(id) {
-    for (var i = 0, l = events.data.length; i < l; i++)
-        if (events.data[i].id == id) {
-            // Remove if ID found
-            events.data.splice(id, 1);
-            // ID Management
-            events.freeIDs.push(id);
-            break;
-        }
-}
-
-/**
- * Generate the data for the events
- */
-function generateEventData() {
-    // Datastring
-    for (var i = 0, l = events.data.length; i < l; i++)
-        game.data += "addEvent(" + events.data[i] + ");\n";
-}
-
 // SPRITESHEETS ----------------------------------------------------------------
 
 /**
@@ -213,8 +168,6 @@ function drawSprite(ctx, spritesheet, number, x, y) {
  */
 var maps = {
     data: [], // Contains the maps
-    currentMap: 0, // The map which is currently used
-    nextMap: 0, // The map that will be switched to in the next iteration
     freeIDs: [] // Free IDs
 };
 
@@ -240,7 +193,7 @@ function removeMap(id) {
     for (var i = 0, l = maps.data.length; i < l; i++)
         if (maps.data[i].id == id) {
             // Remove if ID found
-            maps.data.splice(id, 1);
+            maps.data.splice(i, 1);
             // ID Management
             maps.freeIDs.push(id);
             break;
@@ -275,9 +228,6 @@ function Tile(spritesheetID, x, y) {
     // Collision
     this.collision = 0;
 
-    this.interactEventID;
-    this.stepOnEventID;
-
     /** This draws the tile on the cached canvas'
      * @param Cached canvas context for layer 1 & 2 (Background)
      * @param Cached canvas context for layer 3 (Foreground)
@@ -300,12 +250,6 @@ function Tile(spritesheetID, x, y) {
             }
             game.cgx3.fillRect(this.x, this.y, this.width, this.height);
             game.cgx3.globalAlpha = 1.0;
-            // Show event
-            if (this.stepOnEventID != undefined || this.interactEventID != undefined) {
-                game.cgx3.font = "bold 8px Serif";
-                game.cgx3.fillStyle = "black";
-                game.cgx3.fillText("E", this.x + 1, this.y + 7);
-            }
         }
     }
 }
@@ -343,44 +287,35 @@ function Map(imageID, spritesheetID, mapWidth, mapHeight) {
     // The name is the filename
     this.name = spritesheets.data[this.spritesheetID].name.match(/[\w]+/)[0];
 
-    // Contains all the tiles
-    // A tile is a component which contains the layers and the collision
+    // Contains all the tiles of this map
+    // A tile is a component which contains the layers and collision / stepOnEventID / interactEventID
     this.tiles = [];
     for (var i = 0, l = this.mapWidth * this.mapHeight; i < l; i++) {
         var res = i2xy(i, this.mapWidth);
         this.tiles.push(new Tile(this.spritesheetID, res[0] * spritesheets.data[this.spritesheetID].spriteWidth, res[1] * spritesheets.data[this.spritesheetID].spriteHeight));
     }
-    // Contains all the components of the map
-    this.components = [];
-    // Function for adding components to the map
-    this.addComponent = function (component) {
-        if (component.length != undefined)
-            for (var i = 0, l = component.length; i < l; i++) this.components.push(component[i]);
-        else this.components.push(component);
-    }
 
-    // Contains all the events of the map
-    this.events = [];
-    // Function for adding events to the map
-    this.addEvent = function (event) {
-        if (event.length != undefined)
-            for (var i = 0, l = event.length; i < l; i++) this.events.push(event[i]);
-        else this.events.push(event[i]);
+    // Contains all components of this map
+    this.components = {
+        data: [], // Contains the components
+        freeIDs: [] // Free IDs
     }
 
     /**
-     * Load layers into the the map
+     * Load layers + collision & eventIDs into the the map
      * @param layer1 (background)
      * @param layer2 (background)
      * @param layer3 (foreground)
-     * @param collision layer
+     * @param collision
+     * @param stepOnEventID
+     * @param interactEventID
      */
-    this.loadLayers = function (l1, l2, l3, lc) {
+    this.loadLayers = function (l1, l2, l3, collision) {
         for (var i = 0, l = this.mapWidth * this.mapHeight; i < l; i++) {
             this.tiles[i].layer1 = l1[i];
             this.tiles[i].layer2 = l2[i];
             this.tiles[i].layer3 = l3[i];
-            this.tiles[i].collision = lc[i];
+            this.tiles[i].collision = collision[i];
         }
     }
 
@@ -452,7 +387,7 @@ function Map(imageID, spritesheetID, mapWidth, mapHeight) {
         if (game.activeCanvas == 0) {
             var x = Math.floor((param_x + game.camera.x) / spritesheets.data[this.spritesheetID].spriteWidth);
             var y = Math.floor((param_y + game.camera.y) / spritesheets.data[this.spritesheetID].spriteHeight);
-            var d = maps.data[maps.currentMap].tiles[xy2i(x, y, this.mapWidth)];
+            var d = maps.data[game.currentMap].tiles[xy2i(x, y, this.mapWidth)];
             // Clicked Tile console.log(xy2i(x, y, this.mapWidth));
             if (game.drawingOn) {
                 if (game.currentLayer == 0) d.layer1 = game.tiletype;
@@ -460,7 +395,7 @@ function Map(imageID, spritesheetID, mapWidth, mapHeight) {
                 if (game.currentLayer == 2) d.layer3 = game.tiletype;
                 if (game.currentLayer == 3) d.collision = game.tileCollisionType;
 
-                maps.data[maps.currentMap].drawCache();
+                maps.data[game.currentMap].drawCache();
             }
             document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
         }
@@ -557,16 +492,9 @@ function Map(imageID, spritesheetID, mapWidth, mapHeight) {
 // COMPONENTS ----------------------------------------------------------------
 
 /**
- * Contains all components of the game
- */
-var components = {
-    data: [], // Contains the components
-    freeIDs: [] // Free IDs
-}
-
-/**
  * For adding a new component
  * @param name
+ * @param mapID: the original map of creation
  * @param spritesheetID
  * @param x-position
  * @param y-position
@@ -574,15 +502,17 @@ var components = {
  * @param offsetY
  * @param offsetWidth
  * @param offsetHeight
- * @param interactEventID
- * @param movementEventID
+ * @param {function} trigger to be defined in function
  */
-function addComponent(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID, movementEventID) {
-    // Add
-    components.data.push(new Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID, movementEventID));
-    // ID management
-    if (components.freeIDs.length > 0) components.data[components.data.length - 1].id = components.freeIDs[0].pop();
-    else components.data[components.data.length - 1].id = components.data.length - 1;
+function addComponent(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, triggerEvent, moveEvent) {
+    var map = containsObject(maps.data, mapID);
+    if (map != undefined) {
+        // Add
+        var index = map.components.data.push(new Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, triggerEvent, moveEvent));
+        // ID management
+        if (map.components.freeIDs.length > 0) map.components.data[index - 1].id = map.components.freeIDs[0].pop();
+        else map.components.data[index - 1].id = index - 1;
+    }
 }
 
 /**
@@ -592,13 +522,17 @@ function removeComponent(id) {
     for (var i = 0, l = components.data.length; i < l; i++)
         if (components.data[i].id == id) {
             // Remove if ID found
+            //delete components.data[i];
             components.data.splice(id, 1);
             // ID Management
             components.freeIDs.push(id);
             break;
         }
-    // TODO: Run over maps and remove its id
-    // Also check if there are any references elsewhere (i.e. events) hm...
+    // Remove componentID reference from all maps
+    for (var i = 0, l = maps.data.length; i < l; i++)
+        for (var j = 0; j < maps.data[i].components.length; j++)
+            if (maps.data[i].components[j] == id)
+                maps.data[i].components.splice(j, 1);
 }
 
 /**
@@ -606,32 +540,34 @@ function removeComponent(id) {
  */
 function generateComponentData() {
     // Datastring
-    for (var i = 0, l = components.data.length; i < l; i++)
-        game.data += "addComponent('" + components.data[i].name + "', " + components.data[i].spritesheetID + ", " + components.data[i].x + ", " + components.data[i].y + ", " + components.data[i].offsetX + ", " + components.data[i].offsetY + ", " + components.data[i].offsetWidth + ", " + components.data[i].offsetHeight + ", " + components.data[i].interactEventID + ", " + components.data[i].movementEventID + ");\n";
+    for (var i = 0, l = maps.data.length; i < l; i++)
+        for (var j = 0; j < maps.data[i].components.data.length; j++) {
+            var c = maps.data[i].components.data;
+            game.data += "addComponent('" + c[j].name + "', " + c[j].mapID + ", " + c[j].spritesheetID + ", " + c[j].x + ", " + c[j].y + ", " + c[j].boundingBox.x + ", " + c[j].boundingBox.y + ", " + c[j].boundingBox.width + ", " + c[j].boundingBox.height + ", " + c[j].triggerEvent + ", " + c[j].moveEvent + ");\n";
+        }
 }
 
 /**
  * Component constructor
  * @param name
  * @param spritesheetID
+ * @param mapID: the original map of creation
  * @param x-position
  * @param y-position
  * @param offsetX
  * @param offsetY
  * @param offsetWidth
  * @param offsetHeight
- * @param interactEventID
- * @param movementEventID
+ * @param {function} triggerEvent
+ * @param {function} moveEvent
  */
-function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, interactEventID, movementEventID) {
-
+function Component(name, mapID, spritesheetID, x, y, offsetX, offsetY, offsetWidth, offsetHeight, triggerEvent, moveEvent) {
     this.name = name;
+    this.mapID = mapID;
     this.spritesheetID = spritesheetID;
 
     this.x = x;
     this.y = y;
-    this.width = spritesheets.data[this.spritesheetID].spriteWidth;
-    this.height = spritesheets.data[this.spritesheetID].spriteHeight;
 
     // Movement Properties
     this.speed = 2;
@@ -639,12 +575,22 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
     this.speedY = 0;
 
     // Collision Properties
-    this.collidable = true;
-    //this.moveable = false; // True if it can be pushed away by other Components. TODO: Implement
-    this.offsetX = offsetX;
-    this.offsetY = offsetY;
-    this.offsetWidth = offsetWidth;
-    this.offsetHeight = offsetHeight;
+    this.boundingBox = {
+        x: x + offsetX,
+        y: y + offsetY,
+        width: offsetWidth,
+        height: offsetHeight,
+        offsetX: offsetX, // To restore this.x after a teleport
+        offsetY: offsetY, // To restore this.y after a teleport
+        collidable: true,
+        //moveable: false // TODO: Implement
+    };
+
+    // NOOP function if no event
+    this.triggerEvent = function () {};
+    if (triggerEvent instanceof Function) this.triggerEvent = triggerEvent;
+    this.moveEvent = function () {};
+    if (moveEvent instanceof Function) this.moveEvent = moveEvent;
 
     // Animation Properties
     this.sequence = 0;
@@ -655,32 +601,32 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
     this.animationIndexCounter = 0;
     this.direction = 64; // Default Direction
 
-    // Event Properties
-    if (interactEventID != undefined) this.interactEventID = interactEventID;
-    if (movementEventID != undefined) this.movementEventID = movementEventID;
+    // NOOP function if no image
+    this.draw = function () {};
+    if (spritesheetID != undefined) {
+        this.draw = function (ctx) {
+            // Sets animations (based on moving and direction)        
+            this.updateAnimation();
 
-    this.draw = function (ctx) {
-        // Sets animations (based on moving and direction)        
-        this.updateAnimation();
-
-        // Debug information
-        if (game.debug) {
-            // Draw Collision Box
-            ctx.strokeStyle = "black";
-            ctx.strokeRect(this.x + this.offsetX - game.camera.x, this.y + this.offsetY - game.camera.y, this.offsetWidth, this.offsetHeight);
-        }
-
-        // Animation: Moving / Idle
-        if (this.sequence.length != undefined) {
-            if (this.animationDelay++ >= this.animationTime) {
-                this.animationDelay = 0;
-                this.animationIndexCounter++;
-                if (this.animationIndexCounter >= this.sequence.length) this.animationIndexCounter = 0;
+            // Debug information
+            if (game.debug) {
+                // Draw Collision Box
+                ctx.strokeStyle = "black";
+                ctx.strokeRect(this.boundingBox.x - game.camera.x, this.boundingBox.y - game.camera.y, this.boundingBox.width, this.boundingBox.height);
             }
-            drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence[this.animationIndexCounter], (this.x - game.camera.x), (this.y - game.camera.y));
+
+            // Animation: Moving / Idle
+            if (this.sequence.length != undefined) {
+                if (this.animationDelay++ >= this.animationTime) {
+                    this.animationDelay = 0;
+                    this.animationIndexCounter++;
+                    if (this.animationIndexCounter >= this.sequence.length) this.animationIndexCounter = 0;
+                }
+                drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence[this.animationIndexCounter], (this.x - game.camera.x), (this.y - game.camera.y));
+            }
+            // No Animation: Just sprite image
+            else drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence, (this.x - game.camera.x), (this.y - game.camera.y));
         }
-        // No Animation: Just sprite image
-        else drawSprite(ctx, spritesheets.data[this.spritesheetID], this.sequence, (this.x - game.camera.x), (this.y - game.camera.y));
     }
 
     this.idleAnimation = function (idleAnimationTime, idleUp, idleDown, idleLeft, idleRight) {
@@ -781,26 +727,26 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
      */
     this.tileCollision = function () {
 
-        var d = maps.data[maps.currentMap];
+        var d = maps.data[game.currentMap];
 
         // Check map borders
-        if (this.x + this.offsetX + this.speedX < 0) this.speedX = 0;
-        else if (this.y + this.offsetY + this.speedY < 0) this.speedY = 0;
-        else if (this.x + this.offsetX + this.speedX + this.offsetWidth > d.width) this.speedX = 0;
-        else if (this.y + this.offsetY + this.speedY + this.offsetHeight > d.height) this.speedY = 0;
+        if (this.boundingBox.x + this.speedX < 0) this.speedX = 0;
+        else if (this.boundingBox.y + this.speedY < 0) this.speedY = 0;
+        else if (this.boundingBox.x + this.speedX + this.boundingBox.width > d.width) this.speedX = 0;
+        else if (this.boundingBox.y + this.speedY + this.boundingBox.height > d.height) this.speedY = 0;
 
         // Converts the cartesian to grid coordiantes
-        var x1 = Math.floor((this.x + this.offsetX + this.speedX) / 8);
+        var x1 = Math.floor((this.boundingBox.x + this.speedX) / 8);
         var x2 = x1 + 1;
-        var x3 = Math.floor((this.x + this.offsetX + this.speedX + this.offsetWidth) / 8);
-        var y1 = Math.floor((this.y + this.offsetY + this.speedY) / 8);
+        var x3 = Math.floor((this.boundingBox.x + this.speedX + this.boundingBox.width) / 8);
+        var y1 = Math.floor((this.boundingBox.y + this.speedY) / 8);
         var y2 = y1 + 1;
-        var y3 = Math.floor((this.y + this.offsetY + this.speedY + this.offsetHeight) / 8);
+        var y3 = Math.floor((this.boundingBox.y + this.speedY + this.boundingBox.height) / 8);
 
-        if (Math.abs(x3 - (this.x + this.offsetX + this.offsetWidth + this.speedX) / 8) < 0.1) x3 = x2;
-        if (Math.abs(y3 - (this.y + this.offsetY + this.offsetHeight + this.speedY) / 8) < 0.1) y3 = y2;
+        if (Math.abs(x3 - (this.boundingBox.x + this.boundingBox.width + this.speedX) / 8) < 0.1) x3 = x2;
+        if (Math.abs(y3 - (this.boundingBox.y + this.boundingBox.height + this.speedY) / 8) < 0.1) y3 = y2;
 
-        if (this.collidable) {
+        if (this.boundingBox.collidable) {
             // Apply the movement restriction of the tiles the component is standing on to it
             this.tileRestriction(d.tiles[xy2i(x1, y1, d.mapWidth)]);
             this.tileRestriction(d.tiles[xy2i(x1, y2, d.mapWidth)]);
@@ -811,48 +757,6 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
             this.tileRestriction(d.tiles[xy2i(x3, y1, d.mapWidth)]);
             this.tileRestriction(d.tiles[xy2i(x3, y2, d.mapWidth)]);
             this.tileRestriction(d.tiles[xy2i(x3, y3, d.mapWidth)]);
-        }
-
-        // Checks if the component can trigger tile events: the main character
-        if (this == game.camera.target) {
-            // stepOnEvent
-            if (d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].stepOnEventID](this.id);
-            else if (d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].stepOnEventID](this.id);
-            else if (d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].stepOnEventID](this.id);
-            else if (d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].stepOnEventID](this.id);
-            else if (d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].stepOnEventID](this.id);
-            else if (d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].stepOnEventID](this.id);
-            else if (d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].stepOnEventID](this.id);
-            else if (d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].stepOnEventID](this.id);
-            else if (d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].stepOnEventID](this.id);
-            // onEnterEvent
-            if (d.tiles[xy2i(x1, y1, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y1, d.mapWidth)].enterEventID](this.id);
-            else if (d.tiles[xy2i(x1, y2, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y2, d.mapWidth)].enterEventID](this.id);
-            else if (d.tiles[xy2i(x1, y3, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x1, y3, d.mapWidth)].enterEventID](this.id);
-            else if (d.tiles[xy2i(x2, y1, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y1, d.mapWidth)].enterEventID](this.id);
-            else if (d.tiles[xy2i(x2, y2, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y2, d.mapWidth)].enterEventID](this.id);
-            else if (d.tiles[xy2i(x2, y3, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x2, y3, d.mapWidth)].enterEventID](this.id);
-            else if (d.tiles[xy2i(x3, y1, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y1, d.mapWidth)].enterEventID](this.id);
-            else if (d.tiles[xy2i(x3, y2, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y2, d.mapWidth)].enterEventID](this.id);
-            else if (d.tiles[xy2i(x3, y3, d.mapWidth)].enterEventID != undefined)
-                events.data[d.tiles[xy2i(x3, y3, d.mapWidth)].enterEventID](this.id);
         }
     }
 
@@ -875,22 +779,22 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
             for (var i = 0, l = tile.collision.length; i < l; i++) {
                 // RESTRICTED: UP
                 if (tile.collision[i] == 0) {
-                    if (this.y + this.offsetY > tile.y /*+ tile.height*/ )
+                    if (this.boundingBox.y > tile.y /*+ tile.height*/ )
                         if (this.speedY < 0) this.speedY = 0;
                 }
                 // RESTRICTED: DOWN 
                 else if (tile.collision[i] == 1) {
-                    if (this.y + this.offsetY /*+ this.offsetHeight*/ < tile.y)
+                    if (this.boundingBox.y /*+ this.boundingBox.height*/ < tile.y)
                         if (this.speedY > 0) this.speedY = 0;
                 }
                 // RESTRICTED: LEFT
                 else if (tile.collision[i] == 2) {
-                    if (this.x + this.offsetX > tile.x /*+ tile.width*/ )
+                    if (this.boundingBox.x > tile.x /*+ tile.width*/ )
                         if (this.speedX < 0) this.speedX = 0;
                 }
                 // RESTRICTED: RIGHT
                 else if (tile.collision[i] == 3) {
-                    if (this.x + this.offsetX /*+ this.offsetWidth*/ < tile.x)
+                    if (this.boundingBox.x /*+ this.boundingBox.width*/ < tile.x)
                         if (this.speedX > 0) this.speedX = 0;
                 }
             }
@@ -900,10 +804,12 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
     /**
      * Prevent collision with other Components
      * Has to be called in the main loop for all combinations after the control updates of all Components
-     * (TODO: Pushable Components -> if (pushable && otherobj.noMapCollision) => push) 
+     * (TODO: Fix up/down/left/right collision dectection: if up it also detects down ...
+     * Pushable Components -> if (pushable && otherobj.noMapCollision) => push) 
      */
     this.componentCollision = function (otherobj) {
-        if (!this.collidable || !otherobj.collidable) return false;
+        if (!this.boundingBox.collidable || !otherobj.boundingBox.collidable) return false;
+        if (this == otherobj) return false;
 
         // Saving y-speed
         var tmp1 = this.speedY;
@@ -913,23 +819,23 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
         this.speedY = 0;
         otherobj.speedY = 0;
 
-        if ((this.y + this.offsetY + this.speedY + this.offsetHeight <= otherobj.y + otherobj.offsetY + otherobj.speedY) ||
-            (this.y + this.offsetY + this.speedY >= otherobj.y + otherobj.offsetY + otherobj.speedY + otherobj.offsetHeight) ||
-            (this.x + this.offsetX + this.speedX + this.offsetWidth <= otherobj.x + otherobj.offsetX + otherobj.speedX) ||
-            (this.x + this.offsetX + this.speedX >= otherobj.x + otherobj.offsetX + otherobj.speedX + otherobj.offsetWidth)) {
+        if ((this.boundingBox.y + this.speedY + this.boundingBox.height <= otherobj.boundingBox.y + otherobj.speedY) ||
+            (this.boundingBox.y + this.speedY >= otherobj.boundingBox.y + otherobj.speedY + otherobj.boundingBox.height) ||
+            (this.boundingBox.x + this.speedX + this.boundingBox.width <= otherobj.boundingBox.x + otherobj.speedX) ||
+            (this.boundingBox.x + this.speedX >= otherobj.boundingBox.x + otherobj.speedX + otherobj.boundingBox.width)) {
             // No X Collision
-            this.xLeftCollision = false;
-            this.xRightCollision = false;
+            this.leftCollision = false;
+            this.rightCollision = false;
         } else {
-            if ((this.x + this.offsetX + this.speedX + this.offsetWidth > otherobj.x + otherobj.offsetX + otherobj.speedX)) {
+            if ((this.boundingBox.x + this.speedX + this.boundingBox.width > otherobj.boundingBox.x + otherobj.speedX)) {
                 // X Right Collision
-                this.xRightCollision = true;
+                this.rightCollision = true;
                 if (this.speedX <= 0) this.speedX = 0;
                 if (otherobj.speedX >= 0) otherobj.speedX = 0;
             }
-            if ((this.x + this.offsetX + this.speedX < otherobj.x + otherobj.offsetX + otherobj.speedX + otherobj.offsetWidth)) {
+            if ((this.boundingBox.x + this.speedX < otherobj.boundingBox.x + otherobj.speedX + otherobj.boundingBox.width)) {
                 // X Left Collision
-                this.xLeftCollision = true;
+                this.leftCollision = true;
                 if (this.speedX >= 0) this.speedX = 0;
                 if (otherobj.speedX <= 0) otherobj.speedX = 0;
             }
@@ -939,23 +845,23 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
         this.speedY = tmp1;
         otherobj.speedY = tmp2;
 
-        if ((this.y + this.offsetY + this.speedY + this.offsetHeight <= otherobj.y + otherobj.offsetY + otherobj.speedY) ||
-            (this.y + this.offsetY + this.speedY >= otherobj.y + otherobj.offsetY + otherobj.speedY + otherobj.offsetHeight) ||
-            (this.x + this.offsetX + this.speedX + this.offsetWidth <= otherobj.x + otherobj.offsetX + otherobj.speedX) ||
-            (this.x + this.offsetX + this.speedX >= otherobj.x + otherobj.offsetX + otherobj.speedX + otherobj.offsetWidth)) {
+        if ((this.boundingBox.y + this.speedY + this.boundingBox.height <= otherobj.boundingBox.y + otherobj.speedY) ||
+            (this.boundingBox.y + this.speedY >= otherobj.boundingBox.y + otherobj.speedY + otherobj.boundingBox.height) ||
+            (this.boundingBox.x + this.speedX + this.boundingBox.width <= otherobj.boundingBox.x + otherobj.speedX) ||
+            (this.boundingBox.x + this.speedX >= otherobj.boundingBox.x + otherobj.speedX + otherobj.boundingBox.width)) {
             // NO Y Collision
-            this.yTopCollision = false;
-            this.yBottomCollision = false;
+            this.upCollision = false;
+            this.downCollision = false;
         } else {
-            if ((this.y + this.offsetY + this.speedY + this.offsetHeight > otherobj.y + otherobj.offsetY + otherobj.speedY)) {
-                // Y Top Collision
-                this.yTopCollision = true;
+            if ((this.boundingBox.y + this.speedY + this.boundingBox.height > otherobj.boundingBox.y + otherobj.speedY)) {
+                // Y Up Collision
+                this.upCollision = true;
                 if (this.speedY >= 0) this.speedY = 0;
                 if (otherobj.speedY <= 0) otherobj.speedY = 0;
             }
-            if ((this.y + this.offsetY + this.speedY < otherobj.y + otherobj.offsetY + otherobj.speedY + otherobj.offsetHeight)) {
-                // Y Bottom Collision
-                this.yBottomCollision = true;
+            if ((this.boundingBox.y + this.speedY < otherobj.boundingBox.y + otherobj.speedY + otherobj.boundingBox.height)) {
+                // Y Down Collision
+                this.downCollision = true;
                 if (this.speedY >= 0) this.speedY = 0;
                 if (otherobj.speedY <= 0) otherobj.speedY = 0;
             }
@@ -964,19 +870,18 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
     }
 
     this.mid = function () {
-        return rectangleMid(this.x, this.y, this.width, this.height);
+        return rectangleMid(this.boundingBox.x, this.boundingBox.y, this.boundingBox.width, this.boundingBox.height);
     }
-
 
     // Trigger on enter / click / touch when in range
     this.updateInteraction = function (other) {
         // No self interaction
         if (this != other) {
-            if (distance(this.mid(), other.mid()) <= Math.min(other.width, other.height) && this.facing(other)) {
+            if (distance(this.mid(), other.mid()) <= Math.max(other.boundingBox.width, other.boundingBox.height) + 4 && this.facing(other)) {
                 if (game.enter || game.mousedown || game.touchdown) {
                     if (game.eventReady) {
                         if (other.faceOnInteraction) this.face(other);
-                        if (other.interactEventID != undefined) events.data[other.interactEventID]();
+                        other.triggerEvent();
                         game.eventReady = false;
                     }
                 } else game.eventReady = true;
@@ -1049,11 +954,11 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
 
     /**
      * Update the components movement (based on speedX/Y values)
-     * Here the movement can change through movementEvents (and TODO: moveable interaction)
+     * Tile Collision
      */
     this.updateMovement = function () {
-        // If the component has an movement event it will be called here
-        if (this.movementEventID != undefined) events.data[this.movementEventID](this);
+        // Movement Function
+        this.moveEvent();
 
         // The direction the component is facing can be updated after the speedX/Y is set
         this.updateDirection();
@@ -1074,6 +979,8 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
         // Update Position
         this.x += this.speedX;
         this.y += this.speedY;
+        this.boundingBox.x += this.speedX;
+        this.boundingBox.y += this.speedY;
 
         // Reset Movement
         this.speedX = 0;
@@ -1090,18 +997,17 @@ function Component(name, spritesheetID, x, y, offsetX, offsetY, offsetWidth, off
  */
 var dialogs = {
     data: [], // Contains the dialogs
-    currentDialog: null, // The current dialog
     freeIDs: [] // FreeIDs
 };
 
 /**
  * For adding a new dialog
  * @param the text
- * @param eventID
+ * @param fnc
  */
-function addDialog(input, eventID) {
+function addDialog(input, fnc) {
     // Add
-    dialogs.data.push(new Dialog(input, eventID));
+    dialogs.data.push(new Dialog(input, fnc));
     // ID Management
     if (dialogs.freeIDs.length != 0) dialogs.data[dialogs.data.length - 1].id = dialogs.freeIDs.pop();
     else dialogs.data[dialogs.data.length - 1].id = dialogs.data.length - 1;
@@ -1127,7 +1033,7 @@ function removeDialog(id) {
 function generateDialogData() {
     // Datastring
     for (var i = 0, l = dialogs.data.length; i < l; i++)
-        game.data += "addDialog(" + JSON.stringify(dialogs.data[i].text) + ", " + dialogs.data[i].eventID + ");\n";
+        game.data += "addDialog(" + JSON.stringify(dialogs.data[i].text) + ", " + dialogs.data[i].event + ");\n";
 }
 
 /**
@@ -1138,9 +1044,10 @@ function generateDialogData() {
  * The second parameter is for an eventID
  * TODO: Refine dialog styling
  */
-function Dialog(input, eventID) {
+function Dialog(input, fnc) {
     this.text = input;
-    if (events.data[eventID] != undefined) this.eventID = eventID;
+    this.event = function () {};
+    if (fnc instanceof Function) this.event = fnc;
     this.chatCounter = 0;
     this.selectedOption = 0;
 
@@ -1163,17 +1070,17 @@ function Dialog(input, eventID) {
         this.width = width;
     }
     // Set an event to fire when the dialog finished
-    this.setEvent = function (eventID) {
-        if (events.data[eventID] != undefined) this.eventID = eventID;
+    this.setEvent = function (fnc) {
+        if (fnc instanceof Function) this.event = fnc;
     }
 
     this.update = function () {
         // Dialog finished
         if (this.chatCounter == this.text.length) {
             // Stop dialog updating in main-loop
-            dialogs.currentDialog = undefined;
+            game.currentDialog = undefined;
             // Check for event
-            if (this.eventID != undefined) events.data[this.eventID](this.selectedOption);
+            this.event(this.selectedOption);
             // Reset dialog
             this.chatCounter = 0;
             this.selectedOption = 0;
@@ -1255,7 +1162,6 @@ function Dialog(input, eventID) {
 function generateGameData() {
     generateImageData();
     generateAudioData();
-    generateEventData();
     generateSpriteData();
     generateMapData();
     generateComponentData();

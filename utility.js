@@ -28,56 +28,33 @@ function distance(xy1, xy2) {
 }
 
 /**
- * Check if an array contains a certain componentID
- * If it contains it return it's index else return false
- * @param the array (i.e. dialogs.data)
- * @param the object (i.e. dialogs.data[4])
+ * Check if an array contains an object with a given id and mapID
+ * If it contains it return it else return undefined
+ * @param the array (i.e. maps.data)
+ * @param the object (i.e. 3)
  */
-function containsObject(data, componentID) {
+function containsObject(data, id, mapID) {
     for (var i = 0, l = data.length; i < l; i++)
-        if (data[i] == componentID) return i;
-    return false;
+        if (data[i].id == id && data[i].mapID == mapID) return data[i];
+    return undefined;
 }
 
-/**
- * Removes an componentID from an array if it contains it
- * @param the array
- * @param the componentID
- */
-function removeComponentID(data, componentID) {
-    var index = containsObject(data, componentID);
-    if (index !== false) data.splice(index, 1);
-}
-
-/**
- * Add an object to an array if it doesn't already contains it
- * @param the array
- * @param the componentID
- */
-function addComponentID(data, componentID) {
-    var index = containsObject(data, componentID);
-    if (!index) data.push(componentID);
-}
-
-/** 
- * Let a component change the map
- * @param new components x
- * @param new components y
- * @param new map
- * @param the component
- * @param {bool} change map?
- */
-function componentMapSwitch(x, y, nextMap, componentID, changeMap) {
-    // Change the position of the component
-    if (x != null) components.data[componentID].x = x;
-    if (y != null) components.data[componentID].y = y;
-    // Removes the component from the current map
-    removeComponentID(maps.data[maps.currentMap].components, componentID);
-    // Adds the component to the new map
-    addComponentID(maps.data[nextMap].components, componentID);
-    if (changeMap) {
-        maps.nextMap = nextMap;
-        game.transition = true;
+function teleportComponent(component, map, x, y) {
+    // Set new position
+    if (x != null) {
+        component.x = x;
+        component.boundingBox.x = component.x + component.boundingBox.offsetX;
+    }
+    if (y != null) {
+        component.y = y;
+        component.boundingBox.y = component.y + component.boundingBox.offsetY;
+    }
+    // Remove component from current map and add to new
+    if (game.currentMap != map) {
+        for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) {
+            if (maps.data[game.currentMap].components.data[i] == component)
+                maps.data[map].components.data.push(maps.data[game.currentMap].components.data.splice(i, 1)[0]);
+        }
     }
 }
 
@@ -97,13 +74,13 @@ function loadImage(img) {
         addSprite(img, 60, 32, 8, 8);
         tmp = spritesheets.data[spritesheets.data.length - 1];
     }
-    //maps.data[maps.currentMap].image.src = img; //maps background image
-    maps.data[maps.currentMap].tileset = tmp;
-    maps.data[maps.currentMap].switchTileset();
+    //maps.data[game.currentMap].image.src = img; //maps background image
+    maps.data[game.currentMap].tileset = tmp;
+    maps.data[game.currentMap].switchTileset();
 
     setTimeout(function () {
-        maps.data[maps.currentMap].drawCache();
-        maps.data[maps.currentMap].drawTileset();
+        maps.data[game.currentMap].drawCache();
+        maps.data[game.currentMap].drawTileset();
     }, 100);
 }
 
@@ -187,9 +164,9 @@ function getGrid(maplayer, width, height) {
 
 //convert mapCL to a graph
 function getGraph() {
-    var mapCL = maps.data[maps.currentMap].layerC;
-    var mapWidth = maps.data[maps.currentMap].mapWidth;
-    var mapHeight = maps.data[maps.currentMap].mapHeight;
+    var mapCL = maps.data[game.currentMap].layerC;
+    var mapWidth = maps.data[game.currentMap].mapWidth;
+    var mapHeight = maps.data[game.currentMap].mapHeight;
 
     var arr = Array();
     for (var i = 0; i < mapWidth; i++) {
@@ -244,16 +221,16 @@ function enterFullscreen() {
 
 // Size the canvas to the size of the map if it fits on the screen
 function resizeCanvas() {
-    if (document.body.clientWidth > maps.data[maps.currentMap].width) {
+    if (document.body.clientWidth > maps.data[game.currentMap].width) {
         // Screen bigger than map
-        game.canvas.width = maps.data[maps.currentMap].width;
+        game.canvas.width = maps.data[game.currentMap].width;
     }
     // Screen fits on map
     else game.canvas.width = game.canvas.width = document.body.clientWidth;
 
-    if (document.body.clientHeight > maps.data[maps.currentMap].height) {
+    if (document.body.clientHeight > maps.data[game.currentMap].height) {
         // Screen bigger than map
-        game.canvas.height = maps.data[maps.currentMap].height;
+        game.canvas.height = maps.data[game.currentMap].height;
     }
     // Screen fits on map
     else game.canvas.height = game.canvas.height = document.body.clientHeight;
@@ -297,7 +274,7 @@ function toggle(boolean) {
 function blackTransition() {
     ctx = game.context;
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, maps.data[maps.currentMap].width, maps.data[maps.currentMap].height);
+    ctx.fillRect(0, 0, maps.data[game.currentMap].width, maps.data[game.currentMap].height);
 }
 
 function extraGuiRect() {
@@ -343,8 +320,8 @@ function showFPS() {
 function showPosition(target) {
     ctx = game.context;
     ctx.fillStyle = "black";
-    ctx.fillText("x:" + (target.x + target.offsetX) + ", y:" + (target.y + target.offsetY), 5, 60);
-    ctx.fillText("Tile[" + Math.floor((target.x + target.offsetX) / spritesheets.data[maps.data[maps.currentMap].spritesheetID].spriteWidth) + ", " + Math.floor((target.y + target.offsetY) / spritesheets.data[maps.data[maps.currentMap].spritesheetID].spriteHeight) + "]", 5, 80);
+    ctx.fillText("x:" + (target.boundingBox.x) + ", y:" + (target.boundingBox.y), 5, 60);
+    ctx.fillText("Tile[" + Math.floor(target.boundingBox.x / spritesheets.data[maps.data[game.currentMap].spritesheetID].spriteWidth) + ", " + Math.floor(target.boundingBox.y / spritesheets.data[maps.data[game.currentMap].spritesheetID].spriteHeight) + "]", 5, 80);
 }
 
 function showDistance() {
@@ -363,7 +340,7 @@ function showDistance() {
 
 function debugButton() {
     game.debug = toggle(game.debug);
-    maps.data[maps.currentMap].drawCache();
+    maps.data[game.currentMap].drawCache();
     if (game.debug) {
         document.getElementById("debugButton").setAttribute("class", "w3-button w3-green");
         document.getElementById("debugButton").innerHTML = "Debug On";
