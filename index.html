@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>RPG Engine</title>
     <meta charset="UTF-8">
@@ -10,27 +9,64 @@
     <link rel="icon" href="Assets/Image/favicon.ico">
 </head>
 
-<body class="w3-content" style="max-width:1300px; background-color:black;">
-
-    <header class="w3-display-container w3-center">
-        <div class="w3-container" id="game container">
-            <button class="w3-button w3-orange" id="startGame" onclick="startGame()">Start Demo</button>
-            <button class="w3-button w3-orange" id="startEditor" onclick="startEditor()">Start Editor</button>
+<body style="width:100%; background-color:black;">
+    <!-- Game -->
+    <div class="w3-content w3-display-container w3-center">
+        <canvas class="w3-image w3-black" id="game" width=800 height=450></canvas>
+        <div onclick="startButton()" id="startButton" class="w3-padding w3-button w3-round-xxlarge w3-jumbo w3-display-middle w3-orange w3-hover-shadow"><b>Start</b></div>
+        <!--
+        <div class="w3-padding w3-display-topleft w3-orange">Display</div>
+        <div class="w3-padding w3-display-topmiddle w3-orange">Display</div>
+        <div class="w3-padding w3-display-topright w3-orange">Display</div>
+        <div class="w3-padding w3-display-left w3-orange">Display</div>
+        <div class="w3-padding w3-display-right w3-orange">Display</div>
+        <div class="w3-padding w3-display-bottomleft w3-orange">Display</div>
+        <div class="w3-padding w3-display-bottommiddle w3-orange">Display</div>
+        <div class="w3-padding w3-display-bottomright w3-orange">Display</div>
+        -->
+    </div>
+    <!-- Buttons -->
+    <div class="w3-content w3-center">
+        <a id="editorButtons"></a>
+        <div class="w3-container">
+            <!--<button class="w3-button w3-orange" onclick="enterFullscreen()">Fullscreen</button>-->
+            <span class="w3-button w3-orange" id="activeCanvas">Off Canvas</span>
+            <span class="w3-button w3-orange" id="canvasXY"></span>
+            <button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug</button>
+            <button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI</button>
             <br>
-            <a class="w3-button w3-orange" href="https://github.com/TheNyanta/JS-RPG-Engine" target="_blank">Repository</a>
-            <div id="gameScripts">
-                <script src="scriptLoader.js"></script>
-            </div>
+            <span class="w3-button w3-yellow">Selected Tile</span>
+            <span class="w3-button w3-yellow" id="selectedTile"></span>
+            <span class="w3-button w3-pink">Clicked Tile</span>
+            <span class="w3-button w3-pink" id="clickedXY"></span>
+            <div class="w3-dropdown-click">
+                <button id="currentLayer" onclick="openlayerButton()" class="w3-button w3-blue">Select Layer</button>
+                <div id="layerSelection" class="w3-dropdown-content w3-bar-block w3-border">
+                    <a id="layer1Button" onclick="layerButton(0)" class="w3-bar-item w3-button w3-blue">Layer 1</a>
+                    <a id="layer2Button" onclick="layerButton(1)" class="w3-bar-item w3-button w3-blue">Layer 2</a>
+                    <a id="layer3Button" onclick="layerButton(2)" class="w3-bar-item w3-button w3-blue">Layer 3</a>
+                </div>
+            </div><br>
+            <!--
+            <span class="w3-button w3-yellow">Change Tileset</span>
+            <input class="w3-button w3-yellow" type="string" id="tilesetFile" onchange="loadImage(value)" value="/Assets/Image/xyz.png"><br>
+            <br>-->
+            <button class="w3-button w3-red" id="drawButton" onclick="drawButton()">Drawing Off</button>
+            <!--
+            <span class="w3-button w3-orange">Selected Collision</span>
+            <span class="w3-button w3-red" id="collisionUpButton" onclick="collisionButton(0)">Up</span>
+            <span class="w3-button w3-red" id="collisionDownButton" onclick="collisionButton(1)">Down</span>
+            <span class="w3-button w3-red" id="collisionLeftButton" onclick="collisionButton(2)">Left</span>
+            <span class="w3-button w3-red" id="collisionRightButton" onclick="collisionButton(3)">Right</span>
+            -->
         </div>
-    </header>
-
+    </div>
     <!-- Footer -->
     <footer class="w3-container w3-black w3-padding-16">
         <div class="w3-center w3-small w3-opacity">
             <a href=https://thenyanta.github.io target="_parent"><img src="https://thenyanta.github.io/images/link.png" alt="Back"></a>
         </div>
     </footer>
-
+    <script id="gameScripts" src="scriptLoader.js"></script>
 </body>
-
 </html>

@@ -1,20 +1,9 @@
-function startGame() {
-    game.editor = false;
-    game.init();
-    game.start();
-}
-
-function startEditor() {
-    game.editor = true;
-    game.init()
-    game.start();
-}
-
 var game = {
-    canvas: document.createElement("canvas"),
+    //canvas: document.createElement("canvas"),
+    canvas: document.getElementById("game"),
     tileset: document.createElement("canvas"),
     debug: false, // For debugging
-    showExtra: false,
+    info: false,
     // Map Editor Variables
     activeCanvas: undefined,
     tiletype: 1,
@@ -31,9 +20,6 @@ var game = {
     // Init
     init: function () {
         // Game canvas
-        this.canvas.width = 600;
-        this.canvas.height = 400;
-        this.canvas.id = "game";
         this.context = this.canvas.getContext("2d");
 
         // Tileset canvas
@@ -51,9 +37,6 @@ var game = {
             document.active = false;
         });
 
-        this.minWidth = 1600;
-        this.minHeight = 900;
-
         this.frameNo = 0;
         this.gameSequence = false;
 
@@ -64,6 +47,12 @@ var game = {
         this.enter = false;
         this.mousedown = false;
         this.touchdown = false;
+
+        // Draw Tileset
+        maps.data[game.currentMap].drawTileset();
+
+        // Collision setup
+        game.tileCollisions = [false, false, false, false];
 
         //this.canvas.style.cursor = "none"; //hide the original cursor
 
@@ -76,24 +65,61 @@ var game = {
 
         this.foreground = document.createElement('canvas');
         this.cgx3 = this.foreground.getContext("2d");
+        
+        // For quick accessing of doms objects
+        this.dom = {
+            layerSelection: document.getElementById("layerSelection"),
+            layer1: document.getElementById("layer1Button"),
+            layer2: document.getElementById("layer2Button"),
+            layer3: document.getElementById("layer3Button"),
+            currentLayer: document.getElementById("currentLayer"),
+        }
 
         // Camera
         this.camera = new function () {
             this.x = 0;
             this.y = 0;
 
-            this.disableControls = false;
-            this.disableMouse = false;
-
             this.setTarget = function (target) {
                 this.target = target;
             }
 
             this.update = function () {
-                // Follow target
-                if (this.target != undefined) {
+                // Move camera with WASD or Arrow Keys if no target is defined
+                if (this.target == undefined) {
+                    if (game.keys[38] || game.keys[87])
+                        this.y--;
+                    else if (game.keys[40] || game.keys[83])
+                        this.y++;
+                    else if (game.keys[37] || game.keys[65])
+                        this.x--;
+                    else if (game.keys[39] || game.keys[68])
+                        this.x++;
+                }
+                // Camera will follow target
+                else {
                     this.x = this.target.x - game.canvas.width / 2;
                     this.y = this.target.y - game.canvas.height / 2;
+                }
+                // Keep camera view inside the map
+                if (this.x < 0) this.x = 0;
+                if (this.y < 0) this.y = 0;
+                if (this.x > maps.data[game.currentMap].width - game.canvas.width) this.x = maps.data[game.currentMap].width - game.canvas.width;
+                if (this.y > maps.data[game.currentMap].height - game.canvas.height) this.y = maps.data[game.currentMap].height - game.canvas.height;
+            }
+        }
+
+        // Control
+        this.control = new function () {
+            this.setTarget = function (target) {
+                this.target = target;
+            }
+
+            this.disableControls = false;
+            this.disableMouse = false;
+
+            this.update = function () {
+                if (this.target != undefined) {
                     // Check if it key control is allowed
                     if (!this.disableControls && !game.gameSequence) {
                         // Listen to keys: "Else if" to limit movement in only one direction at the same time (no diagonal moving)
@@ -107,20 +133,6 @@ var game = {
                             this.target.speedX = this.target.speed;
                         else if (!this.disableMouse) {
                             if (game.mousedown || game.touchdown) {
-                                // Move direction = To current mousemove/touch position
-                                /*
-                                if (Math.abs(game.x + this.x - this.target.x - this.target.offsetX) >= Math.abs(game.y + this.y - this.target.y - this.target.offsetY)) {
-                                    if (this.target.x + this.target.offsetX < game.x + this.x - 4)
-                                        this.target.speedX += this.target.speed;
-                                    else if (this.target.x + this.target.offsetX > game.x + this.x + 4)
-                                        this.target.speedX -= this.target.speed;
-                                } else {
-                                    if (this.target.y + this.target.offsetY < game.y + this.y - 4)
-                                        this.target.speedY += this.target.speed;
-                                    else if (this.target.y + this.target.offsetY > game.y + this.y + 4)
-                                        this.target.speedY -= this.target.speed;
-                                }
-                                */
                                 // Move direction = Difference between clicked and current mousemove/touch position
                                 if (Math.abs(game.x - game.clickdownX) > Math.abs(game.y - game.clickdownY)) {
                                     if (game.x < game.clickdownX - 4)
@@ -133,95 +145,26 @@ var game = {
                                     else if (game.y > game.clickdownY + 4)
                                         this.target.speedY += this.target.speed;
                                 }
-
                             }
                         }
                     }
                 }
-
-                // Keep camera view inside the map
-                if (this.x < 0) this.x = 0;
-                if (this.x > maps.data[game.currentMap].width - game.canvas.width) this.x = maps.data[game.currentMap].width - game.canvas.width;
-                if (this.y < 0) this.y = 0;
-                if (this.y > maps.data[game.currentMap].height - game.canvas.height) this.y = maps.data[game.currentMap].height - game.canvas.height;
-
-                // Camera (0,0) if map smaller than canvas
-                if (maps.data[game.currentMap].width - game.canvas.width < 0) this.x = 0;
-                if (maps.data[game.currentMap].height - game.canvas.height < 0) this.y = 0;
             }
         }
 
-        // Init Camera Target
+        // Set first component of the current map (start map) as the target of the camera and control
         this.camera.setTarget(maps.data[0].components.data[0]);
+        this.control.setTarget(maps.data[0].components.data[0]);
+
         // Disable Mouse Control in Editor Mode
         if (game.editor) game.camera.disableMouse = true;
 
         // Initalize Maps
-        for (i = 0, l = maps.data.length; i < l; i++) {
-            maps.data[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);
-            //this.minWidth = Math.min(this.minWidth, maps.data[i].mapWidth * maps.data[i].tileset.spriteWidth);
-            //this.minHeight = Math.min(this.minHeight, maps.data[i].mapHeight * maps.data[i].tileset.spriteHeight);
-        }
-
-        // Smallest map
-        //this.canvas.width = this.minWidth;
-        //this.canvas.height = this.minHeight;
+        for (i = 0, l = maps.data.length; i < l; i++) maps.data[i].loadLayers(layers1[i], layers2[i], layers3[i], layersC[i]);
 
         // Draw the first or current map onto the cached canvas'
         maps.data[game.currentMap].drawCache();
-        if (game.editor) {
-            // Draw Tileset
-            maps.data[game.currentMap].drawTileset();
 
-            // Collision setup
-            game.tileCollisions = [false, false, false, false];
-
-            // Editor Mode Buttons
-            var myGameButtons =
-                '<div class="w3-container w3-padding-64">' +
-                '<button class="w3-button w3-green" id="layer1Button" onclick="layerButton(0)">Layer 1</button>' +
-                '<button class="w3-button w3-blue" id="layer2Button" onclick="layerButton(1)">Layer 2</button>' +
-                '<button class="w3-button w3-blue" id="layer3Button" onclick="layerButton(2)">Layer 3</button>' +
-                '<button class="w3-button w3-blue" id="layerCButton" onclick="layerButton(3)">Collision Layer</button><br>' +
-                '<span class="w3-button w3-yellow">Change Tileset</span>' +
-                '<input class="w3-button w3-yellow" type="string" id="tilesetFile" onchange="loadImage(value)" value="/Assets/Image/xyz.png"><br>' +
-                '<button class="w3-button w3-red" id="drawButton" onclick="drawButton()">Drawing Off</button>' +
-                '<button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug Off</button>' +
-                '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +
-                '<br>' +
-                '<span class="w3-button w3-orange" id="activeCanvas">Off Canvas</span>' +
-                '<span class="w3-button w3-orange" id="canvasXY"></span>' +
-                '<br>' +
-                '<span class="w3-button w3-yellow">Selected Tile</span>' +
-                '<span class="w3-button w3-yellow" id="selectedTile"></span>' +
-                '<span class="w3-button w3-pink">Clicked Tile</span>' +
-                '<span class="w3-button w3-pink" id="clickedXY"></span>' +
-                '<br>' +
-                '<span class="w3-button w3-orange">Selected Collision</span>' +
-                '<span class="w3-button w3-red" id="collisionUpButton" onclick="collisionButton(0)">Up</span>' +
-                '<span class="w3-button w3-red" id="collisionDownButton" onclick="collisionButton(1)">Down</span>' +
-                '<span class="w3-button w3-red" id="collisionLeftButton" onclick="collisionButton(2)">Left</span>' +
-                '<span class="w3-button w3-red" id="collisionRightButton" onclick="collisionButton(3)">Right</span>' +
-                '</div>';
-        } else {
-            // Game Mode Buttons
-            var myGameButtons =
-                '<div class="w3-container w3-padding-64">' +
-                '<button class="w3-button w3-green" onclick="enterFullscreen()">Fullscreen</button>' +
-                '<button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug Off</button>' +
-                '<button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI Off</button>' +
-                '<br>' +
-                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(containsComponent(maps.data[game.currentMap].components.data, 0, 0))">Control Boy</button>' +
-                '<button class="w3-button w3-blue" onclick="game.camera.setTarget(containsComponent(maps.data[game.currentMap].components.data, 1, 0))">Control Girl</button>' +
-                '</div>';
-        }
-
-        document.getElementById("startEditor").insertAdjacentHTML('afterend', myGameButtons);
-
-        // Replace Start Button with Canvas
-        document.getElementById("startGame").parentElement.replaceChild(this.canvas, document.getElementById("startGame"));
-        // Delete Start Editor Button
-        document.getElementById("startEditor").parentNode.removeChild(document.getElementById("startEditor"));
         // Insert tileset canvas after game canvas if editor mode
         if (game.editor) this.canvas.after(this.tileset);
 
@@ -239,12 +182,12 @@ var game = {
                 clearTimeout(requestID)
             }; //fall back
 
-        // OnCanvas
+        // OnCanvas if not zoomed
         this.onCanvas = function (x, y, canvas) {
-            if (x >= canvas.getBoundingClientRect().x &&
-                x <= canvas.getBoundingClientRect().x + canvas.width &&
-                y >= canvas.getBoundingClientRect().y &&
-                y <= canvas.getBoundingClientRect().y + canvas.height) return true;
+            if (x > canvas.getBoundingClientRect().x &&
+                x < canvas.getBoundingClientRect().x + canvas.width &&
+                y > canvas.getBoundingClientRect().y &&
+                y < canvas.getBoundingClientRect().y + canvas.height) return true;
             return false;
         }
 
@@ -257,7 +200,7 @@ var game = {
                 //toggleMenuOn();
                 //positionMenu(e);
             } else {
-                console.log("Default context menu");
+                //console.log("Default context menu");
                 //taskItemInContext = null;
                 //toggleMenuOff();
             }
@@ -277,184 +220,122 @@ var game = {
             game.keys[e.keyCode] = (e.type == "keydown");
             if (e.keyCode == 13) game.enter = false;
         })
-        if (game.editor) {
-            // Mouse down
-            window.addEventListener('mousedown', function (e) {
-                game.mousedown = true;
-                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                    game.clickdownX = Math.floor(e.clientX - game.canvas.getBoundingClientRect().x);
-                    game.clickdownY = Math.floor(e.clientY - game.canvas.getBoundingClientRect().y);
-                    e.preventDefault();
-                    maps.data[game.currentMap].clickedTile(game.clickdownX, game.clickdownY);
-                } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
-                    game.clickdownX = Math.floor(e.clientX - game.tileset.getBoundingClientRect().x);
-                    game.clickdownY = Math.floor(e.clientY - game.tileset.getBoundingClientRect().y);
-                    e.preventDefault();
-                    maps.data[game.currentMap].clickedTile(game.clickdownX, game.clickdownY);
-                } else {
-                    game.clickdownX = undefined;
-                    game.clickdownY = undefined;
-                }
-            })
-            // Mouse up
-            window.addEventListener('mouseup', function (e) {
-                game.mousedown = false;
+        // Mouse down
+        window.addEventListener('mousedown', function (e) {
+            game.mousedown = true;
+            if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                e.preventDefault();
+                game.clickdownX = Math.floor(e.clientX - game.canvas.getBoundingClientRect().x);
+                game.clickdownY = Math.floor(e.clientY - game.canvas.getBoundingClientRect().y);
+                maps.data[game.currentMap].clickedTile(game.clickdownX, game.clickdownY);
+            } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
+                e.preventDefault();
+                game.clickdownX = Math.floor(e.clientX - game.tileset.getBoundingClientRect().x);
+                game.clickdownY = Math.floor(e.clientY - game.tileset.getBoundingClientRect().y);
+                maps.data[game.currentMap].clickedTile(game.clickdownX, game.clickdownY);
+            } else {
+                game.clickdownX = undefined;
+                game.clickdownY = undefined;
+            }
+        })
+        // Mouse up
+        window.addEventListener('mouseup', function (e) {
+            game.mousedown = false;
 
-                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                    game.clickupX = e.clientX - game.canvas.getBoundingClientRect().x;
-                    game.clickupY = e.clientY - game.canvas.getBoundingClientRect().y;
-                } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
-                    game.clickupX = e.clientX - game.tileset.getBoundingClientRect().x;
-                    game.clickupY = e.clientY - game.tileset.getBoundingClientRect().y;
-                } else {
-                    game.activeCanvas = undefined;
-                    game.clickupX = undefined;
-                    game.clickupY = undefined;
-                }
-            })
-            // Mouse move
-            window.addEventListener('mousemove', function (e) {
-                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                    game.activeCanvas = 0;
-                    document.getElementById("activeCanvas").innerHTML = "Game";
-                    game.x = Math.floor(e.clientX - game.canvas.getBoundingClientRect().x);
-                    game.y = Math.floor(e.clientY - game.canvas.getBoundingClientRect().y);
-                    document.getElementById("canvasXY").innerHTML = "[" + game.x + " | " + game.y + "]";
-                } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
-                    game.activeCanvas = 1;
-                    document.getElementById("activeCanvas").innerHTML = "Tileset";
-                    game.x = Math.floor(e.clientX - game.tileset.getBoundingClientRect().x);
-                    game.y = Math.floor(e.clientY - game.tileset.getBoundingClientRect().y);
-                    document.getElementById("canvasXY").innerHTML = "[" + game.x + " | " + game.y + "]";
-                } else {
-                    game.activeCanvas = undefined;
-                    document.getElementById("activeCanvas").innerHTML = "Off Canvas";
-                    document.getElementById("canvasXY").innerHTML = "[" + e.clientX + " | " + e.clientY + "]";
-                    game.x = undefined;
-                    game.y = undefined;
-                }
-            })
-            // Touch start
-            window.addEventListener('touchstart', function (e) {
-                game.touchdown = true;
+            if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                game.clickupX = e.clientX - game.canvas.getBoundingClientRect().x;
+                game.clickupY = e.clientY - game.canvas.getBoundingClientRect().y;
+            } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
+                game.clickupX = e.clientX - game.tileset.getBoundingClientRect().x;
+                game.clickupY = e.clientY - game.tileset.getBoundingClientRect().y;
+            } else {
+                game.activeCanvas = undefined;
+                game.clickupX = undefined;
+                game.clickupY = undefined;
+            }
+        })
+        // Mouse move
+        window.addEventListener('mousemove', function (e) {
+            if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                game.activeCanvas = 0;
+                game.x = Math.floor(e.clientX - game.canvas.getBoundingClientRect().x);
+                game.y = Math.floor(e.clientY - game.canvas.getBoundingClientRect().y);
 
-                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                    game.clickdownX = e.clientX - game.canvas.getBoundingClientRect().x;
-                    game.clickdownY = e.clientY - game.canvas.getBoundingClientRect().y;
-                    e.preventDefault();
-                } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
-                    game.clickdownX = e.clientX - game.tileset.getBoundingClientRect().x;
-                    game.clickdownY = e.clientY - game.tileset.getBoundingClientRect().y;
-                    e.preventDefault();
-                } else {
-                    activeCanvas = undefined;
-                    game.clickdownX = undefined;
-                    game.clickdownY = undefined;
-                }
-            })
-            // Touch end
-            window.addEventListener('touchend', function (e) {
-                game.touchdown = false;
-                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                    game.clickupX = e.clientX - game.canvas.getBoundingClientRect().x;
-                    game.clickupY = e.clientY - game.canvas.getBoundingClientRect().y;
-                } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
-                    game.clickupX = e.clientX - game.tileset.getBoundingClientRect().x;
-                    game.clickupY = e.clientY - game.tileset.getBoundingClientRect().y;
-                } else {
-                    activeCanvas = undefined;
-                    game.clickdownX = undefined;
-                    game.clickdownY = undefined;
-                }
-            })
-            // Touch move
-            window.addEventListener('touchmove', function (e) {
-                if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.canvas)) {
-                    activeCanvas = 0;
-                    game.x1 = Math.floor(e.touches[0].clientX - game.canvas.getBoundingClientRect().x);
-                    game.y1 = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
-                    e.preventDefault();
-                } else {
-                    game.x1 = undefined;
-                    game.y1 = undefined;
-                }
-                if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.tileset)) {
-                    activeCanvas = 1;
-                    game.x2 = Math.floor(e.touches[0].clientX - game.tileset.getBoundingClientRect().x);
-                    game.y2 = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
-                    e.preventDefault();
-                } else {
-                    game.x2 = undefined;
-                    game.y2 = undefined;
-                }
-            })
-        } else {
-            // Mouse down
-            window.addEventListener('mousedown', function (e) {
-                game.mousedown = true;
-                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                    game.clickdownX = e.clientX - game.canvas.getBoundingClientRect().x;
-                    game.clickdownY = e.clientY - game.canvas.getBoundingClientRect().y;
-                    e.preventDefault();
-                }
-            })
-            // Mouse up
-            window.addEventListener('mouseup', function (e) {
-                game.mousedown = false;
-                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                    game.clickupX = e.clientX - game.canvas.getBoundingClientRect().x;
-                    game.clickupY = e.clientY - game.canvas.getBoundingClientRect().y;
-                }
-            })
-            // Mouse move
-            window.addEventListener('mousemove', function (e) {
-                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                    game.x = Math.floor(e.clientX - game.canvas.getBoundingClientRect().x);
-                    game.y = Math.floor(e.clientY - game.canvas.getBoundingClientRect().y);
-                } else {
-                    game.x = undefined;
-                    game.y = undefined;
-                }
-            })
-            // Touch start
-            window.addEventListener('touchstart', function (e) {
-                game.touchdown = true;
-                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                    game.clickdownX = e.clientX - game.canvas.getBoundingClientRect().x;
-                    game.clickdownY = e.clientY - game.canvas.getBoundingClientRect().y;
-                    e.preventDefault();
-                }
-            })
-            // Touch end
-            window.addEventListener('touchend', function (e) {
-                game.touchdown = false;
-                if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                    game.clickupX = e.clientX - game.canvas.getBoundingClientRect().x;
-                    game.clickupY = e.clientY - game.canvas.getBoundingClientRect().y;
-                }
-            })
-            // Touch move
-            window.addEventListener('touchmove', function (e) {
-                if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.canvas)) {
-                    game.x = Math.floor(e.touches[0].clientX - game.canvas.getBoundingClientRect().x);
-                    game.y = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
-                    e.preventDefault();
-                } else {
-                    game.x = undefined;
-                    game.y = undefined;
-                }
-            })
-        }
+                document.getElementById("activeCanvas").innerHTML = "Game";
+                document.getElementById("canvasXY").innerHTML = "[" + game.x + " | " + game.y + "]";
+            } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
+                game.activeCanvas = 1;
+                game.x = Math.floor(e.clientX - game.tileset.getBoundingClientRect().x);
+                game.y = Math.floor(e.clientY - game.tileset.getBoundingClientRect().y);
+
+                document.getElementById("activeCanvas").innerHTML = "Tileset";
+                document.getElementById("canvasXY").innerHTML = "[" + game.x + " | " + game.y + "]";
+            } else {
+                game.activeCanvas = undefined;
+                game.x = e.clientX;
+                game.y = e.clientY;
+
+                document.getElementById("activeCanvas").innerHTML = "Off Canvas";
+                document.getElementById("canvasXY").innerHTML = "[" + e.clientX + " | " + e.clientY + "]";
+            }
+        })
+        // Touch start
+        window.addEventListener('touchstart', function (e) {
+            game.touchdown = true;
+            if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                game.clickdownX = e.clientX - game.canvas.getBoundingClientRect().x;
+                game.clickdownY = e.clientY - game.canvas.getBoundingClientRect().y;
+            } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
+                game.clickdownX = e.clientX - game.tileset.getBoundingClientRect().x;
+                game.clickdownY = e.clientY - game.tileset.getBoundingClientRect().y;
+            } else {
+                activeCanvas = undefined;
+                game.clickdownX = undefined;
+                game.clickdownY = undefined;
+            }
+        })
+        // Touch end
+        window.addEventListener('touchend', function (e) {
+            game.touchdown = false;
+            if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
+                game.clickupX = e.clientX - game.canvas.getBoundingClientRect().x;
+                game.clickupY = e.clientY - game.canvas.getBoundingClientRect().y;
+            } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
+                game.clickupX = e.clientX - game.tileset.getBoundingClientRect().x;
+                game.clickupY = e.clientY - game.tileset.getBoundingClientRect().y;
+            } else {
+                activeCanvas = undefined;
+                game.clickdownX = undefined;
+                game.clickdownY = undefined;
+            }
+        })
+        // Touch move
+        window.addEventListener('touchmove', function (e) {
+            if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.canvas)) {
+                activeCanvas = 0;
+                game.x1 = Math.floor(e.touches[0].clientX - game.canvas.getBoundingClientRect().x);
+                game.y1 = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
+            } else {
+                game.x1 = undefined;
+                game.y1 = undefined;
+            }
+            if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.tileset)) {
+                activeCanvas = 1;
+                game.x2 = Math.floor(e.touches[0].clientX - game.tileset.getBoundingClientRect().x);
+                game.y2 = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
+            } else {
+                game.x2 = undefined;
+                game.y2 = undefined;
+            }
+        })
     },
 
     start: function () {
-
         function gameLoop() {
             requestAnimationFrame(gameLoop);
             if (document.active)
                 updateGameArea();
         }
-
         gameLoop();
     },
 
@@ -523,23 +404,37 @@ function draw() {
         maps.data[game.currentMap].components.data.sort(function (a, b) {
             return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);
         });
-        // Draw the invisiable components of the current map in editor mode
-        if (game.editor)
-            for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++)
-                if (maps.data[game.currentMap].components.data[i].editorDraw != undefined)
-                    maps.data[game.currentMap].components.data[i].editorDraw(game.context);
-        // Draw the visiable components of the current map
         for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) maps.data[game.currentMap].components.data[i].draw(game.context);
         // Draw Foreground
         maps.data[game.currentMap].drawForeground();
-    }
-    // Draw extras
-    if (game.showExtra) {
-        extraGuiRect();
-        showTime();
-        updateFPS();
-        showFPS();
-        if (game.camera.target != undefined) showPosition(game.camera.target);
+
+        // Information for debugging and editing
+        if (game.debug) {
+            for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) {
+                var comp = maps.data[game.currentMap].components.data[i];
+                // Draw a rectangle for invisiable components
+                if (comp.spritesheetID == undefined) {
+                    game.context.fillStyle = "cyan";
+                    game.context.globalAlpha = 0.8;
+                    game.context.fillRect(comp.x + comp.boundingBox.x - game.camera.x, comp.y + comp.boundingBox.y - game.camera.y, comp.boundingBox.width, comp.boundingBox.height);
+                    game.context.globalAlpha = 1.0;
+                }
+                // Draw Collision Box
+                game.context.strokeStyle = "red";
+                game.context.strokeRect(comp.x + comp.boundingBox.x - game.camera.x, comp.y + comp.boundingBox.y - game.camera.y, comp.boundingBox.width, comp.boundingBox.height);
+            }
+        }
+        // Useful information
+        if (game.info) {
+            game.context.globalAlpha = 0.5;
+            game.context.fillStyle = "cyan";
+            game.context.fillRect(0, 0, 120, 90);
+            game.context.globalAlpha = 1.0;
+            showTime();
+            updateFPS();
+            showFPS();
+            if (game.camera.target != undefined) showPosition(game.camera.target);
+        }
     }
 }
 
@@ -562,6 +457,8 @@ function updateGameArea() {
 
     // Update camera
     game.camera.update();
+    // Update control
+    game.control.update();
     // Update game
     update();
     // Draw game
@@ -572,7 +469,4 @@ function updateGameArea() {
         game.gameSequence = true;
         game.currentDialog.update();
     } else game.gameSequence = false;
-
-    // Simple hardcoded sound player for jukebox
-    myHarp.play(Math.round(Math.random()));
 }

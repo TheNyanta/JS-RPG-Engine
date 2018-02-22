@@ -3,9 +3,7 @@ addImage("Assets/Image/forest.png");
 addImage("Assets/Image/snowforest.png");
 addImage("Assets/Image/castle.png");
 addImage("Assets/Image/castletown.png");
-addImage("Assets/Image/character.png");
-addImage("Assets/Image/girl.png");
-addImage("Assets/Image/cat.png");
+addImage("Assets/Image/wizard.png");
 addImage("Assets/Image/animal.png");
 addImage("Assets/Image/snow_jukebox.png");
 addImage("Assets/Image/castledoor_1.png");
@@ -28,26 +26,44 @@ addSprite(2, 60, 32, 8, 8);
 addSprite(3, 60, 32, 8, 8);
 // Spritesheet Objects
 addSprite(4, 12, 8, 24, 32);
+addSprite(4, 12, 8, 24, 32);
+addSprite(5, 12, 8, 24, 32);
 addSprite(5, 12, 8, 24, 32);
 addSprite(6, 12, 8, 24, 32);
-addSprite(7, 12, 8, 24, 32);
-addSprite(8, 12, 8, 24, 32);
-addSprite(9, 1, 4, 47, 48);
+addSprite(7, 1, 4, 47, 48);
 // Maps
-addMap(10, 0, 80, 60);
+addMap(8, 0, 80, 60);
 addMap(null, 1, 80, 60);
 addMap(null, 2, 42, 40);
 addMap(null, 3, 42, 60);
 // Components
-addComponent("Boy", 0, 4, 240, 280, 4, 16, 16, 16, true, undefined,
+addComponent("Boy", 0, 4, 240, 280, {
+        x: 4,
+        y: 16,
+        width: 16,
+        height: 16,
+        collidable: true
+    }, undefined,
     function () {
         game.currentDialog = dialogs.data[1];
     }, undefined);
-addComponent("Girl", 0, 5, 370, 210, 4, 16, 16, 16, true, undefined,
+addComponent("Girl", 0, 5, 370, 210, {
+        x: 4,
+        y: 16,
+        width: 16,
+        height: 16,
+        collidable: true
+    }, undefined,
     function () {
         game.currentDialog = dialogs.data[1];
     }, undefined);
-addComponent("Cat", 0, 6, 160, 390, 4, 16, 16, 16, true, undefined,
+addComponent("Cat", 0, 6, 160, 390, {
+        x: 4,
+        y: 16,
+        width: 16,
+        height: 16,
+        collidable: true
+    }, undefined,
     function () {
         game.currentDialog = dialogs.data[4];
         if (this.routeForward) this.routeIndex--;
@@ -71,7 +87,13 @@ addComponent("Cat", 0, 6, 160, 390, 4, 16, 16, 16, true, undefined,
             else this.speedX = -this.speed;
         }
     });
-addComponent("Dog", 1, 7, 100, 100, 4, 16, 16, 16, true, undefined,
+addComponent("Dog", 1, 7, 100, 100, {
+        x: 4,
+        y: 16,
+        width: 16,
+        height: 16,
+        collidable: true
+    }, undefined,
     function () {
         audio.data[9].play();
     },
@@ -79,36 +101,63 @@ addComponent("Dog", 1, 7, 100, 100, 4, 16, 16, 16, true, undefined,
         // Dog simple follow controlled component
         if (!game.gameSequence && game.camera.target != undefined) {
             // x move
-            if (Math.abs(this.boundingBox.x - game.camera.target.x) > Math.abs(this.boundingBox.y - game.camera.target.y)) {
-                if (this.boundingBox.x != game.camera.target.x) {
-                    if (this.boundingBox.x < game.camera.target.x) this.speedX = this.speed;
+            if (Math.abs(this.x - game.camera.target.x) > Math.abs(this.y - game.camera.target.y)) {
+                if (this.x != game.camera.target.x) {
+                    if (this.x < game.camera.target.x) this.speedX = this.speed;
                     else this.speedX = -this.speed;
                 }
             }
             // y move
             else {
-                if (this.boundingBox.y != game.camera.target.y) {
-                    if (this.boundingBox.y < game.camera.target.y) this.speedY = this.speed;
+                if (this.y != game.camera.target.y) {
+                    if (this.y < game.camera.target.y) this.speedY = this.speed;
                     else this.speedY = -this.speed;
                 }
             }
         }
     });
-addComponent("Jukebox", 1, 8, 260, 120, 0, 16, 24, 16, true, undefined,
+addComponent("Jukebox", 1, 8, 260, 120, {
+        x: 0,
+        y: 16,
+        width: 24,
+        height: 16,
+        collidable: true
+    }, undefined,
     function () {
         game.currentDialog = dialogs.data[3];
+    },
+    function () {
+        myHarp.play(Math.round(Math.random()));
     });
-addComponent("Door", 2, 9, 144, 62, 0, 0, 47, 42, true, undefined,
+addComponent("Door", 2, 9, 144, 62, {
+        x: 0,
+        y: 0,
+        width: 47,
+        height: 42,
+        collidable: true
+    }, undefined,
     function () {
         game.currentDialog = dialogs.data[5];
     });
-addComponent("Townport", 2, undefined, 96, 312, 0, 0, 146, 8, false,
+addComponent("Townport", 2, undefined, 96, 312, {
+        x: 0,
+        y: 0,
+        width: 146,
+        height: 8,
+        collidable: false
+    },
     function () {
         teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 3, null, -6);
         game.nextMap = 3;
         game.transition = true;
     });
-addComponent("Castleport", 3, undefined, 96, 0, 0, 0, 146, 8, false,
+addComponent("Castleport", 3, undefined, 96, 0, {
+        x: 0,
+        y: 0,
+        width: 146,
+        height: 8,
+        collidable: false
+    },
     function () {
         teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 2, null, 278);
         game.nextMap = 2;
@@ -116,57 +165,60 @@ addComponent("Castleport", 3, undefined, 96, 0, 0, 0, 146, 8, false,
     });
 // Dialogs
 addDialog(["Just an old stone."]);
-addDialog(["Hello!", "Choose a map!", ["Grass", "Snow", "Castletown"]], function (choice) {
-    if (choice == game.currentMap) {
-        // Chaining dialogs by calling a new in the dialog event function
-        game.currentDialog = dialogs.data[2];
-    } else {
-        if (choice == 0) {
-            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 0, 380, 208);
-            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 1, 0), 0, 364, 208);
-            game.nextMap = 0;
-            game.transition = true;
-        } else if (choice == 1) {
-            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 1, 192, 360);
-            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 1, 0), 1, 176, 360);
-            game.nextMap = 1;
-            game.transition = true;
-        } else if (choice == 2) {
-            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 2, 166, 210);
-            teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 1, 0), 2, 150, 210);
-            game.nextMap = 2;
-            game.transition = true;
+addDialog(["Hello!", "Choose a map!", ["Grass", "Snow", "Castletown"]],
+    function (choice) {
+        if (choice == game.currentMap) {
+            // Chaining dialogs by calling a new in the dialog event function
+            game.currentDialog = dialogs.data[2];
+        } else {
+            if (choice == 0) {
+                teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 0, 380, 208);
+                teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 1, 0), 0, 364, 208);
+                game.nextMap = 0;
+                game.transition = true;
+            } else if (choice == 1) {
+                teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 1, 192, 360);
+                teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 1, 0), 1, 176, 360);
+                game.nextMap = 1;
+                game.transition = true;
+            } else if (choice == 2) {
+                teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 0, 0), 2, 166, 210);
+                teleportComponent(containsComponent(maps.data[game.currentMap].components.data, 1, 0), 2, 150, 210);
+                game.nextMap = 2;
+                game.transition = true;
+            }
         }
-    }
-});
+    });
 addDialog(["We are on this map!"]);
-addDialog(["This is jukebox!", "Wanna here some music?", ["Yes", "No"]], function (choice) {
-    if (choice == 0) myHarp.startPlaying();
-    if (choice == 1) myHarp.stopPlaying();
-});
-addDialog(["Meow!", "Want meow to meow?", ["Yes", "No"]], function (choice) {
-    if (choice == 0)
-        audio.data[8].play();
-});
-addDialog(["The door is closed!", ["Yes", "No"]], function (choice) {
-    if (choice == 0) {
-        maps.data[2].components.data[0].startSpecial(); // Opening Animation
-        dialogs.data[5].setDialog(["The door is opened", "...", "There is no map for the castle."]);
-    }
-});
+addDialog(["This is jukebox!", "Wanna here some music?", ["Yes", "No"]],
+    function (choice) {
+        if (choice == 0) myHarp.startPlaying();
+        if (choice == 1) myHarp.stopPlaying();
+    });
+addDialog(["Meow!", "Want meow to meow?", ["Yes", "No"]],
+    function (choice) {
+        if (choice == 0)
+            audio.data[8].play();
+    });
+addDialog(["The door is closed!", ["Yes", "No"]],
+    function (choice) {
+        if (choice == 0) {
+            maps.data[2].components.data[0].startSpecial(); // Opening Animation
+            dialogs.data[5].setDialog(["The door is opened", "...", "There is no map for the castle."]);
+        }
+    });
 
 // ######## TODO: Add into self generation
 
 // Add animation sequences
 maps.data[0].components.data[0].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-maps.data[0].components.data[1].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
-maps.data[0].components.data[2].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
+maps.data[0].components.data[1].idleAnimation(3, 55, 79, 91, 67).moveAnimation(3, [54, 55, 56], [78, 79, 80], [90, 91, 92], [66, 67, 68]);
+maps.data[0].components.data[2].idleAnimation(3, 4, 28, 40, 16).moveAnimation(3, [3, 4, 5], [27, 28, 29], [39, 40, 41], [15, 16, 17]);
 maps.data[1].components.data[0].idleAnimation(3, 1, 25, 37, 13).moveAnimation(3, [0, 1, 2], [24, 25, 26], [36, 37, 38], [12, 13, 14]);
 maps.data[2].components.data[0].specialAnimation(20, [0, 1, 2, 3]);
 // Cat walk
 maps.data[0].components.data[2].route = [[50, 390], [50, 380], [50, 150], [600, 150], [600, 390]];
 maps.data[0].components.data[2].routeIndex = 0;
-maps.data[0].components.data[2].speed = 5;
 maps.data[0].components.data[2].routeForward = true;
 
 

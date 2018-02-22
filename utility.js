@@ -51,14 +51,8 @@ function containsComponent(data, id, mapID) {
 
 function teleportComponent(component, map, x, y) {
     // Set new position
-    if (x != null) {
-        component.x = x;
-        component.boundingBox.x = component.x + component.boundingBox.offsetX;
-    }
-    if (y != null) {
-        component.y = y;
-        component.boundingBox.y = component.y + component.boundingBox.offsetY;
-    }
+    if (x != null) component.x = x;
+    if (y != null) component.y = y;
     // Remove component from current map and add to new
     if (game.currentMap != map) {
         for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) {
@@ -229,23 +223,6 @@ function enterFullscreen() {
     }
 }
 
-// Size the canvas to the size of the map if it fits on the screen
-function resizeCanvas() {
-    if (document.body.clientWidth > maps.data[game.currentMap].width) {
-        // Screen bigger than map
-        game.canvas.width = maps.data[game.currentMap].width;
-    }
-    // Screen fits on map
-    else game.canvas.width = game.canvas.width = document.body.clientWidth;
-
-    if (document.body.clientHeight > maps.data[game.currentMap].height) {
-        // Screen bigger than map
-        game.canvas.height = maps.data[game.currentMap].height;
-    }
-    // Screen fits on map
-    else game.canvas.height = game.canvas.height = document.body.clientHeight;
-}
-
 /**
  * Use localStorage to save game state
  * TODO: Change to save all the game state values
@@ -284,15 +261,7 @@ function toggle(boolean) {
 function blackTransition() {
     ctx = game.context;
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, maps.data[game.currentMap].width, maps.data[game.currentMap].height);
-}
-
-function extraGuiRect() {
-    ctx = game.context;
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = "cyan";
-    ctx.fillRect(0, 0, 120, 90);
-    ctx.globalAlpha = 1.0;
+    ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
 }
 
 function showTime() {
@@ -351,56 +320,47 @@ function showDistance() {
 function debugButton() {
     game.debug = toggle(game.debug);
     maps.data[game.currentMap].drawCache();
-    if (game.debug) {
-        document.getElementById("debugButton").setAttribute("class", "w3-button w3-green");
-        document.getElementById("debugButton").innerHTML = "Debug On";
-    } else {
-        document.getElementById("debugButton").setAttribute("class", "w3-button w3-red");
-        document.getElementById("debugButton").innerHTML = "Debug Off";
-    }
+    if (game.debug) document.getElementById("debugButton").setAttribute("class", "w3-button w3-green");
+    else document.getElementById("debugButton").setAttribute("class", "w3-button w3-red");
 }
 
 function guiButton() {
-    game.showExtra = toggle(game.showExtra);
-    if (game.showExtra) {
-        document.getElementById("guiButton").setAttribute("class", "w3-button w3-green");
-        document.getElementById("guiButton").innerHTML = "GUI On";
-    } else {
-        document.getElementById("guiButton").setAttribute("class", "w3-button w3-red");
-        document.getElementById("guiButton").innerHTML = "GUI Off";
-    }
+    game.info = toggle(game.info);
+    if (game.info) document.getElementById("guiButton").setAttribute("class", "w3-button w3-green");
+    else document.getElementById("guiButton").setAttribute("class", "w3-button w3-red");
 }
 
 // ##########
 // Map Editor
 // ##########
 
+function openlayerButton() {
+    if (game.dom.layerSelection.className.indexOf("w3-show") == -1) game.dom.layerSelection.className += " w3-show";
+    else game.dom.layerSelection.className = game.dom.layerSelection.className.replace(" w3-show", "");
+}
+
 function layerButton(i) {
     game.currentLayer = i;
     if (i == 0) {
-        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-green");
-        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-blue");
-        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-blue");
-        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-blue");
+        game.dom.layer1.setAttribute("class", "w3-bar-item w3-button w3-green");
+        game.dom.layer2.setAttribute("class", "w3-bar-item w3-button w3-blue");
+        game.dom.layer3.setAttribute("class", "w3-bar-item w3-button w3-blue");
+        game.dom.layerSelection.className = game.dom.layerSelection.className.replace(" w3-show", "");
+        game.dom.currentLayer.innerHTML = "Layer 1";
     }
     if (i == 1) {
-        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-blue");
-        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-green");
-        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-blue");
-        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-blue");
+        game.dom.layer1.setAttribute("class", "w3-bar-item w3-button w3-blue");
+        game.dom.layer2.setAttribute("class", "w3-bar-item w3-button w3-green");
+        game.dom.layer3.setAttribute("class", "w3-bar-item w3-button w3-blue");
+        game.dom.layerSelection.className = game.dom.layerSelection.className.replace(" w3-show", "");
+        game.dom.currentLayer.innerHTML = "Layer 2";
     }
     if (i == 2) {
-        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-blue");
-        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-blue");
-        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-green");
-        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-blue");
-    }
-    if (i == 3) {
-        document.getElementById("layer1Button").setAttribute("class", "w3-button w3-blue");
-        document.getElementById("layer2Button").setAttribute("class", "w3-button w3-blue");
-        document.getElementById("layer3Button").setAttribute("class", "w3-button w3-blue");
-        document.getElementById("layerCButton").setAttribute("class", "w3-button w3-green");
-        if (!game.debug) debugButton();
+        game.dom.layer1.setAttribute("class", "w3-bar-item w3-button w3-blue");
+        game.dom.layer2.setAttribute("class", "w3-bar-item w3-button w3-blue");
+        game.dom.layer3.setAttribute("class", "w3-bar-item w3-button w3-green");
+        game.dom.layerSelection.className = game.dom.layerSelection.className.replace(" w3-show", "");
+        game.dom.currentLayer.innerHTML = "Layer 3";
     }
     if (!game.drawingOn) drawButton();
 }
@@ -437,11 +397,12 @@ function collisionButton(i) {
 
 function drawButton() {
     game.drawingOn = toggle(game.drawingOn);
-    if (game.drawingOn) {
-        document.getElementById("drawButton").setAttribute("class", "w3-button w3-green");
-        document.getElementById("drawButton").innerHTML = "Drawing On";
-    } else {
-        document.getElementById("drawButton").setAttribute("class", "w3-button w3-red");
-        document.getElementById("drawButton").innerHTML = "Drawing Off";
-    }
+    if (game.drawingOn) document.getElementById("drawButton").setAttribute("class", "w3-button w3-green");
+    else document.getElementById("drawButton").setAttribute("class", "w3-button w3-red");
+}
+
+function startButton() {
+    document.getElementById("startButton").parentNode.removeChild(document.getElementById("startButton"));
+    game.init();
+    game.start();
 }
