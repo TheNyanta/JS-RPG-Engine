@@ -2,7 +2,7 @@ var game = {
     //canvas: document.createElement("canvas"),
     canvas: document.getElementById("game"),
     tileset: document.createElement("canvas"),
-    debug: false, // For debugging
+    debug: false,
     info: false,
     // Map Editor Variables
     activeCanvas: undefined,
@@ -51,9 +51,6 @@ var game = {
         // Draw Tileset
         maps.data[game.currentMap].drawTileset();
 
-        // Collision setup
-        game.tileCollisions = [false, false, false, false];
-
         //this.canvas.style.cursor = "none"; //hide the original cursor
 
         // "Cache" Map on an hidden canvas
@@ -65,14 +62,33 @@ var game = {
 
         this.foreground = document.createElement('canvas');
         this.cgx3 = this.foreground.getContext("2d");
-        
+
         // For quick accessing of doms objects
         this.dom = {
+            // Layer Selection
             layerSelection: document.getElementById("layerSelection"),
+            currentLayer: document.getElementById("currentLayer"),
             layer1: document.getElementById("layer1Button"),
             layer2: document.getElementById("layer2Button"),
             layer3: document.getElementById("layer3Button"),
-            currentLayer: document.getElementById("currentLayer"),
+            collisionLayer: document.getElementById("collisionLayerButton"),
+            // Collision Restriction Selection            
+            currentRestriction: document.getElementById("currentRestriction"),
+            restrictionSelection: document.getElementById("restrictionSelection"),
+            restriction1: document.getElementById("restriction1"),
+            restriction2: document.getElementById("restriction2"),
+            restriction3: document.getElementById("restriction3"),
+            restriction4: document.getElementById("restriction4"),
+            restriction5: document.getElementById("restriction5"),
+            restriction6: document.getElementById("restriction6"),
+            restriction7: document.getElementById("restriction7"),
+            restriction8: document.getElementById("restriction8"),
+            restriction9: document.getElementById("restriction9"),
+            restriction10: document.getElementById("restriction10"),
+            restriction11: document.getElementById("restriction11"),
+            restriction12: document.getElementById("restriction12"),
+            restriction13: document.getElementById("restriction13"),
+            restriction14: document.getElementById("restriction14"),
         }
 
         // Camera
@@ -153,8 +169,9 @@ var game = {
         }
 
         // Set first component of the current map (start map) as the target of the camera and control
-        this.camera.setTarget(maps.data[0].components.data[0]);
-        this.control.setTarget(maps.data[0].components.data[0]);
+        this.hero = maps.data[0].components.data[0];
+        this.camera.setTarget(game.hero);
+        this.control.setTarget(game.hero);
 
         // Disable Mouse Control in Editor Mode
         if (game.editor) game.camera.disableMouse = true;
@@ -195,7 +212,7 @@ var game = {
         // Customize context menu on right click if canvas
         window.addEventListener('contextmenu', function (e) {
             if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                console.log("Default context menu prevent");
+                //console.log("Default context menu prevent");
                 e.preventDefault();
                 //toggleMenuOn();
                 //positionMenu(e);
@@ -313,19 +330,19 @@ var game = {
         window.addEventListener('touchmove', function (e) {
             if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.canvas)) {
                 activeCanvas = 0;
-                game.x1 = Math.floor(e.touches[0].clientX - game.canvas.getBoundingClientRect().x);
-                game.y1 = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
+                game.x = Math.floor(e.touches[0].clientX - game.canvas.getBoundingClientRect().x);
+                game.y = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
             } else {
-                game.x1 = undefined;
-                game.y1 = undefined;
+                game.x = undefined;
+                game.y = undefined;
             }
             if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.tileset)) {
                 activeCanvas = 1;
-                game.x2 = Math.floor(e.touches[0].clientX - game.tileset.getBoundingClientRect().x);
-                game.y2 = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
+                game.x = Math.floor(e.touches[0].clientX - game.tileset.getBoundingClientRect().x);
+                game.y = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
             } else {
-                game.x2 = undefined;
-                game.y2 = undefined;
+                game.x = undefined;
+                game.y = undefined;
             }
         })
     },
@@ -355,21 +372,15 @@ var game = {
 function update() {
     // While game.gameSequence == true all components will stop moving (i.e. used for menus, dialogs,...)
     if (!game.gameSequence) {
-        // For components that can start an interacted
-        for (var i = 0; i < maps.data[game.currentMap].components.data.length; i++)
-            // The controlled component can acted with other component
-            if (maps.data[game.currentMap].components.data[i] == game.camera.target)
-                for (var j = 0; j < maps.data[game.currentMap].components.data.length; j++) {
-                    var c1 = maps.data[game.currentMap].components.data[i];
-                    var c2 = maps.data[game.currentMap].components.data[j];
-                    c1.updateInteraction(c2);
-                }
-
         // Update the movement of all components on the current map (this also resolves tileCollision)
         if (!game.transition)
             for (var i = 0; i < maps.data[game.currentMap].components.data.length; i++)
                 maps.data[game.currentMap].components.data[i].updateMovement();
-
+        // For components that can start an interacted
+        for (var i = 0; i < maps.data[game.currentMap].components.data.length; i++)
+            // The controlled component can acted with other component
+            if (maps.data[game.currentMap].components.data[i] != game.control.target)
+                game.control.target.updateInteraction(maps.data[game.currentMap].components.data[i]);
         // Check each combination pair of components on the current map for component-component-collision
         for (var i = 0; i < maps.data[game.currentMap].components.data.length; i++)
             for (var j = 0; j < maps.data[game.currentMap].components.data.length; j++) {
@@ -377,7 +388,6 @@ function update() {
                 var c2 = maps.data[game.currentMap].components.data[j];
                 c1.componentCollision(c2);
             }
-
         // Update the position of all components on the current map
         for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) maps.data[game.currentMap].components.data[i].updatePosition();
     }
@@ -392,49 +402,45 @@ function update() {
  * 4) Draw the gui
  */
 function draw() {
-    // Draw map transition
-    if (game.transition) blackTransition();
     // Draw map
-    else {
-        // Clear the canvas
-        game.context.clearRect(0, 0, game.canvas.width, game.canvas.height);
-        // Draw Background
-        maps.data[game.currentMap].drawBackground();
-        // Sorts the array after it's y value so that components with bigger y are drawn later
-        maps.data[game.currentMap].components.data.sort(function (a, b) {
-            return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);
-        });
-        for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) maps.data[game.currentMap].components.data[i].draw(game.context);
-        // Draw Foreground
-        maps.data[game.currentMap].drawForeground();
+    // Clear the canvas
+    game.context.clearRect(0, 0, game.canvas.width, game.canvas.height);
+    // Draw Background
+    maps.data[game.currentMap].drawBackground();
+    // Sorts the array after it's y value so that components with bigger y are drawn later
+    maps.data[game.currentMap].components.data.sort(function (a, b) {
+        return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);
+    });
+    for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) maps.data[game.currentMap].components.data[i].draw(game.context);
+    // Draw Foreground
+    maps.data[game.currentMap].drawForeground();
 
-        // Information for debugging and editing
-        if (game.debug) {
-            for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) {
-                var comp = maps.data[game.currentMap].components.data[i];
-                // Draw a rectangle for invisiable components
-                if (comp.spritesheetID == undefined) {
-                    game.context.fillStyle = "cyan";
-                    game.context.globalAlpha = 0.8;
-                    game.context.fillRect(comp.x + comp.boundingBox.x - game.camera.x, comp.y + comp.boundingBox.y - game.camera.y, comp.boundingBox.width, comp.boundingBox.height);
-                    game.context.globalAlpha = 1.0;
-                }
-                // Draw Collision Box
-                game.context.strokeStyle = "red";
-                game.context.strokeRect(comp.x + comp.boundingBox.x - game.camera.x, comp.y + comp.boundingBox.y - game.camera.y, comp.boundingBox.width, comp.boundingBox.height);
+    // Information for debugging and editing
+    if (game.debug) {
+        for (var i = 0, l = maps.data[game.currentMap].components.data.length; i < l; i++) {
+            var comp = maps.data[game.currentMap].components.data[i];
+            // Draw a rectangle for invisiable components
+            if (comp.spritesheetID == undefined) {
+                game.context.fillStyle = "cyan";
+                game.context.globalAlpha = 0.8;
+                game.context.fillRect(comp.x + comp.boundingBox.x - game.camera.x, comp.y + comp.boundingBox.y - game.camera.y, comp.boundingBox.width, comp.boundingBox.height);
+                game.context.globalAlpha = 1.0;
             }
+            // Draw Collision Box
+            game.context.strokeStyle = "red";
+            game.context.strokeRect(comp.x + comp.boundingBox.x - game.camera.x, comp.y + comp.boundingBox.y - game.camera.y, comp.boundingBox.width, comp.boundingBox.height);
         }
-        // Useful information
-        if (game.info) {
-            game.context.globalAlpha = 0.5;
-            game.context.fillStyle = "cyan";
-            game.context.fillRect(0, 0, 120, 90);
-            game.context.globalAlpha = 1.0;
-            showTime();
-            updateFPS();
-            showFPS();
-            if (game.camera.target != undefined) showPosition(game.camera.target);
-        }
+    }
+    // Useful information
+    if (game.info) {
+        game.context.globalAlpha = 0.5;
+        game.context.fillStyle = "cyan";
+        game.context.fillRect(0, 0, 120, 90);
+        game.context.globalAlpha = 1.0;
+        showTime();
+        updateFPS();
+        showFPS();
+        if (game.camera.target != undefined) showPosition(game.camera.target);
     }
 }
 
@@ -455,14 +461,18 @@ function updateGameArea() {
         }, 400);
     }
 
-    // Update camera
-    game.camera.update();
-    // Update control
-    game.control.update();
-    // Update game
-    update();
-    // Draw game
-    draw();
+    // Draw map transition
+    if (game.transition) blackTransition();
+    else {
+        // Update camera
+        game.camera.update();
+        // Update control
+        game.control.update();
+        // Update game
+        update();
+        // Draw game
+        draw();
+    }
 
     // Draw dialog
     if (game.currentDialog != undefined) {

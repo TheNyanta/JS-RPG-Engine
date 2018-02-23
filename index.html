@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>RPG Engine</title>
     <meta charset="UTF-8">
@@ -26,34 +27,56 @@
         -->
     </div>
     <!-- Buttons -->
-    <div class="w3-content w3-center">
-        <a id="editorButtons"></a>
+    <div class="w3-content w3-center w3-hide" id="editorButtons">
         <div class="w3-container">
             <!--<button class="w3-button w3-orange" onclick="enterFullscreen()">Fullscreen</button>-->
-            <span class="w3-button w3-orange" id="activeCanvas">Off Canvas</span>
-            <span class="w3-button w3-orange" id="canvasXY"></span>
             <button class="w3-button w3-red" id="debugButton" onclick="debugButton()">Debug</button>
             <button class="w3-button w3-red" id="guiButton" onclick="guiButton()">GUI</button>
-            <br>
-            <span class="w3-button w3-yellow">Selected Tile</span>
-            <span class="w3-button w3-yellow" id="selectedTile"></span>
-            <span class="w3-button w3-pink">Clicked Tile</span>
-            <span class="w3-button w3-pink" id="clickedXY"></span>
+            <button class="w3-button w3-red" id="drawButton" onclick="drawButton()">Draw</button>
             <div class="w3-dropdown-click">
                 <button id="currentLayer" onclick="openlayerButton()" class="w3-button w3-blue">Select Layer</button>
                 <div id="layerSelection" class="w3-dropdown-content w3-bar-block w3-border">
                     <a id="layer1Button" onclick="layerButton(0)" class="w3-bar-item w3-button w3-blue">Layer 1</a>
                     <a id="layer2Button" onclick="layerButton(1)" class="w3-bar-item w3-button w3-blue">Layer 2</a>
                     <a id="layer3Button" onclick="layerButton(2)" class="w3-bar-item w3-button w3-blue">Layer 3</a>
+                    <a id="collisionLayerButton" onclick="layerButton(3)" class="w3-bar-item w3-button w3-blue">Collision</a>
                 </div>
-            </div><br>
+            </div>
+            <div class="w3-dropdown-click">
+                <image class="w3-image w3-hide" id="currentRestriction" onclick="openCollisionButton()" src="Assets/Image/Restriction Arrows/up_down_left_right.png"></image>
+                <div id="restrictionSelection" class="w3-dropdown-content w3-bar-block w3-border w3-black">
+                    <image id="restriction1" class="w3-image" src="Assets/Image/Restriction Arrows/no.png" onclick="restrictionButton(0, this.src)"></image>
+                    <image id="restriction2" class="w3-image" src="Assets/Image/Restriction Arrows/up.png" onclick="restrictionButton(1, this.src)"></image>
+                    <image id="restriction3" class="w3-image" src="Assets/Image/Restriction Arrows/down.png" onclick="restrictionButton(2, this.src)"></image>
+                    <image id="restriction4" class="w3-image" src="Assets/Image/Restriction Arrows/left.png" onclick="restrictionButton(3, this.src)"></image>
+                    <image id="restriction5" class="w3-image" src="Assets/Image/Restriction Arrows/right.png" onclick="restrictionButton(4, this.src)"></image>
+                    <image id="restriction6" class="w3-image" src="Assets/Image/Restriction Arrows/up_down.png" onclick="restrictionButton(5, this.src)"></image>
+                    <image id="restriction7" class="w3-image" src="Assets/Image/Restriction Arrows/up_left.png" onclick="restrictionButton(6, this.src)"></image>
+                    <image id="restriction8" class="w3-image" src="Assets/Image/Restriction Arrows/up_right.png" onclick="restrictionButton(7, this.src)"></image>
+                    <image id="restriction9" class="w3-image" src="Assets/Image/Restriction Arrows/down_left.png" onclick="restrictionButton(8, this.src)"></image>
+                    <image id="restriction10" class="w3-image" src="Assets/Image/Restriction Arrows/down_right.png" onclick="restrictionButton(9, this.src)"></image>
+                    <image id="restriction11" class="w3-image" src="Assets/Image/Restriction Arrows/left_right.png" onclick="restrictionButton(10, this.src)"></image>
+                    <image id="restriction12" class="w3-image" src="Assets/Image/Restriction Arrows/up_down_left.png" onclick="restrictionButton(11, this.src)"></image>
+                    <image id="restriction13" class="w3-image" src="Assets/Image/Restriction Arrows/up_down_right.png" onclick="restrictionButton(12, this.src)"></image>
+                    <image id="restriction14" class="w3-image" src="Assets/Image/Restriction Arrows/up_left_right.png" onclick="restrictionButton(13, this.src)"></image>
+                    <image id="restriction15" class="w3-image" src="Assets/Image/Restriction Arrows/down_left_right.png" onclick="restrictionButton(14, this.src)"></image>
+                    <image id="restriction16" class="w3-image" src="Assets/Image/Restriction Arrows/up_down_left_right.png" onclick="restrictionButton(15, this.src)"></image>
+                </div>
+            </div>
+            <br>
+            <span class="w3-button w3-orange" id="activeCanvas">Off Canvas</span>
+            <span class="w3-button w3-orange" id="canvasXY"></span>
+            <br>
+            <span class="w3-button w3-yellow">Selected Tile</span>
+            <span class="w3-button w3-yellow" id="selectedTile"></span>
+            <span class="w3-button w3-pink">Clicked Tile</span>
+            <span class="w3-button w3-pink" id="clickedXY"></span>
+            <br>
             <!--
             <span class="w3-button w3-yellow">Change Tileset</span>
             <input class="w3-button w3-yellow" type="string" id="tilesetFile" onchange="loadImage(value)" value="/Assets/Image/xyz.png"><br>
             <br>-->
-            <button class="w3-button w3-red" id="drawButton" onclick="drawButton()">Drawing Off</button>
             <!--
-            <span class="w3-button w3-orange">Selected Collision</span>
             <span class="w3-button w3-red" id="collisionUpButton" onclick="collisionButton(0)">Up</span>
             <span class="w3-button w3-red" id="collisionDownButton" onclick="collisionButton(1)">Down</span>
             <span class="w3-button w3-red" id="collisionLeftButton" onclick="collisionButton(2)">Left</span>
@@ -69,4 +92,5 @@
     </footer>
     <script id="gameScripts" src="scriptLoader.js"></script>
 </body>
+
 </html>

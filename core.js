@@ -238,7 +238,7 @@ function Tile(spritesheetID, x, y) {
         if (this.layer3 - 1 >= 0) drawSprite(ctx2, spritesheets.data[this.spritesheetID], this.layer3 - 1, this.x, this.y);
         // Debug information
         if (game.debug) {
-            // Show collision layer: TODO: Visualize direction restrictions
+            //Draw Collision Restriction of the tiles; TODO: Better Visualization!
             game.cgx3.globalAlpha = 0.3;
             if (this.collision === 0) game.cgx3.fillStyle = "blue";
             else if (this.collision === 1) game.cgx3.fillStyle = "red";
@@ -499,15 +499,15 @@ function Map(imageID, spritesheetID, mapWidth, mapHeight) {
  * @param x-position
  * @param y-position
  * @param {offsetX: , offsetY: , width: , height: , collidable: }
- * @param {function} collisionEvent
+ * @param {function} contactEvent
  * @param {function} triggerEvent
  * @param {function} moveEvent
  */
-function addComponent(name, mapID, spritesheetID, x, y, boundingBox, collisionEvent, triggerEvent, moveEvent) {
+function addComponent(name, mapID, spritesheetID, x, y, boundingBox, contactEvent, triggerEvent, moveEvent) {
     var map = containsComponent(maps.data, mapID);
     if (map != undefined) {
         // Add
-        var index = map.components.data.push(new Component(name, mapID, spritesheetID, x, y, boundingBox, collisionEvent, triggerEvent, moveEvent));
+        var index = map.components.data.push(new Component(name, mapID, spritesheetID, x, y, boundingBox, contactEvent, triggerEvent, moveEvent));
         // ID management
         if (map.components.freeIDs.length > 0) map.components.data[index - 1].id = map.components.freeIDs[0].pop();
         else map.components.data[index - 1].id = index - 1;
@@ -542,7 +542,7 @@ function generateComponentData() {
     for (var i = 0, l = maps.data.length; i < l; i++)
         for (var j = 0; j < maps.data[i].components.data.length; j++) {
             var c = maps.data[i].components.data;
-            game.data += "addComponent('" + c[j].name + "', " + c[j].mapID + ", " + c[j].spritesheetID + ", " + c[j].x + ", " + c[j].y + ", " + c[j].boundingBox.x + ", " + c[j].boundingBox.y + ", " + c[j].boundingBox.width + ", " + c[j].boundingBox.height + ", " + c[j].collidable + ", " + c[j].triggerEvent + ", " + c[j].moveEvent + ");\n";
+            game.data += "addComponent('" + c[j].name + "', " + c[j].mapID + ", " + c[j].spritesheetID + ", " + c[j].x + ", " + c[j].y + ", {x: " + c[j].boundingBox.x + ", y: " + c[j].boundingBox.y + ", width: " + c[j].boundingBox.width + ", height: " + c[j].boundingBox.height + ", collidable: " + c[j].boundingBox.collidable + "}, " + c[j].contactEvent + ", " + c[j].triggerEvent + ", " + c[j].moveEvent + ");\n";
         }
 }
 
@@ -553,12 +553,12 @@ function generateComponentData() {
  * @param spritesheetID
  * @param x-position
  * @param y-position
- * @param {offsetX: , offsetY: , width: , height: , collidable: }
- * @param {function} collisionEvent
+ * @param {x: , y: , width: , height: , collidable: } //x, y are offsets to the components x,y which are for the sprite image
+ * @param {function} contactEvent
  * @param {function} triggerEvent
  * @param {function} moveEvent
  */
-function Component(name, mapID, spritesheetID, x, y, boundingBox, collisionEvent, triggerEvent, moveEvent) {
+function Component(name, mapID, spritesheetID, x, y, boundingBox, contactEvent, triggerEvent, moveEvent) {
     this.name = name;
     this.mapID = mapID;
     this.spritesheetID = spritesheetID;
@@ -568,8 +568,8 @@ function Component(name, mapID, spritesheetID, x, y, boundingBox, collisionEvent
 
     // Collision Properties
     this.boundingBox = {
-        offsetX: 0,
-        offsetY: 0,
+        x: 0,
+        y: 0,
         width: 0,
         height: 0,
         collidable: false,
@@ -578,8 +578,8 @@ function Component(name, mapID, spritesheetID, x, y, boundingBox, collisionEvent
     this.boundingBox = boundingBox;
 
     // NOOP function if no event
-    this.collisionEvent = function () {};
-    if (collisionEvent instanceof Function) this.collisionEvent = collisionEvent;
+    this.contactEvent = function () {};
+    if (contactEvent instanceof Function) this.contactEvent = contactEvent;
     this.triggerEvent = function () {};
     if (triggerEvent instanceof Function) this.triggerEvent = triggerEvent;
     this.moveEvent = function () {};
@@ -867,7 +867,7 @@ function Component(name, mapID, spritesheetID, x, y, boundingBox, collisionEvent
         // No self interaction
         if (this != other) {
             if (this.boundingBoxOverlap(other)) {
-                other.collisionEvent();
+                other.contactEvent();
                 if (this.facing(other)) {
                     if (game.enter || other.isClicked()) {
                         if (game.eventReady) {
