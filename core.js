@@ -239,17 +239,39 @@ function Tile(spritesheetID, x, y) {
         // Debug information
         if (game.debug) {
             //Draw Collision Restriction of the tiles; TODO: Better Visualization!
-            game.cgx3.globalAlpha = 0.3;
-            if (this.collision === 0) game.cgx3.fillStyle = "blue";
-            else if (this.collision === 1) game.cgx3.fillStyle = "red";
-            else {
-                if (this.collision[0] == 0) game.cgx3.fillStyle = "purple";
-                if (this.collision[0] == 1) game.cgx3.fillStyle = "cyan";
-                if (this.collision[0] == 2) game.cgx3.fillStyle = "yellow";
-                if (this.collision[0] == 3) game.cgx3.fillStyle = "black";
+            if (this.collision === 0) {
+                game.cgx3.drawImage(game.arrows.up_down_left_right, this.x, this.y, this.width, this.height);
+            } else if (this.collision === 1) {
+                game.cgx3.drawImage(game.arrows.no, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [1, 2, 3])) {
+                game.cgx3.drawImage(game.arrows.up, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [0, 2, 3])) {
+                game.cgx3.drawImage(game.arrows.down, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [0, 1, 3])) {
+                game.cgx3.drawImage(game.arrows.left, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [0, 1, 2])) {
+                game.cgx3.drawImage(game.arrows.right, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [0, 1])) {
+                game.cgx3.drawImage(game.arrows.up_down, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [1, 3])) {
+                game.cgx3.drawImage(game.arrows.up_left, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [1, 2])) {
+                game.cgx3.drawImage(game.arrows.up_right, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [0, 3])) {
+                game.cgx3.drawImage(game.arrows.down_left, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [0, 2])) {
+                game.cgx3.drawImage(game.arrows.down_right, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [0, 1])) {
+                game.cgx3.drawImage(game.arrows.left_right, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [3])) {
+                game.cgx3.drawImage(game.arrows.up_down_left, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [2])) {
+                game.cgx3.drawImage(game.arrows.up_down_right, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [1])) {
+                game.cgx3.drawImage(game.arrows.down_left_right, this.x, this.y, this.width, this.height);
+            } else if (arrayEqual(this.collision, [0])) {
+                game.cgx3.drawImage(game.arrows.up_down_left_right, this.x, this.y, this.width, this.height);
             }
-            game.cgx3.fillRect(this.x, this.y, this.width, this.height);
-            game.cgx3.globalAlpha = 1.0;
         }
     }
 }
@@ -404,7 +426,7 @@ function Map(imageID, spritesheetID, mapWidth, mapHeight) {
             var y = Math.floor(param_y / spritesheets.data[this.spritesheetID].spriteHeight);
             game.tiletype = xy2i(x, y, spritesheets.data[this.spritesheetID].spritesX) + 1;
             this.drawTileset();
-            
+
             document.getElementById("selectedTile").innerHTML = game.tiletype;
             document.getElementById("clickedXY").innerHTML = "[" + x + " | " + y + "]";
         }
@@ -1126,11 +1148,13 @@ function Dialog(input, fnc) {
                 this.keyPush = false;
             }
         } else this.keyPush = true;
-        // TODO: Refine select with Mouseover / Touching
-        if (game.x > 30 && game.x < 140 && game.y > 345 && game.y < 370) this.selectedOption = 0;
-        else if (game.x > 30 && game.x < 140 && game.y > 370 && game.y < 395) this.selectedOption = 1;
-        else if (game.x > 190 && game.x < 350 && game.y > 345 && game.y < 370) this.selectedOption = 2;
-        else if (game.x > 190 && game.x < 350 && game.y > 370 && game.y < 395) this.selectedOption = 3;
+        if (game.activeCanvas == 0) {
+            // TODO: Refine select with Mouseover / Touching
+            if (game.x > 30 && game.x < 160 && game.y > 405 && game.y < 425) this.selectedOption = 0;
+            else if (game.x > 30 && game.x < 160 && game.y > 425 && game.y < 445) this.selectedOption = 1;
+            else if (game.x > 190 && game.x < 350 && game.y > 405 && game.y < 425) this.selectedOption = 2;
+            else if (game.x > 190 && game.x < 350 && game.y > 425 && game.y < 445) this.selectedOption = 3;
+        }
         // Stay in range
         if (this.selectedOption < 0) this.selectedOption = this.selectedOption + this.text[this.chatCounter].length;
         else this.selectedOption = this.selectedOption % this.text[this.chatCounter].length;
