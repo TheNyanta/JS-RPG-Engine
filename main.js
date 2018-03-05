@@ -383,7 +383,7 @@ var game = {
     start: function () {
         function gameLoop() {
             requestAnimationFrame(gameLoop);
-            //if (document.active)
+            if (document.active)
                 updateGameArea();
         }
         gameLoop();
