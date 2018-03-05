@@ -355,8 +355,8 @@ var game = {
                 game.clickupY = e.clientY - game.tileset.getBoundingClientRect().y;
             } else {
                 activeCanvas = undefined;
-                game.clickdownX = undefined;
-                game.clickdownY = undefined;
+                game.clickupX = undefined;
+                game.clickupY = undefined;
             }
         })
         // Touch move
