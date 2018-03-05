@@ -1,7 +1,7 @@
 var game = {
     //canvas: document.createElement("canvas"),
     canvas: document.getElementById("game"),
-    tileset: document.createElement("canvas"),
+    tileset: document.getElementById("tileset"),
     debug: false,
     info: false,
     // Map Editor Variables
@@ -23,9 +23,6 @@ var game = {
         this.context = this.canvas.getContext("2d");
 
         // Tileset canvas
-        this.tileset.width = 0;
-        this.tileset.height = 0;
-        this.tileset.id = "tileset";
         this.tilecontext = this.tileset.getContext("2d");
 
         // Pause game if not selected
@@ -90,6 +87,42 @@ var game = {
             restriction13: document.getElementById("restriction13"),
             restriction14: document.getElementById("restriction14"),
         }
+        // Editor images
+        this.arrows = {
+            no: new Image(),
+            up: new Image(),
+            down: new Image(),
+            left: new Image(),
+            right: new Image(),
+            up_down: new Image(),
+            up_left: new Image(),
+            up_right: new Image(),
+            down_left: new Image(),
+            down_right: new Image(),
+            left_right: new Image(),
+            up_down_left: new Image(),
+            up_down_right: new Image(),
+            up_left_right: new Image(),
+            down_left_right: new Image(),
+            up_down_left_right: new Image()
+        }
+
+        game.arrows.no.src = "Assets/Image/Restriction Arrows/no.png";
+        game.arrows.up.src = "Assets/Image/Restriction Arrows/up.png";
+        game.arrows.down.src = "Assets/Image/Restriction Arrows/down.png";
+        game.arrows.left.src = "Assets/Image/Restriction Arrows/left.png";
+        game.arrows.right.src = "Assets/Image/Restriction Arrows/right.png";
+        game.arrows.up_down.src = "Assets/Image/Restriction Arrows/up_down.png";
+        game.arrows.up_left.src = "Assets/Image/Restriction Arrows/up_left.png";
+        game.arrows.up_right.src = "Assets/Image/Restriction Arrows/up_right.png";
+        game.arrows.down_left.src = "Assets/Image/Restriction Arrows/down_left.png";
+        game.arrows.down_right.src = "Assets/Image/Restriction Arrows/down_right.png";
+        game.arrows.left_right.src = "Assets/Image/Restriction Arrows/left_right.png";
+        game.arrows.up_down_left.src = "Assets/Image/Restriction Arrows/up_down_left.png";
+        game.arrows.up_down_right.src = "Assets/Image/Restriction Arrows/up_down_right.png";
+        game.arrows.up_left_right.src = "Assets/Image/Restriction Arrows/up_left_right.png";
+        game.arrows.down_left_right.src = "Assets/Image/Restriction Arrows/down_left_right.png";
+        game.arrows.up_down_left_right.src = "Assets/Image/Restriction Arrows/up_down_left_right.png";
 
         // Camera
         this.camera = new function () {
