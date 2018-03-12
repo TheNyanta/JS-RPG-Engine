@@ -10,8 +10,6 @@ Map collision with direction restrictions
 
 Component-component-collision
 
-Gamedata 'saving' for maps and spritesheets (see myGameArea.data)
-
 Click/touch interaction with objects, for "main" charcter enter interaction
 
 Simple Mousedown / Touchdown moving
