@@ -12,8 +12,6 @@ Component-component-collision
 
 Click/touch interaction with objects, for "main" charcter enter interaction
 
-Simple model for dialog, map switching and events 
-
 ## TODO:
 
 ### Engine
