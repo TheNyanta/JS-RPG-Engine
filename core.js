@@ -1937,8 +1937,7 @@ var game = {
                 game.clickdownX = e.clientX;
                 game.clickdownY = e.clientY;
             }
-            document.getElementById("clicked/touched").innerHTML = "Click";
-            document.getElementById("ctsp").innerHTML = "[" + game.clickdownX + "|" + game.clickdownY + "]";
+            document.getElementById("clicked/touched").innerHTML = "Mousedown" + "[" + game.clickdownX + "|" + game.clickdownY + "]";
         })
         // Mouse up
         window.addEventListener('mouseup', function (e) {
@@ -1955,7 +1954,7 @@ var game = {
                 game.clickupX = e.clientX;
                 game.clickupY = e.clientY;
             }
-            document.getElementById("clicked/touched").innerHTML = "None";
+            document.getElementById("clicked/touched").innerHTML = "-";
         })
         // Mouse move
         window.addEventListener('mousemove', function (e) {
@@ -1981,7 +1980,7 @@ var game = {
                 document.getElementById("activeCanvas").innerHTML = "Off Canvas";
                 document.getElementById("canvasXY").innerHTML = "[" + e.clientX + " | " + e.clientY + "]";
             }
-            document.getElementById("mtp").innerHTML = "[" + game.x + "|" + game.y + "]";
+            document.getElementById("mtp").innerHTML = "-> [" + game.x + "|" + game.y + "]";
         })
         // TOUCH
         // Touch start
@@ -1998,8 +1997,7 @@ var game = {
                 game.touchstartX = e.clientX;
                 game.touchstartY = e.clientY;
             }
-            document.getElementById("clicked/touched").innerHTML = "Touch";
-            document.getElementById("ctsp").innerHTML = "[" + game.touchstartX + "|" + game.touchstartY + "]";
+            document.getElementById("clicked/touched").innerHTML = "Touchstart" + "[" + game.touchstartX + "|" + game.touchstartY + "]";
         })
         // Touch end
         window.addEventListener('touchend', function (e) {
@@ -2015,7 +2013,7 @@ var game = {
                 game.touchendX = e.clientX;
                 game.touchendY = e.clientY;
             }
-            document.getElementById("clicked/touched").innerHTML = "None";
+            document.getElementById("clicked/touched").innerHTML = "-";
         })
         // Touch move
         window.addEventListener('touchmove', function (e) {
@@ -2041,7 +2039,7 @@ var game = {
                 document.getElementById("activeCanvas").innerHTML = "Off Canvas";
                 document.getElementById("canvasXY").innerHTML = "[" + e.clientX + " | " + e.clientY + "]";
             }
-            document.getElementById("mtp").innerHTML = "[" + game.x + "|" + game.y + "]";
+            document.getElementById("mtp").innerHTML = "-> [" + game.x + "|" + game.y + "]";
         })
     },
 
