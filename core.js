@@ -1816,31 +1816,33 @@ var game = {
                             this.target.speedX = this.target.speed;
                         else if (!this.disableMouse) {
                             if (game.mousedown || game.touchdown) {
-                                // Move direction = Difference between clicked and current mousemove/touch position
-                                if (game.mousedown) {
-                                    if (Math.abs(game.x - game.clickdownX) > Math.abs(game.y - game.clickdownY)) {
-                                        if (game.x < game.clickdownX - 4)
-                                            this.target.speedX -= this.target.speed;
-                                        else if (game.x > game.clickdownX + 4)
-                                            this.target.speedX += this.target.speed;
-                                    } else {
-                                        if (game.y < game.clickdownY - 4)
-                                            this.target.speedY -= this.target.speed;
-                                        else if (game.y > game.clickdownY + 4)
-                                            this.target.speedY += this.target.speed;
+                                if (game.activeCanvas == 0) {
+                                    // Move direction = Difference between clicked and current mousemove/touch position
+                                    if (game.mousedown) {
+                                        if (Math.abs(game.x - game.clickdownX) > Math.abs(game.y - game.clickdownY)) {
+                                            if (game.x < game.clickdownX - 4)
+                                                this.target.speedX -= this.target.speed;
+                                            else if (game.x > game.clickdownX + 4)
+                                                this.target.speedX += this.target.speed;
+                                        } else {
+                                            if (game.y < game.clickdownY - 4)
+                                                this.target.speedY -= this.target.speed;
+                                            else if (game.y > game.clickdownY + 4)
+                                                this.target.speedY += this.target.speed;
+                                        }
                                     }
-                                }
-                                if (game.touchdown) {
-                                    if (Math.abs(game.x - game.touchstartX) > Math.abs(game.y - game.touchstartY)) {
-                                        if (game.x < game.touchstartX - 4)
-                                            this.target.speedX -= this.target.speed;
-                                        else if (game.x > game.touchstartX + 4)
-                                            this.target.speedX += this.target.speed;
-                                    } else {
-                                        if (game.y < game.touchstartY - 4)
-                                            this.target.speedY -= this.target.speed;
-                                        else if (game.y > game.touchstartY + 4)
-                                            this.target.speedY += this.target.speed;
+                                    if (game.touchdown) {
+                                        if (Math.abs(game.x - game.touchstartX) > Math.abs(game.y - game.touchstartY)) {
+                                            if (game.x < game.touchstartX - 4)
+                                                this.target.speedX -= this.target.speed;
+                                            else if (game.x > game.touchstartX + 4)
+                                                this.target.speedX += this.target.speed;
+                                        } else {
+                                            if (game.y < game.touchstartY - 4)
+                                                this.target.speedY -= this.target.speed;
+                                            else if (game.y > game.touchstartY + 4)
+                                                this.target.speedY += this.target.speed;
+                                        }
                                     }
                                 }
                             }
@@ -1923,41 +1925,44 @@ var game = {
         // Mouse down
         window.addEventListener('mousedown', function (e) {
             game.mousedown = true;
+            game.clickdownX = e.clientX;
+            game.clickdownY = e.clientY;
+
             if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
                 e.preventDefault();
-                game.clickdownX = Math.floor(e.clientX - game.canvas.getBoundingClientRect().x);
-                game.clickdownY = Math.floor(e.clientY - game.canvas.getBoundingClientRect().y);
+                game.clickdownX -= game.canvas.getBoundingClientRect().x;
+                game.clickdownY -= game.canvas.getBoundingClientRect().y;
                 maps.data[game.currentMap].clickedTile(game.clickdownX, game.clickdownY);
             } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
                 e.preventDefault();
-                game.clickdownX = Math.floor(e.clientX - game.tileset.getBoundingClientRect().x);
-                game.clickdownY = Math.floor(e.clientY - game.tileset.getBoundingClientRect().y);
+                game.clickdownX -= game.tileset.getBoundingClientRect().x;
+                game.clickdownY -= game.tileset.getBoundingClientRect().y;
                 maps.data[game.currentMap].clickedTile(game.clickdownX, game.clickdownY);
-            } else {
-                game.clickdownX = e.clientX;
-                game.clickdownY = e.clientY;
             }
+
             document.getElementById("clicked/touched").innerHTML = "Mousedown" + "[" + game.clickdownX + "|" + game.clickdownY + "]";
         })
         // Mouse up
         window.addEventListener('mouseup', function (e) {
             game.mousedown = false;
+            game.clickupX = e.clientX;
+            game.clickupY = e.clientY;
 
             if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                game.clickupX = e.clientX - game.canvas.getBoundingClientRect().x;
-                game.clickupY = e.clientY - game.canvas.getBoundingClientRect().y;
+                game.clickupX -= game.canvas.getBoundingClientRect().x;
+                game.clickupY -= game.canvas.getBoundingClientRect().y;
             } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
-                game.clickupX = e.clientX - game.tileset.getBoundingClientRect().x;
-                game.clickupY = e.clientY - game.tileset.getBoundingClientRect().y;
-            } else {
-                game.activeCanvas = undefined;
-                game.clickupX = e.clientX;
-                game.clickupY = e.clientY;
+                game.clickupX -= game.tileset.getBoundingClientRect().x;
+                game.clickupY -= game.tileset.getBoundingClientRect().y;
             }
+
             document.getElementById("clicked/touched").innerHTML = "-";
         })
         // Mouse move
         window.addEventListener('mousemove', function (e) {
+            game.x = e.clientX;
+            game.y = e.clientY;
+
             if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
                 game.activeCanvas = 0;
                 game.x = Math.floor(e.clientX - game.canvas.getBoundingClientRect().x);
@@ -1974,8 +1979,6 @@ var game = {
                 document.getElementById("canvasXY").innerHTML = "[" + game.x + " | " + game.y + "]";
             } else {
                 game.activeCanvas = undefined;
-                game.x = e.clientX;
-                game.y = e.clientY;
 
                 document.getElementById("activeCanvas").innerHTML = "Off Canvas";
                 document.getElementById("canvasXY").innerHTML = "[" + e.clientX + " | " + e.clientY + "]";
@@ -1986,41 +1989,44 @@ var game = {
         // Touch start
         window.addEventListener('touchstart', function (e) {
             game.touchdown = true;
+            game.touchstartX = e.touches[0].clientX;
+            game.touchstartY = e.touches[0].clientY;
+
             if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                game.touchstartX = e.clientX - game.canvas.getBoundingClientRect().x;
-                game.touchstartY = e.clientY - game.canvas.getBoundingClientRect().y;
+                game.touchstartX -= game.canvas.getBoundingClientRect().x;
+                game.touchstartY -= game.canvas.getBoundingClientRect().y;
             } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
-                game.touchstartX = e.clientX - game.tileset.getBoundingClientRect().x;
-                game.touchstartY = e.clientY - game.tileset.getBoundingClientRect().y;
-            } else {
-                activeCanvas = undefined;
-                game.touchstartX = e.clientX;
-                game.touchstartY = e.clientY;
+                game.touchstartX -= game.tileset.getBoundingClientRect().x;
+                game.touchstartY -= game.tileset.getBoundingClientRect().y;
             }
+
             document.getElementById("clicked/touched").innerHTML = "Touchstart" + "[" + game.touchstartX + "|" + game.touchstartY + "]";
         })
         // Touch end
         window.addEventListener('touchend', function (e) {
             game.touchdown = false;
+            game.touchendX = e.touches[0].clientX;
+            game.touchendY = e.touches[0].clientY;
+
             if (game.onCanvas(e.clientX, e.clientY, game.canvas)) {
-                game.touchendX = e.clientX - game.canvas.getBoundingClientRect().x;
-                game.touchendY = e.clientY - game.canvas.getBoundingClientRect().y;
+                game.touchendX -= game.canvas.getBoundingClientRect().x;
+                game.touchendY -= game.canvas.getBoundingClientRect().y;
             } else if (game.onCanvas(e.clientX, e.clientY, game.tileset)) {
-                game.touchendX = e.clientX - game.tileset.getBoundingClientRect().x;
-                game.touchendY = e.clientY - game.tileset.getBoundingClientRect().y;
-            } else {
-                activeCanvas = undefined;
-                game.touchendX = e.clientX;
-                game.touchendY = e.clientY;
+                game.touchendX -= game.tileset.getBoundingClientRect().x;
+                game.touchendY -= game.tileset.getBoundingClientRect().y;
             }
+
             document.getElementById("clicked/touched").innerHTML = "-";
         })
         // Touch move
         window.addEventListener('touchmove', function (e) {
+            game.x = e.touches[0].clientX;
+            game.y = e.touches[0].clientY;
+
             if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.canvas)) {
                 activeCanvas = 0;
                 game.x = Math.floor(e.touches[0].clientX - game.canvas.getBoundingClientRect().x);
-                game.y = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
+                game.y = Math.floor(e.touches[0].clientY - game.canvas.getBoundingClientRect().y);
 
                 document.getElementById("activeCanvas").innerHTML = "Game";
                 document.getElementById("canvasXY").innerHTML = "[" + game.x + " | " + game.y + "]";
@@ -2033,8 +2039,6 @@ var game = {
                 document.getElementById("canvasXY").innerHTML = "[" + game.x + " | " + game.y + "]";
             } else {
                 game.activeCanvas = undefined;
-                game.x = e.clientX;
-                game.y = e.clientY;
 
                 document.getElementById("activeCanvas").innerHTML = "Off Canvas";
                 document.getElementById("canvasXY").innerHTML = "[" + e.clientX + " | " + e.clientY + "]";
@@ -2140,17 +2144,19 @@ function draw() {
     }
     // Mouse / Touch
     if (game.mousedown || game.touchdown) {
-        ctx = game.context;
-        ctx.beginPath();
-        if (game.mousedown) ctx.arc(game.clickdownX, game.clickdownY, 5, 0, 2 * Math.PI, true);
-        if (game.touchdown) ctx.arc(game.touchstartX, game.touchstartY, 5, 0, 2 * Math.PI, true);
-        ctx.arc(game.x, game.y, 5, 0, 2 * Math.PI, true);
-        // Fill
-        ctx.fillStyle = "black";
-        ctx.fill();
-        // Outline
-        ctx.strokeStyle = "black";
-        ctx.stroke();
+        if (game.activeCanvas == 0) {
+            ctx = game.context;
+            ctx.beginPath();
+            if (game.mousedown) ctx.arc(game.clickdownX, game.clickdownY, 5, 0, 2 * Math.PI, true);
+            if (game.touchdown) ctx.arc(game.touchstartX, game.touchstartY, 5, 0, 2 * Math.PI, true);
+            ctx.arc(game.x, game.y, 5, 0, 2 * Math.PI, true);
+            // Fill
+            ctx.fillStyle = "black";
+            ctx.fill();
+            // Outline
+            ctx.strokeStyle = "black";
+            ctx.stroke();
+        }
     }
 }
 
