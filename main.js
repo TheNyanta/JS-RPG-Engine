@@ -232,7 +232,7 @@ var game = {
                 clearTimeout(requestID)
             }; //fall back
 
-        // OnCanvas if not zoomed
+        // OnCanvas
         this.onCanvas = function (x, y, canvas) {
             if (x > canvas.getBoundingClientRect().x &&
                 x < canvas.getBoundingClientRect().x + canvas.width &&

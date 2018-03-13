@@ -49,6 +49,13 @@ function containsComponent(data, id, mapID) {
     return undefined;
 }
 
+// Not for nested arrays
+function arrayEqual(arr1, arr2) {
+    if (arr1.length != arr2.length) return false;
+    for (var i = 0, l = arr1.length; i < l; i++) if (arr1[i] !== arr2[i]) return false 
+    return true;
+}
+
 function teleportComponent(component, map, x, y) {
     // Set new position
     if (x != null) component.x = x;
@@ -364,7 +371,6 @@ function layerButton(i) {
         game.dom.currentLayer.innerHTML = "Collision";
         // Enable debug to see collision restriction
         if (!game.debug) debugButton();
-        console.log("Show collision");
         // Show restricition selection
         game.dom.currentRestriction.className = game.dom.currentRestriction.className.replace("w3-hide", "");
 
@@ -420,5 +426,5 @@ function startButton() {
     document.getElementById("startButton").parentNode.removeChild(document.getElementById("startButton"));
     document.getElementById("editorButtons").className += document.getElementById("editorButtons").className.replace(" w3-hide", "");
     game.init();
-    game.start();
+    setTimeout(game.start, 200);
 }
