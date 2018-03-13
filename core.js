@@ -1910,10 +1910,11 @@ var game = {
                 game.clickdownY = Math.floor(e.clientY - game.tileset.getBoundingClientRect().y);
                 maps.data[game.currentMap].clickedTile(game.clickdownX, game.clickdownY);
             } else {
-                game.clickdownX = undefined;
-                game.clickdownY = undefined;
+                game.clickdownX = e.clientX;
+                game.clickdownY = e.clientY;
             }
             document.getElementById("clicked/touched").innerHTML = "True";
+            document.getElementById("ctsp").innerHTML = "[" + game.clickdownX + "|" + game.clickdownY + "]";
         })
         // Mouse up
         window.addEventListener('mouseup', function (e) {
@@ -1927,8 +1928,8 @@ var game = {
                 game.clickupY = e.clientY - game.tileset.getBoundingClientRect().y;
             } else {
                 game.activeCanvas = undefined;
-                game.clickupX = undefined;
-                game.clickupY = undefined;
+                game.clickupX = e.clientX;
+                game.clickupY = e.clientY;
             }
             document.getElementById("clicked/touched").innerHTML = "False";
         })
@@ -1956,6 +1957,7 @@ var game = {
                 document.getElementById("activeCanvas").innerHTML = "Off Canvas";
                 document.getElementById("canvasXY").innerHTML = "[" + e.clientX + " | " + e.clientY + "]";
             }
+            document.getElementById("mtp").innerHTML = "[" + game.x + "|" + game.y + "]";
         })
         // Touch start
         window.addEventListener('touchstart', function (e) {
@@ -1968,10 +1970,11 @@ var game = {
                 game.clickdownY = e.clientY - game.tileset.getBoundingClientRect().y;
             } else {
                 activeCanvas = undefined;
-                game.clickdownX = undefined;
-                game.clickdownY = undefined;
+                game.clickdownX = e.clientX;
+                game.clickdownY = e.clientY;
             }
             document.getElementById("clicked/touched").innerHTML = "True";
+            document.getElementById("ctsp").innerHTML = "[" + game.clickdownX + "|" + game.clickdownY + "]";
         })
         // Touch end
         window.addEventListener('touchend', function (e) {
@@ -1984,8 +1987,8 @@ var game = {
                 game.clickupY = e.clientY - game.tileset.getBoundingClientRect().y;
             } else {
                 activeCanvas = undefined;
-                game.clickupX = undefined;
-                game.clickupY = undefined;
+                game.clickupX = e.clientX;
+                game.clickupY = e.clientY;
             }
             document.getElementById("clicked/touched").innerHTML = "False";
         })
@@ -1995,18 +1998,15 @@ var game = {
                 activeCanvas = 0;
                 game.x = Math.floor(e.touches[0].clientX - game.canvas.getBoundingClientRect().x);
                 game.y = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
-            } else {
-                game.x = undefined;
-                game.y = undefined;
-            }
-            if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.tileset)) {
+            } else if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.tileset)) {
                 activeCanvas = 1;
                 game.x = Math.floor(e.touches[0].clientX - game.tileset.getBoundingClientRect().x);
                 game.y = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
             } else {
-                game.x = undefined;
-                game.y = undefined;
+                game.x = e.clientX;
+                game.y = e.clientY;
             }
+            document.getElementById("mtp").innerHTML = "[" + game.x + "|" + game.y + "]";
         })
     },
 
