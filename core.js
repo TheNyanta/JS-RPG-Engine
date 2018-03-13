@@ -1998,13 +1998,23 @@ var game = {
                 activeCanvas = 0;
                 game.x = Math.floor(e.touches[0].clientX - game.canvas.getBoundingClientRect().x);
                 game.y = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
+
+                document.getElementById("activeCanvas").innerHTML = "Game";
+                document.getElementById("canvasXY").innerHTML = "[" + game.x + " | " + game.y + "]";
             } else if (game.onCanvas(e.touches[0].clientX, e.touches[0].clientY, game.tileset)) {
                 activeCanvas = 1;
                 game.x = Math.floor(e.touches[0].clientX - game.tileset.getBoundingClientRect().x);
                 game.y = Math.floor(e.touches[0].clientY - game.tileset.getBoundingClientRect().y);
+
+                document.getElementById("activeCanvas").innerHTML = "Tileset";
+                document.getElementById("canvasXY").innerHTML = "[" + game.x + " | " + game.y + "]";
             } else {
+                game.activeCanvas = undefined;
                 game.x = e.clientX;
                 game.y = e.clientY;
+
+                document.getElementById("activeCanvas").innerHTML = "Off Canvas";
+                document.getElementById("canvasXY").innerHTML = "[" + e.clientX + " | " + e.clientY + "]";
             }
             document.getElementById("mtp").innerHTML = "[" + game.x + "|" + game.y + "]";
         })
