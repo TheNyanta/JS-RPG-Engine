@@ -1,8 +1,6 @@
 // All script that need to be loaded
 var scriptsToLoad = [
-    'main.js',
     'astar.js',
-    'utility.js',
     'core.js',
     'data.js'];
 scriptsToLoad.forEach(function (src) {
