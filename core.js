@@ -1643,7 +1643,7 @@ var game = {
     // The data of the game: When creating new spritesheets/maps/components it will be saved as a string
     // If you start the engine again and feed it this data it will be the same game data as before
     data: "",
-    // Init
+    // Init control, maps, ..
     init: function () {
         // Game canvas
         this.context = this.canvas.getContext("2d");
@@ -1913,6 +1913,7 @@ var game = {
                 game.clickdownX = undefined;
                 game.clickdownY = undefined;
             }
+            document.getElementById("clicked/touched").innerHTML = "True";
         })
         // Mouse up
         window.addEventListener('mouseup', function (e) {
@@ -1929,6 +1930,7 @@ var game = {
                 game.clickupX = undefined;
                 game.clickupY = undefined;
             }
+            document.getElementById("clicked/touched").innerHTML = "False";
         })
         // Mouse move
         window.addEventListener('mousemove', function (e) {
@@ -1969,6 +1971,7 @@ var game = {
                 game.clickdownX = undefined;
                 game.clickdownY = undefined;
             }
+            document.getElementById("clicked/touched").innerHTML = "True";
         })
         // Touch end
         window.addEventListener('touchend', function (e) {
@@ -1984,6 +1987,7 @@ var game = {
                 game.clickupX = undefined;
                 game.clickupY = undefined;
             }
+            document.getElementById("clicked/touched").innerHTML = "False";
         })
         // Touch move
         window.addEventListener('touchmove', function (e) {
@@ -2100,6 +2104,19 @@ function draw() {
         updateFPS();
         showFPS();
         if (game.camera.target != undefined) showPosition(game.camera.target);
+    }
+    // Mouse / Touch
+    if (game.mousedown || game.touchdown) {
+        ctx = game.context;
+        ctx.beginPath();
+        ctx.arc(game.clickdownX, game.clickdownY, 5, 0, 2 * Math.PI, true);
+        ctx.arc(game.x, game.y, 5, 0, 2 * Math.PI, true);
+        // Fill
+        ctx.fillStyle = "black";
+        ctx.fill();
+        // Outline
+        ctx.strokeStyle = "black";
+        ctx.stroke();
     }
 }
 
