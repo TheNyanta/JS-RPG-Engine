@@ -37,7 +37,7 @@ addMap(null, 1, 80, 60);
 addMap(null, 2, 42, 40);
 addMap(null, 3, 42, 60);
 // Components
-addComponent("Boy", 0, 4, 240, 280, {
+addComponent("Wizard", 0, 4, 240, 280, {
         x: 4,
         y: 16,
         width: 16,
