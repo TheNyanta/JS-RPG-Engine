@@ -308,8 +308,8 @@ function showFPS() {
 function showPosition(target) {
     ctx = game.context;
     ctx.fillStyle = "black";
-    ctx.fillText("x:" + (target.boundingBox.x) + ", y:" + (target.boundingBox.y), 5, 60);
-    ctx.fillText("Tile[" + Math.floor(target.boundingBox.x / spritesheets.data[maps.data[game.currentMap].spritesheetID].spriteWidth) + ", " + Math.floor(target.boundingBox.y / spritesheets.data[maps.data[game.currentMap].spritesheetID].spriteHeight) + "]", 5, 80);
+    ctx.fillText("x:" + (target.x + target.boundingBox.x) + ", y:" + (target.y + target.boundingBox.y), 5, 60);
+    ctx.fillText("Tile[" + Math.floor((target.x + target.boundingBox.x) / spritesheets.data[maps.data[game.currentMap].spritesheetID].spriteWidth) + ", " + Math.floor((target.y + target.boundingBox.y) / spritesheets.data[maps.data[game.currentMap].spritesheetID].spriteHeight) + "]", 5, 80);
 }
 
 function showDistance() {
@@ -1168,11 +1168,11 @@ function Component(name, mapID, spritesheetID, x, y, boundingBox, contactEvent, 
     // #########################
 
     /**
-     * Prevents tile collision
+     * Apply map tile collision to the component
+     * First check map borders
+     * If component can collide calculates its four corners and applies the tile restrictions of all the tile it is standing on
      * [TODO: Check if there is no collision between the old and the new position
      * (Can happen if either moving really fast or realtime moving <big delta * speed>)]
-     * Calculates the new position and checks if it's walkable by using the maps collision layer
-     *  8x8 tiles - "may TODO": Adept for all sizes
      */
     this.tileCollision = function () {
 
@@ -1184,34 +1184,24 @@ function Component(name, mapID, spritesheetID, x, y, boundingBox, contactEvent, 
         else if (this.x + this.boundingBox.x + this.speedX + this.boundingBox.width > d.width) this.speedX = 0;
         else if (this.y + this.boundingBox.y + this.speedY + this.boundingBox.height > d.height) this.speedY = 0;
 
-        // Converts the cartesian to grid coordiantes
-        var x1 = Math.floor((this.x + this.boundingBox.x + this.speedX) / 8);
-        var x2 = x1 + 1;
-        var x3 = Math.floor((this.x + this.boundingBox.x + this.speedX + this.boundingBox.width) / 8);
-        var y1 = Math.floor((this.y + this.boundingBox.y + this.speedY) / 8);
-        var y2 = y1 + 1;
-        var y3 = Math.floor((this.y + this.boundingBox.y + this.speedY + this.boundingBox.height) / 8);
-
-        if (Math.abs(x3 - (this.x + this.boundingBox.x + this.boundingBox.width + this.speedX) / 8) < 0.1) x3 = x2;
-        if (Math.abs(y3 - (this.y + this.boundingBox.y + this.boundingBox.height + this.speedY) / 8) < 0.1) y3 = y2;
-
         if (this.boundingBox.collidable) {
-            // Apply the movement restriction of the tiles the component is standing on to it
-            this.tileRestriction(d.tiles[xy2i(x1, y1, d.mapWidth)]);
-            this.tileRestriction(d.tiles[xy2i(x1, y2, d.mapWidth)]);
-            this.tileRestriction(d.tiles[xy2i(x1, y3, d.mapWidth)]);
-            this.tileRestriction(d.tiles[xy2i(x2, y1, d.mapWidth)]);
-            this.tileRestriction(d.tiles[xy2i(x2, y2, d.mapWidth)]);
-            this.tileRestriction(d.tiles[xy2i(x2, y3, d.mapWidth)]);
-            this.tileRestriction(d.tiles[xy2i(x3, y1, d.mapWidth)]);
-            this.tileRestriction(d.tiles[xy2i(x3, y2, d.mapWidth)]);
-            this.tileRestriction(d.tiles[xy2i(x3, y3, d.mapWidth)]);
+            // Grid coordinates of the components corners 
+            var x0 = Math.floor((this.x + this.boundingBox.x + this.speedX) / spritesheets.data[d.spritesheetID].spriteWidth);
+            var y0 = Math.floor((this.y + this.boundingBox.y + this.speedY) / spritesheets.data[d.spritesheetID].spriteHeight);
+            var xn = (this.x + this.boundingBox.x + this.boundingBox.width + this.speedX) / spritesheets.data[d.spritesheetID].spriteWidth;
+            var yn = (this.y + this.boundingBox.y + this.boundingBox.height + this.speedY) / spritesheets.data[d.spritesheetID].spriteHeight;
+            // Check if only touching right/down tile
+            if (Math.floor(xn) - xn == 0) xn = Math.floor(xn) - 1;
+            if (Math.floor(yn) - yn == 0) yn = Math.floor(yn) - 1;
+            // Check collision for all the tiles the comonent is standing on
+            for (var i = x0; i <= xn; i++)
+                for (var j = y0; j <= yn; j++)
+                    this.tileRestriction(d.tiles[xy2i(i, j, d.mapWidth)]);
         }
     }
 
     /**
      * Set movement based on the tiles collision restricting certain directions
-     * ?TODO? uncomment parts when setting collision box = tile size
      * @param the tile
      */
     this.tileRestriction = function (tile) {
@@ -1228,22 +1218,22 @@ function Component(name, mapID, spritesheetID, x, y, boundingBox, contactEvent, 
             for (var i = 0, l = tile.collision.length; i < l; i++) {
                 // RESTRICTED: UP
                 if (tile.collision[i] == 0) {
-                    if (this.y + this.boundingBox.y > tile.y /*+ tile.height*/ )
+                    if (this.y + this.boundingBox.y >= tile.y + tile.height)
                         if (this.speedY < 0) this.speedY = 0;
                 }
                 // RESTRICTED: DOWN 
                 else if (tile.collision[i] == 1) {
-                    if (this.y + this.boundingBox.y /*+ this.boundingBox.height*/ < tile.y)
+                    if (this.y + this.boundingBox.y + this.boundingBox.height <= tile.y)
                         if (this.speedY > 0) this.speedY = 0;
                 }
                 // RESTRICTED: LEFT
                 else if (tile.collision[i] == 2) {
-                    if (this.x + this.boundingBox.x > tile.x /*+ tile.width*/ )
+                    if (this.x + this.boundingBox.x >= tile.x + tile.width)
                         if (this.speedX < 0) this.speedX = 0;
                 }
                 // RESTRICTED: RIGHT
                 else if (tile.collision[i] == 3) {
-                    if (this.x + this.boundingBox.x /*+ this.boundingBox.width*/ < tile.x)
+                    if (this.x + this.boundingBox.x + this.boundingBox.width <= tile.x)
                         if (this.speedX > 0) this.speedX = 0;
                 }
             }
@@ -1317,6 +1307,7 @@ function Component(name, mapID, spritesheetID, x, y, boundingBox, contactEvent, 
         }
     }
 
+    // Get the mid of the 
     this.mid = function () {
         return rectangleMid(this.x + this.boundingBox.x, this.y + this.boundingBox.y, this.boundingBox.width, this.boundingBox.height);
     }
@@ -1427,8 +1418,23 @@ function Component(name, mapID, spritesheetID, x, y, boundingBox, contactEvent, 
         // The direction the component is facing can be updated after the speedX/Y is set
         this.updateDirection();
 
-        // Checks if there is a collision with the map and adjust movement if needed
-        this.tileCollision();
+        // Checks for map collision and adjust speed to stop at zero distance
+        if (this.speedX != 0) {
+            var sign = Math.sign(this.speedX);
+            for (var spd = Math.abs(this.speedX); 0 < spd; spd--) {
+                this.speedX = sign * spd;
+                this.tileCollision();
+                if (this.speedX != 0) break;
+            }
+        }
+        if (this.speedY != 0) {
+            var sign = Math.sign(this.speedY);
+            for (var spd = Math.abs(this.speedY); 0 < spd; spd--) {
+                this.speedY = sign * spd;
+                this.tileCollision();
+                if (this.speedY != 0) break;
+            }
+        }
 
         return this;
     }
