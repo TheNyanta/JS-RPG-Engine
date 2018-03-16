@@ -383,7 +383,6 @@ function layerButton(i) {
     if (!game.drawingOn) drawButton();
 }
 
-
 // Collision Restriction Selection
 function openCollisionButton() {
     if (game.dom.restrictionSelection.className.indexOf("w3-show") == -1) game.dom.restrictionSelection.className += " w3-show";
@@ -674,40 +673,13 @@ function Tile(spritesheetID, x, y) {
         if (this.layer3 - 1 >= 0) drawSprite(ctx2, spritesheets.data[this.spritesheetID], this.layer3 - 1, this.x, this.y);
         // Debug information
         if (game.debug) {
-            //Draw Collision Restriction of the tiles; TODO: Better Visualization!
-            if (this.collision === 0) {
-                game.cgx3.drawImage(game.arrows.up_down_left_right, this.x, this.y, this.width, this.height);
-            } else if (this.collision === 1) {
-                game.cgx3.drawImage(game.arrows.no, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [1, 2, 3])) {
-                game.cgx3.drawImage(game.arrows.up, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [0, 2, 3])) {
-                game.cgx3.drawImage(game.arrows.down, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [0, 1, 3])) {
-                game.cgx3.drawImage(game.arrows.left, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [0, 1, 2])) {
-                game.cgx3.drawImage(game.arrows.right, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [0, 1])) {
-                game.cgx3.drawImage(game.arrows.up_down, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [1, 3])) {
-                game.cgx3.drawImage(game.arrows.up_left, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [1, 2])) {
-                game.cgx3.drawImage(game.arrows.up_right, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [0, 3])) {
-                game.cgx3.drawImage(game.arrows.down_left, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [0, 2])) {
-                game.cgx3.drawImage(game.arrows.down_right, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [0, 1])) {
-                game.cgx3.drawImage(game.arrows.left_right, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [3])) {
-                game.cgx3.drawImage(game.arrows.up_down_left, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [2])) {
-                game.cgx3.drawImage(game.arrows.up_down_right, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [1])) {
-                game.cgx3.drawImage(game.arrows.down_left_right, this.x, this.y, this.width, this.height);
-            } else if (arrayEqual(this.collision, [0])) {
-                game.cgx3.drawImage(game.arrows.up_down_left_right, this.x, this.y, this.width, this.height);
-            }
+            //Draw Collision Restriction of the tiles
+            game.cgx3.globalAlpha = 0.3;
+            if (this.collision === 0) game.cgx3.fillStyle = "blue";
+            else if (this.collision === 1) game.cgx3.fillStyle = "red";
+            else game.cgx3.fillStyle = "magenta";
+            game.cgx3.fillRect(this.x, this.y, this.width, this.height);
+            game.cgx3.globalAlpha = 1.0;
         }
     }
 }
@@ -1823,6 +1795,7 @@ var game = {
                         else if (!this.disableMouse) {
                             if (game.mousedown || game.touchdown) {
                                 if (game.activeCanvas == 0) {
+                                    /*
                                     // Move direction = Difference between clicked and current mousemove/touch position
                                     if (game.mousedown) {
                                         if (Math.abs(game.x - game.clickdownX) > Math.abs(game.y - game.clickdownY)) {
@@ -1849,7 +1822,7 @@ var game = {
                                             else if (game.y > game.touchstartY + 4)
                                                 this.target.speedY += this.target.speed;
                                         }
-                                    }
+                                    }*/
                                 }
                             }
                         }
@@ -2149,6 +2122,7 @@ function draw() {
         if (game.camera.target != undefined) showPosition(game.camera.target);
     }
     // Mouse / Touch
+    /*
     if (game.mousedown || game.touchdown) {
         if (game.activeCanvas == 0) {
             ctx = game.context;
@@ -2164,6 +2138,7 @@ function draw() {
             ctx.stroke();
         }
     }
+    */
 }
 
 /**
