@@ -28,13 +28,9 @@ Implement saving and loading of the gamestate into localStorage
 
 Implement proper audio select/play/pause system
 
-Implement proper GUI + Gamemenu (i.e. it opens by pressing "Esc" or Right click)
-
 Refine canvas scaling (i.e. when using fullscreen)
 
-(Implement Custom Keybinding)
-
-(Implement Battle System (Realtime/Roundbased) + Stats (Health, Mana, Strength, etc.))
+(Implement proper GUI + Gamemenu (i.e. it opens by pressing "Esc" or Right click))
 
 ### Editor
 
